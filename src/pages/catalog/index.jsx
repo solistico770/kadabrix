@@ -52,7 +52,19 @@ const ProductList = () => {
     setLoading(true);
     const offset = reset ? 0 : (page - 1) * limit;
 
-    let baseQuery = `SELECT * FROM _collection_part WHERE "flagActive" = '1'`;
+    let baseQuery = `
+    
+    WITH user_cust AS (
+      SELECT user_erpcust(auth.uid()) AS cust
+    )
+    SELECT *
+    FROM _collection_part
+    JOIN _collection_custPartPrice
+      ON _collection_custPartPrice.part = _collection_part.part
+    WHERE _collection_part."flagActive" = '1'
+      AND _collection_custPartPrice.cust = (SELECT cust FROM user_cust)
+
+    `;
 
     if (selectedFamily) {
       baseQuery = `${baseQuery} AND "familyDes" = '${selectedFamily}'`;
@@ -93,7 +105,6 @@ const ProductList = () => {
   const handleLoadMore = () => {
     fetchProducts();
   };
-
   return (
     <Container style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
       <div style={{ flex: '0 0 auto', padding: '16px' }}>
