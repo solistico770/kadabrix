@@ -27,7 +27,7 @@ const Layout = ({ children }) => {
   const handleLogout = async () => {
     await kdb.auth.signOut();
     setUser(null);
-    navigate('/');
+    navigate('/login');
   };
 
   return (
@@ -35,16 +35,17 @@ const Layout = ({ children }) => {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-
+          <Button color="inherit" onClick={() => navigate('/menu')}>
         KaDaBriX
+        </Button>
               </Typography>
           {user ? (
             <Button color="inherit" onClick={handleLogout}>
-              Logoff
+              יציאה
             </Button>
           ) : (
             <Button color="inherit" onClick={() => navigate('/login')}>
-              Login
+              כניסה
             </Button>
           )}
         </Toolbar>

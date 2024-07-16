@@ -24,7 +24,7 @@ const Login = () => {
     console.log('Decoded JWT:', decodedToken);
   }
   
-      navigate('/dashboard');
+      navigate('/menu');
     }
   };
 
@@ -87,12 +87,12 @@ const Login = () => {
         </Button>
         <Grid container justifyContent="space-between">
           <Grid item>
-            <Button href="#" variant="body2">
+            <Button href="/forgot" variant="body2">
               שכחת סיסמה?
             </Button>
           </Grid>
           <Grid item>
-            <Button href="#" variant="body2">
+            <Button href="/signup" variant="body2">
               {"אין לך חשבון? הרשם"}
             </Button>
           </Grid>
