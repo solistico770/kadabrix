@@ -63,6 +63,7 @@ function generateRoutes(pagesDir, outputFile) {
 
   const AppRoutes = () => (
     <Routes>
+      <Route path="/" element={<LoginIndex />} />
       ${routes.map(route => `<Route path="${route.path}" element={<${route.importName} />} />`).join('\n')}
     </Routes>
   );

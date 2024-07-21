@@ -11,24 +11,36 @@ const Users = () => {
   const [editing, setEditing] = useState(null);
   const [newErpCust, setNewErpCust] = useState('');
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const { data, error } = await kdb.rpc('execute_user_query', {
-          query_text: `SELECT * FROM get_user_info()`,
-        });
-        if (error) {
-          setError(error.message);
-        } else {
-          setUsers(data.map(item => item.result));
-        }
-      } catch (err) {
-        setError(err.message);
-      }
-    };
+  const fetchUsers = async () => {
+   
+    try {
+      const data = await kdb.run( 
+        {
+          "module":"kdb_users",
+          "name"  :"getUsers"
+        })
 
+        setUsers(data);
+
+
+      }
+  catch(err) {
+
+    setError(err);
+
+  }
+
+  }
+
+
+  useEffect(() => {
     fetchUsers();
   }, []);
+
+
+
+
+
 
   const handleEdit = (email) => {
     setEditing(email);
@@ -40,12 +52,17 @@ const Users = () => {
     try {
       const user = users.find(user => user.email === email);
       const userId = user.user_id; // Assuming you have user_id in the result
-      const query = user.erpcust
-        ? `UPDATE user_config SET "erpcust" = '${newErpCust}' WHERE "user_id" = '${userId}'`
-        : `INSERT INTO user_config (user_id, erpcust) VALUES ('${userId}', '${newErpCust}')`;
+      
+      await kdb.run( 
+        {
+          "module":"kdb_users",
+          "name"  :"setUser",
+          "data":{userId:userId,erpcust: newErpCust}
+        })
 
-      await kdb.rpc('execute_user_query', { query_text: query });
-      setUsers(users.map(user => (user.email === email ? { ...user, erpcust: newErpCust } : user)));
+        
+      fetchUsers();
+      
       setEditing(null);
     } catch (err) {
       setError(err.message);

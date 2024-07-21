@@ -1,4 +1,8 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2'
+import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
+
+
+
 
 const supabaseServiceClient = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
@@ -6,7 +10,7 @@ const supabaseServiceClient = createClient(
 )
 
 
-async function getController(module,name){
+async function getController(module,name,req){
     
 const { data, error } = await supabaseServiceClient
 .from('kadabrix_app')
@@ -21,6 +25,17 @@ const { data, error } = await supabaseServiceClient
  const serviceConf = JSON.parse(appRecord.config);
  var kdbService = {};
  
+ const databaseUrl = Deno.env.get('SUPABASE_DB_URL')
+ const pool = new postgres.Pool(databaseUrl, 3, true)
+ var connection = await pool.connect()
+ const kdb = getClient(req.headers.get('Authorization'));
+ async function check_role(role){
+  const res = await kdb.rpc("check_role",{p_desired_role:role})
+  if (res.data!=true) throw new Error(`not authorized`) 
+
+ }
+
+ 
 
  for (let i=0;i<serviceConf.di.length;i++){
 
@@ -29,17 +44,12 @@ const { data, error } = await supabaseServiceClient
   const diName = di.name;
   const {appFunction,config} = await getService(diModule,diName);
   
-  
+
   
 
   
   eval(`
-       
-       kdbService.asy2=22;
-       kdbService.asy3=${appFunction};
-
-
-
+      
        kdbService.${diName} =  ${appFunction} ;
           
     `);
@@ -81,7 +91,7 @@ async function getService(module,name){
 
   
   
-async function getClient(authHeader){
+ function getClient(authHeader){
 
 return   createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
@@ -95,21 +105,34 @@ return   createClient(
 
 
 async function  manageFunction(req){
+const corsHeaders =  { 
+  
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
+
+
+  }
+
+  
 
 
 try {  
 
-const reqData = await req.json()
 
-  const kdb = getClient(req.headers.get('Authorization'));
-  const {appFunction,config} = await getController(reqData.module,reqData.name);
+  var vili=11;
+
+  const reqData = await req.json()
+  const {appFunction,config} = await getController(reqData.module,reqData.name,req);
   const funcRet = await appFunction(reqData.data);
  
-  return new Response(JSON.stringify({"status":"ok",data:funcRet}), { headers: { 'Content-Type': 'application/json' } })
+  return new Response(JSON.stringify({"status":"ok",data:funcRet}), { headers: corsHeaders})
  
 } catch(err) {
 
-  return new Response(JSON.stringify({"status":"error", data:err.message}), { headers: { 'Content-Type': 'application/json' } })
+  return new Response(JSON.stringify({"status":"error", data:err.message}), 
+  
+  { headers: corsHeaders })
   
 
 }

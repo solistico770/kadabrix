@@ -11,6 +11,7 @@ import UsersIndex from './pages/users/index.jsx';
 
   const AppRoutes = () => (
     <Routes>
+      <Route path="/" element={<LoginIndex />} />
       <Route path="/catalog" element={<CatalogIndex />} />
 <Route path="/login" element={<LoginIndex />} />
 <Route path="/menu" element={<MenuIndex />} />
