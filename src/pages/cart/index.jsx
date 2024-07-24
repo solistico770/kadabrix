@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useContext } from 'react';
 import kdb from "../../kadabrix/kadabrix";
+import { CartContext } from '../../kadabrix/cartState';
 import {
   Container,
   Button,
@@ -19,32 +20,8 @@ import {
 } from '@mui/material';
 
 const Cart  = () => {
-const [cart, setcart] = useState({items:[]});
 
-
-const fetchCart = async () => { 
-  let data = await kdb.run({
-    "module": "kdb_cart",
-    "name": "getCart",
-    "data": { }
-  });
-  setcart(data);
-}
-
-
-
-const channel = kdb
-.channel('schema-db-changes')
-.on('postgres_changes', { event: '*', schema: 'public', table: 'kadabrix_carts' }, payload => {
-  console.log('Change received!', payload);
-  fetchCart();
-})
-.subscribe();
-
-
-useEffect(()=>{
-  fetchCart();
-},[])
+const { cart , setCart } = useContext(CartContext);
 
 
 

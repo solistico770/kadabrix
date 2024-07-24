@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import kdb from "../../kadabrix/kadabrix";
+import AddButton from './addButton';
+
 import {
   Container,
   Button,
@@ -80,23 +82,6 @@ const ProductList = () => {
     return '₪' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
  } 
  
-
- const addProduct = async (item) => {
-
-  let data = await kdb.run({
-    "module": "kdb_cart",
-    "name": "addItem",
-    "data": { 
-        part:item.part,
-        partName:item.partName,
-        partDes:item.partDes,
-        price:item.price
-     }
-  });
- }
-
-
-
   return (
     <Container style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
       <div style={{ flex: '0 0 auto', padding: '16px' }}>
@@ -141,7 +126,7 @@ const ProductList = () => {
                     <TableCell>{product.partName}</TableCell>
                     <TableCell>{product.partDes}</TableCell>
                     <TableCell>{currencyFormat(product.price)}</TableCell>
-                    <Button onClick={() => addProduct(product) }>add</Button>
+                    <TableCell><AddButton item={product} ></AddButton></TableCell>
                   </TableRow>
                 ))}
               </TableBody>

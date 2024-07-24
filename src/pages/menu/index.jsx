@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect , useContext } from 'react';
 import { Button, Grid, Box, Typography, Avatar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -110,6 +110,7 @@ const Menu = () => {
         bgcolor: 'background.paper',
       }}
     >
+
       <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
         <DashboardIcon />
       </Avatar>
