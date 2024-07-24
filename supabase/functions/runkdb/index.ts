@@ -25,15 +25,49 @@ const { data, error } = await supabaseServiceClient
  const serviceConf = JSON.parse(appRecord.config);
  var kdbService = {};
  
- const databaseUrl = Deno.env.get('SUPABASE_DB_URL')
- const pool = new postgres.Pool(databaseUrl, 3, true)
- var connection = await pool.connect()
  const kdb = getClient(req.headers.get('Authorization'));
  async function check_role(role){
+
   const res = await kdb.rpc("check_role",{p_desired_role:role})
   if (res.data!=true) throw new Error(`not authorized`) 
-
  }
+
+
+ async function runSql(query_text,noSelect = false){
+  
+
+  if (noSelect) {
+    
+    
+    const res = await kdb.rpc("execute_user_queryns",{query_text:query_text})
+    if (res.error) throw  new Error(JSON.stringify(res.error));
+    
+
+
+  } else {
+
+    const res = await kdb.rpc("execute_user_query",{query_text:query_text})
+    if (res.error) throw  new Error(JSON.stringify(res.error));
+
+    if ( res.data ) {
+  
+        const fres = res.data.map((line)=>line.result)
+        return fres
+  
+    } else {
+  
+      return res.data;
+  
+    }
+
+
+
+  }
+
+  
+ }
+
+
 
  
 

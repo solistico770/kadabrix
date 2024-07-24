@@ -12,35 +12,21 @@ const Users = () => {
   const [newErpCust, setNewErpCust] = useState('');
 
   const fetchUsers = async () => {
-   
     try {
-      const data = await kdb.run( 
-        {
-          "module":"kdb_users",
-          "name"  :"getUsers"
-        })
+      const data = await kdb.run({
+        "module": "kdb_users",
+        "name": "getUsers"
+      });
 
-        setUsers(data);
-
-
-      }
-  catch(err) {
-
-    setError(err);
-
+      setUsers(data);
+    } catch (err) {
+      setError(err);
+    }
   }
-
-  }
-
 
   useEffect(() => {
     fetchUsers();
   }, []);
-
-
-
-
-
 
   const handleEdit = (email) => {
     setEditing(email);
@@ -52,17 +38,14 @@ const Users = () => {
     try {
       const user = users.find(user => user.email === email);
       const userId = user.user_id; // Assuming you have user_id in the result
-      
-      await kdb.run( 
-        {
-          "module":"kdb_users",
-          "name"  :"setUser",
-          "data":{userId:userId,erpcust: newErpCust}
-        })
 
-        
+      await kdb.run({
+        "module": "kdb_users",
+        "name": "setUser",
+        "data": { userId: userId, erpcust: newErpCust }
+      });
+
       fetchUsers();
-      
       setEditing(null);
     } catch (err) {
       setError(err.message);
@@ -96,6 +79,7 @@ const Users = () => {
             <TableRow>
               <TableCell>אימייל</TableCell>
               <TableCell>ERP Cust</TableCell>
+              <TableCell>Roles</TableCell>
               <TableCell>פעולות</TableCell>
             </TableRow>
           </TableHead>
@@ -114,6 +98,7 @@ const Users = () => {
                     user.erpcust
                   )}
                 </TableCell>
+                <TableCell>{user.roles}</TableCell>
                 <TableCell>
                   {editing === user.email ? (
                     <IconButton onClick={() => handleSave(user.email)}>

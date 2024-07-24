@@ -50,6 +50,37 @@ const Menu = () => {
 
     if (roles.includes('kagent') || roles.includes('kb2b')) {
       menuItems.push(
+        <Grid item key="cart">
+          <Button
+            onClick={() => navigate('/cart')}
+            variant="contained"
+            startIcon={<ShoppingCartIcon />}
+            fullWidth
+          >
+            סל הקניות
+
+          </Button>
+        </Grid>
+      );
+    }
+
+    if (roles.includes('kagent') || roles.includes('kb2b')) {
+      menuItems.push(
+        <Grid item key="catalog">
+          <Button
+            onClick={() => navigate('/catalog')}
+            variant="contained"
+            startIcon={<ShoppingCartIcon />}
+            fullWidth
+          >
+            קטלוג מוצרים
+          </Button>
+        </Grid>
+      );
+    }
+
+    if (roles.includes('kagent') || roles.includes('kb2b')) {
+      menuItems.push(
         <Grid item key="catalog">
           <Button
             onClick={() => navigate('/catalog')}

@@ -20,91 +20,83 @@ import {
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
-  const [families, setFamilies] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFamily, setSelectedFamily] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
-  useEffect(() => {
-    const fetchFamilies = async () => {
-      const baseQuery = `SELECT DISTINCT "familyDes" FROM _collection_part WHERE "flagActive" = '1'`;
-      const { data, error } = await kdb.rpc('execute_user_query', { query_text: baseQuery });
 
-      if (error) {
-        console.error(error);
-      } else {
-        setFamilies(data.map(item => item.result.familyDes));
-      }
+
+  
+  // Debounce the search term
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 1000);
+
+    // Clean up the timeout if the effect is re-run before the timeout completes
+    return () => {
+      clearTimeout(handler);
     };
+  }, [searchTerm]);
 
-    fetchFamilies();
-  }, []);
-
+  // Fetch products when the debounced search term changes
   useEffect(() => {
-    fetchProducts(true);
-  }, [searchTerm, selectedFamily]);
+      fetchProducts();
+  }, [debouncedSearchTerm]);
 
-  const fetchProducts = async (reset = false) => {
+
+
+  const fetchProducts = async () => {
     setLoading(true);
-    const offset = reset ? 0 : (page - 1) * limit;
-
-    let baseQuery = `
     
-    WITH user_cust AS (
-      SELECT user_erpcust(auth.uid()) AS cust
-    )
-    SELECT *
-    FROM _collection_part
-    JOIN _collection_custPartPrice
-      ON _collection_custPartPrice.part = _collection_part.part
-    WHERE _collection_part."flagActive" = '1'
-      AND _collection_custPartPrice.cust = (SELECT cust FROM user_cust)
+    let data = await kdb.run({
+      "module": "catalog",
+      "name": "getProducts",
+      "data": { searchTerm: searchTerm,limit:limit,page:page}
+    });
 
-    `;
 
-    if (selectedFamily) {
-      baseQuery = `${baseQuery} AND "familyDes" = '${selectedFamily}'`;
-    }
 
-    if (searchTerm) {
-      const searchTerms = searchTerm.split(' ');
-      const searchConditions = searchTerms.map(term => `("partName" ILIKE '%${term}%' OR "partDes" ILIKE '%${term}%')`);
-      const combinedCondition = searchConditions.join(' AND ');
-      baseQuery = `${baseQuery} AND ${combinedCondition}`;
-    }
+    setProducts([...products, ...data] );
+    setHasMore(data.length === limit);
+    setPage(page + 1);
 
-    baseQuery = `${baseQuery} LIMIT ${limit} OFFSET ${offset}`;
+    //      setTotalResults(countData[0].count);
 
-    const { data, error } = await kdb.rpc('execute_user_query', { query_text: baseQuery });
-
-    if (error) {
-      console.error('Error executing query:', error);
-    } else {
-      setProducts(reset ? data : [...products, ...data]);
-      setHasMore(data.length === limit);
-      setPage(page + 1);
-    }
-
-    // Fetch total count
-    const countQuery = baseQuery.replace('SELECT *', 'SELECT COUNT(*) as count');
-    const { data: countData, error: countError } = await kdb.rpc('execute_user_query', { query_text: countQuery });
-
-    if (countError) {
-      console.error('Error executing count query:', countError);
-    } else {
-      setTotalResults(countData[0].result.count);
-    }
-
-    setLoading(false);
-  };
+  }
 
   const handleLoadMore = () => {
     fetchProducts();
   };
+
+  const currencyFormat = (num) => {
+    num=Number(num);
+
+    return '₪' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+ } 
+ 
+
+ const addProduct = async (item) => {
+
+  let data = await kdb.run({
+    "module": "kdb_cart",
+    "name": "addItem",
+    "data": { 
+        part:item.part,
+        partName:item.partName,
+        partDes:item.partDes,
+        price:item.price
+     }
+  });
+ }
+
+
+
   return (
     <Container style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
       <div style={{ flex: '0 0 auto', padding: '16px' }}>
@@ -116,24 +108,7 @@ const ProductList = () => {
           onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
           style={{ marginBottom: '16px' }}
         />
-        <TextField
-          select
-          label="בחר משפחה"
-          value={selectedFamily}
-          onChange={(e) => { setSelectedFamily(e.target.value); setPage(1); }}
-          variant="outlined"
-          fullWidth
-          style={{ marginBottom: '16px' }}
-        >
-          <MenuItem value="">
-            <em>כל המשפחות</em>
-          </MenuItem>
-          {families.map((family) => (
-            <MenuItem key={family} value={family}>
-              {family}
-            </MenuItem>
-          ))}
-        </TextField>
+       
         <Typography variant="h6">
           {totalResults} תוצאות נמצאו
         </Typography>
@@ -149,20 +124,24 @@ const ProductList = () => {
                   <TableCell>תמונה</TableCell>
                   <TableCell>שם חלק</TableCell>
                   <TableCell>תיאור</TableCell>
+                  <TableCell>מחיר</TableCell>
+                  <TableCell></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {products.map((product) => (
-                  <TableRow key={product.result.part}>
+                  <TableRow key={product.part}>
                     <TableCell>
                       <img
-                        src={`https://heuayknlgusdwimnjbgs.supabase.co/storage/v1/render/image/public/images/${product.result.part}.jpg?width=200&height=200`}
-                        alt={product.result.partName}
+                        src={`https://heuayknlgusdwimnjbgs.supabase.co/storage/v1/render/image/public/images/${product.part}.jpg?width=200&height=200`}
+                        alt={product.partName}
                         style={{ width: '100px', height: 'auto' }}
                       />
                     </TableCell>
-                    <TableCell>{product.result.partName}</TableCell>
-                    <TableCell>{product.result.partDes}</TableCell>
+                    <TableCell>{product.partName}</TableCell>
+                    <TableCell>{product.partDes}</TableCell>
+                    <TableCell>{currencyFormat(product.price)}</TableCell>
+                    <Button onClick={() => addProduct(product) }>add</Button>
                   </TableRow>
                 ))}
               </TableBody>
