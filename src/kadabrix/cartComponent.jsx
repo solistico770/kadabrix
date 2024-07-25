@@ -106,7 +106,7 @@ function SimpleDialog(props) {
                 {cart.items.map((item) => (
                     <TableRow key={item.index}>
                       <TableCell>
-                        <img
+                        <img 
                           src={`https://heuayknlgusdwimnjbgs.supabase.co/storage/v1/render/image/public/images/${item.part}.jpg?width=50&height=50`}
                           alt={item.partName}
                           style={{ width: '50px', height: 'auto' }}
