@@ -79,20 +79,6 @@ const Menu = () => {
       );
     }
 
-    if (roles.includes('kagent') || roles.includes('kb2b')) {
-      menuItems.push(
-        <Grid item key="catalog">
-          <Button
-            onClick={() => navigate('/catalog')}
-            variant="contained"
-            startIcon={<ShoppingCartIcon />}
-            fullWidth
-          >
-            קטלוג מוצרים
-          </Button>
-        </Grid>
-      );
-    }
 
     return menuItems;
   };

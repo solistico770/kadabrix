@@ -92,11 +92,28 @@ const { cart , setCart } = useContext(CartContext);
                       
                     <Button onClick={() => removeProduct(item.index) }>REMOVE</Button>
 
-                    
+
                       
                       </TableCell>
                   </TableRow>
-                ))}              </TableBody>
+
+                   
+
+
+
+
+              ))} 
+
+              <TableRow>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell>{currencyFormat(cart.total)}</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+
+
+                           </TableBody>
             </Table>
           </TableContainer>
           <Button onClick={() => clearCart() }>CLEAR</Button>

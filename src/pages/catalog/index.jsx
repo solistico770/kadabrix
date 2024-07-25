@@ -83,7 +83,8 @@ const ProductList = () => {
  } 
  
   return (
-    <Container style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
+    <Container style={{ display: 'flex', 
+    flexDirection: 'column', height: '100vh', width: '100%' }}>
       <div style={{ flex: '0 0 auto', padding: '16px' }}>
         <TextField
           label="חיפוש"
@@ -94,11 +95,9 @@ const ProductList = () => {
           style={{ marginBottom: '16px' }}
         />
        
-        <Typography variant="h6">
-          {totalResults} תוצאות נמצאו
-        </Typography>
+        
       </div>
-      <div style={{ flex: '1 1 auto', overflowY: 'auto' }}>
+      <div >
         {loading && page === 1 ? (
           <CircularProgress />
         ) : (

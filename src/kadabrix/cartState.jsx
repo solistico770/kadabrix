@@ -10,13 +10,24 @@ export const CartProvider = ({ children }) => {
 const [cart, setCart] = useState({items:[]});
 
   
+
+const processCart = async (cartData) => { 
+
+  cartData.total      = cartData.items.reduce((v,item)=>v+(item.price*item.quant),0);
+  cartData.totalQuant = cartData.items.reduce((v,item)=>v+item.quant,0);
+
+  setCart(cartData)
+
+}
+
+
 const fetchCart = async () => { 
   let data = await kdb.run({
     "module": "kdb_cart",
     "name": "getCart",
     "data": { }
   });
-  setCart(data);
+  processCart(data)
 }
 
 

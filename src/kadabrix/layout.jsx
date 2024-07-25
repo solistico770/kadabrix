@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import kdb from './kadabrix';
+import CartComponent from "./cartComponent"
 
 const Layout = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -34,11 +35,23 @@ const Layout = ({ children }) => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
           <Button color="inherit" onClick={() => navigate('/menu')}>
         KaDaBriX
-        </Button>
-              </Typography>
+          </Button>
+              
+          </Typography>
+
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          <Button color="inherit">
+          <CartComponent/>
+
+          </Button>
+              
+          </Typography>
+
+
+
           {user ? (
             <Button color="inherit" onClick={handleLogout}>
               יציאה
