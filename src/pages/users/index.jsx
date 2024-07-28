@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import kdb from '../../kadabrix/kadabrix';
+import KdbInput from './kdbInput';
+import RolesPopup from './rolesPopup';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -36,13 +38,11 @@ const Users = () => {
 
   const handleSave = async (email) => {
     try {
-      const user = users.find(user => user.email === email);
-      const userId = user.user_id; // Assuming you have user_id in the result
 
       await kdb.run({
         "module": "kdb_users",
         "name": "setUser",
-        "data": { userId: userId, erpcust: newErpCust }
+        "data": { email: email, erpcust: newErpCust }
       });
 
       fetchUsers();
@@ -78,9 +78,10 @@ const Users = () => {
           <TableHead>
             <TableRow>
               <TableCell>אימייל</TableCell>
-              <TableCell>ERP Cust</TableCell>
-              <TableCell>Roles</TableCell>
-              <TableCell>פעולות</TableCell>
+              <TableCell>משתמש ERP</TableCell>
+              <TableCell>תקציב</TableCell>
+              <TableCell>הרשאות</TableCell>
+              <TableCell>הרשאות</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -88,28 +89,40 @@ const Users = () => {
               <TableRow key={user.email}>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
-                  {editing === user.email ? (
-                    <TextField
-                      value={newErpCust}
-                      onChange={(e) => setNewErpCust(e.target.value)}
-                      fullWidth
-                    />
-                  ) : (
-                    user.erpcust
-                  )}
+                  
+                  <KdbInput 
+                  
+                   initialValue={user.erpcust} 
+                   table="kadabrix_user_config"
+                   idName="email" 
+                    idValue={user.email}  
+                    editField="erpcust" />
+
                 </TableCell>
-                <TableCell>{user.roles}</TableCell>
                 <TableCell>
-                  {editing === user.email ? (
-                    <IconButton onClick={() => handleSave(user.email)}>
-                      <SaveIcon />
-                    </IconButton>
-                  ) : (
-                    <IconButton onClick={() => handleEdit(user.email)}>
-                      <EditIcon />
-                    </IconButton>
-                  )}
+
+                <KdbInput 
+                  
+                   initialValue={user.budget} 
+                   table="kadabrix_user_config"
+                   idName="email" 
+                   idValue={user.email}  
+                   editField="budget" />
+
+
                 </TableCell>
+                <TableCell>
+                {user.roles}
+
+
+                </TableCell>
+
+                <TableCell>
+
+                    <RolesPopup email={user.email}  />
+
+                </TableCell>
+
               </TableRow>
             ))}
           </TableBody>

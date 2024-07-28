@@ -13,18 +13,23 @@ const Menu = () => {
 
   useEffect(() => {
     const fetchRoles = async () => {
+
       try {
-        const { data, error } = await kdb.rpc('execute_user_query', {
-          query_text: `SELECT role FROM user_roles WHERE user_id = auth.uid()`,
-        });
-        if (error) {
-          setError(error.message);
-        } else {
-          setRoles(data.map(item => item.result.role));
-        }
-      } catch (err) {
-        setError(err.message);
-      }
+    let data = await kdb.run({
+      "module": "kdb_users",
+      "name": "getRoles",
+      "data": {}
+    });
+    
+    setRoles(data.map(item => item.role));
+
+  } catch(err){
+
+    setError(err);
+
+  }
+
+   
     };
 
     fetchRoles();
