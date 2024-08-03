@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = "https://heuayknlgusdwimnjbgs.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhldWF5a25sZ3VzZHdpbW5qYmdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTkzMjQ2ODAsImV4cCI6MjAzNDkwMDY4MH0.4Reqq1Cwh4F2BWunNplzjD5cZOHCzGp0111MoJ3mBvE";
+const supabaseUrl = "https://djtxhconktrcxgcnlscl.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqdHhoY29ua3RyY3hnY25sc2NsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjIzMzYxOTMsImV4cCI6MjAzNzkxMjE5M30.27XWFegmMBKNDUclvWjBDwPTQ3Xnhgeduzxm4v8plfI";
 
 const kadabrix = createClient(supabaseUrl, supabaseKey);
 
