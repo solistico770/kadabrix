@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import kdb from "../../kadabrix/kadabrix";
 import AddButton from './addButton';
+import DetailsButton from './detailsButton';
 
 import {
   Container,
@@ -122,7 +123,7 @@ const ProductList = () => {
                   <TableRow key={product.part}>
                     <TableCell>
                       <img
-                        src={`https://heuayknlgusdwimnjbgs.supabase.co/storage/v1/render/image/public/images/${product.part}.jpg?width=200&height=200`}
+                        src={`https://djtxhconktrcxgcnlscl.supabase.co/storage/v1/render/image/public/images/${product.part}.jpg?width=200&height=200`}
                         alt={product.partName}
                         style={{ width: '100px', height: 'auto' }}
                         onError={imageOnError}
@@ -132,6 +133,7 @@ const ProductList = () => {
                     <TableCell>{product.partDes}</TableCell>
                     <TableCell>{currencyFormat(product.price)}</TableCell>
                     <TableCell><AddButton item={product} ></AddButton></TableCell>
+                    <TableCell><DetailsButton partName={product.partName} partDes={product.partDes}  part={product.part} ></DetailsButton></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
