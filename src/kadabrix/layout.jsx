@@ -37,7 +37,7 @@ const Layout = ({ children }) => {
         <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           <Button color="inherit" onClick={() => navigate('/menu')}>
-        KaDaBriX!
+        KaDaBriX1
           </Button>
               
           </Typography>
