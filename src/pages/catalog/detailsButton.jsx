@@ -24,6 +24,15 @@ const Users = (props) => {
     setIsLoading(true)
 
     try {
+      
+      let res = await kdb.run({
+        "module": "catalog",
+        "name": "getInventory",
+        "data": {part:props.part,cache:true}
+      });
+      setPartData(res);
+    } catch(e){}
+    try {
       let res = await kdb.run({
         "module": "catalog",
         "name": "getInventory",
