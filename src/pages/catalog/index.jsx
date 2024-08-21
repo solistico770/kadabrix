@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import kdb from "../../kadabrix/kadabrix";
 import AddButton from './addButton';
 import DetailsButton from './detailsButton';
-
+import "./catalog.css"
 import {
   Container,
   Button,
@@ -30,7 +30,7 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const limit = 50 ;
+  const limit = 20 ;
 
 
 
@@ -76,7 +76,6 @@ const ProductList = () => {
   const handleLoadMore = () => {
     fetchProducts();
   };
-
   const currencyFormat = (num) => {
     num=Number(num);
 
@@ -89,8 +88,8 @@ const ProductList = () => {
 };
 
   return (
-    <Container style={{ display: 'flex', 
-    flexDirection: 'column', height: '100vh', width: '100%' }}>
+    <Container >
+
       <div style={{ flex: '0 0 auto', padding: '16px' }}>
         <TextField
           label="חיפוש"
@@ -107,9 +106,12 @@ const ProductList = () => {
         {loading && page === 1 ? (
           <CircularProgress />
         ) : (
-          <TableContainer component={Paper}>
+          <TableContainer 
+            className="results"
+          component={Paper}>
             <Table>
-              <TableHead>
+             {true ? <ul/> :
+             (<TableHead>
                 <TableRow>
                   <TableCell>תמונה</TableCell>
                   <TableCell>שם חלק</TableCell>
@@ -117,7 +119,7 @@ const ProductList = () => {
                   <TableCell>מחיר</TableCell>
                   <TableCell></TableCell>
                 </TableRow>
-              </TableHead>
+              </TableHead>)}
               <TableBody>
                 {products.map((product) => (
                   <TableRow key={product.part}>

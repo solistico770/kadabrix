@@ -9,6 +9,53 @@ const supabaseServiceClient = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
 )
 
+let appConfig = null;
+
+async function getConfig() {
+  if (appConfig == null ) {
+    return new Promise(async (resolve, reject) => {
+      let config = {};
+
+      try {
+        // Fetch data from kadabrix_config
+        const { data: configData, error: configError } = await supabaseServiceClient
+          .from('kadabrix_config')
+          .select('*');
+
+        if (configError) {
+          throw new Error('Error fetching kadabrix_config: ' + configError.message);
+        }
+
+        // Populate config with default values
+        configData.forEach(item => {
+          config[item.var] = item.val;
+        });
+
+        // Fetch data from kadabix_config_custom collections
+        const { data: customConfigData, error: customConfigError } = await supabaseServiceClient
+          .from('kadabrix_config_custom')
+          .select('*');
+
+        if (customConfigError) {
+
+          throw new Error('Error fetching kadabix_config_custom: ' + customConfigError.message);
+        }
+
+        // Override default values with custom values
+        customConfigData.forEach(item => {
+          config[item.var] = item.val;
+        });
+
+        appConfig = { ...config  };
+        resolve(appConfig);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  } else {
+    return Promise.resolve(appConfig);
+  }
+}
 
 async function getController(module,name,req) {
     
@@ -212,7 +259,7 @@ const corsHeaders =  {
 try {  
 
 
-  var vili=11;
+   
 
   const reqData = await req.json()
   const {appFunction,config} = await getController(reqData.module,reqData.name,req);

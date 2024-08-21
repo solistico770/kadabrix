@@ -85,6 +85,23 @@ const Menu = () => {
     }
 
 
+    if (roles.includes('ksalesAdmin')) {
+      menuItems.push(
+        <Grid item key="salesReport">
+          <Button
+            onClick={() => navigate('/salesReport')}
+            variant="contained"
+            startIcon={<ShoppingCartIcon />}
+            fullWidth
+          >
+            דוח מכירות
+          </Button>
+        </Grid>
+      );
+    }
+
+
+
     return menuItems;
   };
 

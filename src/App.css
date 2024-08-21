@@ -1,7 +1,14 @@
 body {
   background-color: #282c34;
-  color: white;
+  color: rgb(0, 0, 0);
   padding: 40px;
   font-family: Arial;
   text-align: center;
+}
+
+.root {
+  display: column;
+  flex-direction: row;
+  flex-wrap:wrap;
+  background-color: #FFFFFF;
 }

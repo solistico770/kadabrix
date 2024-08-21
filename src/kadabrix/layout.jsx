@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import kdb from './kadabrix';
 import CartComponent from "./cartComponent"
 
-const Layout = ({ children }) => {
+const Layout = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
@@ -32,17 +32,17 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box>
       <AppBar position="static">
         <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" >
           <Button color="inherit" onClick={() => navigate('/menu')}>
         KaDaBriX
           </Button>
               
           </Typography>
 
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" >
           <Button color="inherit">
           <CartComponent/>
 
@@ -63,9 +63,6 @@ const Layout = ({ children }) => {
           )}
         </Toolbar>
       </AppBar>
-      <Box sx={{ p: 3 }}>
-        {children}
-      </Box>
     </Box>
   );
 };
