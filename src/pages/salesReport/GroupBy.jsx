@@ -1,33 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import kdb from '../../kadabrix/kadabrix';
-import { Checkbox, FormControlLabel, CircularProgress } from '@mui/material';
+import { Checkbox, FormControlLabel } from '@mui/material';
 
 const Data = (props) => {
   
-  const [checked, setChecked] = useState(false);
 
   const handleCheckboxChange = (event) => {
-    setChecked(!checked);
-    let state = {...props.state};
-    state[props.var]=!checked;
-    props.setter(state);
+    props.setter(!props.state);
   };
 
-  useEffect(() => {
-    let state = {...props.state};
-    state[props.var]=checked;
-    props.setter(state);
-
-  }, []);
-
-
+  
   return (
     
       
       <FormControlLabel
         control={
           <Checkbox
-            checked={checked}
+            checked={props.state}
             onChange={handleCheckboxChange}
             color="primary"
           />

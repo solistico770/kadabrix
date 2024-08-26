@@ -59,7 +59,7 @@ const Data = (props) => {
     <Autocomplete
       options={data}
       onChange={(event, newValue) => {
-        props.setter({...props.state,cust:newValue}); // Update selected item state
+        props.setter(newValue); // Update selected item state
       }}
       getOptionLabel={(option) => `${option.custName} ${option.custDes || ''}`}
       filterOptions={(x) => x} // Disable built-in filtering to rely on server-side filtering
