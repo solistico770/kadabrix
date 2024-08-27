@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import kdb from "../../kadabrix/kadabrix";
 import AddButton from './addButton';
-import supabaseUrl from "../../kadabrix/kdbConfig"
+import {supabaseUrl} from "../../kadabrix/kdbConfig";
 import {
   Container,
   Button,
