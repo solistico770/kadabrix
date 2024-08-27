@@ -78,7 +78,7 @@ const Data = (props) => {
           }}
         />
       )}
-      style={{ width: 300 }}
+      
     />
   );
 };

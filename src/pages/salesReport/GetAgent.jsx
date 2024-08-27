@@ -54,7 +54,7 @@ const Data = (props) => {
     <Autocomplete
       options={data}
       onChange={(event, newValue) => {
-        props.setter({...props.state,part:newValue}); // Update selected item state
+        props.setter(newValue); // Update selected item state
       }}
       getOptionLabel={(option) => `${option.agent} ${option.agentDes || ''}`}
       filterOptions={(x) => x} // Disable built-in filtering to rely on server-side filtering
@@ -78,7 +78,7 @@ const Data = (props) => {
           }}
         />
       )}
-      style={{ width: 300 }}
+      
     />
   );
 };
