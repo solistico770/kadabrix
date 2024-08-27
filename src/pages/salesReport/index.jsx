@@ -43,8 +43,10 @@ const Users = () => {
 
 
   const [formData, setFormData] = useState([]);
-    const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [dateGroup, setDateGroup] = useState("month");
+
   
   
   const fetchData = async () => {
@@ -66,6 +68,7 @@ const Users = () => {
               groupPart:groupPart,
               fromDate:fromDate.unix(),
               toDate:toDate.unix(),
+              dateGroup:dateGroup
          },
       });
       setLoading(false);
