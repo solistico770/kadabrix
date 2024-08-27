@@ -12,15 +12,32 @@ import kdb from '../../kadabrix/kadabrix';
 import GetPart from "./GetPart";
 import GetCust from "./GetCust";
 import GetCustType from "./GetCustType";
+import GetDateGroup from "./GetDateGroup";
 import GetFamily from "./GetFamily";
 import GetAgent from "./GetAgent";
 import GetDate from "./GetDate";
 import GroupBy from "./GroupBy";
+
 import ButtonGroup from '@mui/material/ButtonGroup';
 import CircularProgress from '@mui/material/CircularProgress';
 import moment from 'moment';
 import 'moment-timezone';
 import { Container, Grid, Paper, Button } from '@mui/material';
+import LinearProgress from '@mui/material/LinearProgress';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+
+
+const ProgressBar = ({ percent }) => {
+  return (
+    <Box display="flex" alignItems="center" width="100%">
+      <Box width="100%" mr={1}>
+        <LinearProgress variant="determinate" value={percent} />
+      </Box>
+    </Box>
+  );
+};
+
 
 
 const Users = () => {
@@ -82,6 +99,19 @@ const Users = () => {
   };
 
   const columns = formData.length > 0 ? Object.keys(formData[0]) : [];
+  
+  let largetsTotal = formData.reduce((max, entry) => {
+    return entry.TOTAL > max ? entry.TOTAL : max;
+  },0);
+
+
+let allStat={
+
+  groupAgent,
+  groupCustType,
+  groupCust,
+  dateGroup,
+}
 
   return (
 <Container >
@@ -142,7 +172,8 @@ const Users = () => {
              />
           </Paper>
         </Grid>
-    
+
+        <GetDateGroup setter={setDateGroup}/>
 
 
         <Grid item xs={12}>
@@ -181,6 +212,14 @@ const Users = () => {
                   {columns.map((column) => (
                     <TableCell key={column}>{row[column]}</TableCell>
                   ))}
+                  
+                  <TableCell>
+                    
+                  <ProgressBar percent={(row['TOTAL']/largetsTotal).toFixed(2)*100} />
+
+                  
+                    </TableCell>
+
                 </TableRow>
               ))}
             </TableBody>
