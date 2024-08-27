@@ -123,7 +123,7 @@ let allStat={
 
   
 
-{tabValue!=0?'':(<div>
+<div   style={{ display: 0 === tabValue ? 'block' : 'none' }}   >
 
   <Container component="main" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={3}>
@@ -192,8 +192,8 @@ let allStat={
 
   
 
-</div>)}
-{tabValue!=1?'':(<div>
+</div>
+<div   style={{ display: 1 === tabValue ? 'block' : 'none' }}   >
 
 
   <Container component="section">
@@ -228,7 +228,7 @@ let allStat={
       </Container>
 
 
-</div>)}
+</div>
 
 
 
