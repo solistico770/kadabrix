@@ -67,7 +67,7 @@ const Data = (props) => {
           <Grid item xs={12} sm={6}>
             <DatePicker
               format="DD/MM/YYYY"
-              label="From Date"
+              label="מתאריך"
               value={props.fromDate}
               onChange={handleFromDateChange}
               renderInput={(params) => <TextField {...params} fullWidth />}
@@ -77,7 +77,7 @@ const Data = (props) => {
             <DatePicker
               format="DD/MM/YYYY"
               adapterLocale="he"
-              label="To Date"
+              label="עד תאריך"
               value={props.toDate}
               onChange={handleToDateChange}
               renderInput={(params) => <TextField {...params} fullWidth />}
