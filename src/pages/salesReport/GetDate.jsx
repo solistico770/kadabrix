@@ -17,8 +17,8 @@ const Data = (props) => {
   }, []);
 
   const setYear = () => {
-    const startOfYear = moment().startOf('year');
-    const endOfYear = moment().endOf('year');
+    const startOfYear = moment().utc.startOf('year');
+    const endOfYear = moment().utc.endOf('year');
     props.setFromDate(startOfYear)
     props.setToDate(endOfYear)
     
@@ -27,26 +27,26 @@ const Data = (props) => {
 
   const setAllYear = () => {
     
-    props.setFromDate( moment().subtract(1, 'years'));
-    props.setToDate(moment().endOf('day'));
+    props.setFromDate( moment().utc.subtract(1, 'years'));
+    props.setToDate(moment().utc.endOf('day'));
   };
 
   const setMonth = () => {
     
-    props.setFromDate(moment().startOf('month'));
-    props.setToDate(moment().endOf('month'));
+    props.setFromDate(moment().utc.startOf('month'));
+    props.setToDate(moment().utc.endOf('month'));
   };
 
   const setDay = () => {
 
-    props.setFromDate(moment().startOf('day'));
-    props.setToDate(moment().endOf('day'));
+    props.setFromDate(moment().utc.startOf('day'));
+    props.setToDate(moment().utc.endOf('day'));
   };
 
   const setWeek = () => {
     
-    props.setFromDate(moment().startOf('week'));
-    props.setToDate(moment().endOf('week'));
+    props.setFromDate(moment().utc.startOf('week'));
+    props.setToDate(moment().utc.endOf('week'));
   };
 
   const handleFromDateChange = (date) => {
