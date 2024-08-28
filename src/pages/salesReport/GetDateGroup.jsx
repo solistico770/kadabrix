@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 
 const Data = (props) => {
@@ -12,8 +13,8 @@ const Data = (props) => {
   };
 
   return (
-   
-
+    
+<Box>
         <Grid container spacing={2} sx={{ marginTop: 2 }}>
           <Grid item xs={12}>
             <ButtonGroup variant="outlined" fullWidth aria-label="Basic button group">
@@ -25,6 +26,7 @@ const Data = (props) => {
             </ButtonGroup>
           </Grid>
         </Grid>
+</Box>        
  
   );
 };
