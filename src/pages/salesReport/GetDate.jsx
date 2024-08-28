@@ -17,8 +17,8 @@ const Data = (props) => {
   }, []);
 
   const setYear = () => {
-    const startOfYear = moment().utc.startOf('year');
-    const endOfYear = moment().utc.endOf('year');
+    const startOfYear = moment().utc().startOf('year');
+    const endOfYear = moment().utc().endOf('year');
     props.setFromDate(startOfYear)
     props.setToDate(endOfYear)
     
@@ -27,26 +27,26 @@ const Data = (props) => {
 
   const setAllYear = () => {
     
-    props.setFromDate( moment().utc.subtract(1, 'years'));
-    props.setToDate(moment().utc.endOf('day'));
+    props.setFromDate( moment().utc().subtract(1, 'years'));
+    props.setToDate(moment().utc().endOf('day'));
   };
 
   const setMonth = () => {
     
-    props.setFromDate(moment().utc.startOf('month'));
-    props.setToDate(moment().utc.endOf('month'));
+    props.setFromDate(moment().utc().startOf('month'));
+    props.setToDate(moment().utc().endOf('month'));
   };
 
   const setDay = () => {
 
-    props.setFromDate(moment().utc.startOf('day'));
-    props.setToDate(moment().utc.endOf('day'));
+    props.setFromDate(moment().utc().startOf('day'));
+    props.setToDate(moment().utc().endOf('day'));
   };
 
   const setWeek = () => {
     
-    props.setFromDate(moment().utc.startOf('week'));
-    props.setToDate(moment().utc.endOf('week'));
+    props.setFromDate(moment().utc().startOf('week'));
+    props.setToDate(moment().utc().endOf('week'));
   };
 
   const handleFromDateChange = (date) => {
@@ -88,11 +88,11 @@ const Data = (props) => {
         <Grid container spacing={2} sx={{ marginTop: 2 }}>
           <Grid item xs={12}>
             <ButtonGroup variant="outlined" fullWidth aria-label="Basic button group">
-              <Button onClick={setAllYear}>Past Year</Button>
-              <Button onClick={setYear}>This Year</Button>
-              <Button onClick={setMonth}>This Month</Button>
-              <Button onClick={setWeek}>This Week</Button>
-              <Button onClick={setDay}>Today</Button>
+              <Button onClick={setAllYear}>שנה אחורה</Button>
+              <Button onClick={setYear}>כל השנה</Button>
+              <Button onClick={setMonth}>החודש</Button>
+              <Button onClick={setWeek}>השבוע</Button>
+              <Button onClick={setDay}>היום</Button>
             </ButtonGroup>
           </Grid>
         </Grid>
