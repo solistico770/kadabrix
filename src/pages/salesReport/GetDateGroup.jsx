@@ -14,16 +14,42 @@ const Data = (props) => {
 
   return (
     
-<Box>
+<Box sx={{ padding: 2 }}>
         <Grid container spacing={2} sx={{ marginTop: 2 }}>
           <Grid item xs={12}>
-            <ButtonGroup variant="outlined" fullWidth aria-label="Basic button group">
-              <Button onClick={()=>{handleChange("day")}} >יום</Button>
-              <Button onClick={()=>{handleChange("week")}} >שבוע</Button>
-              <Button onClick={()=>{handleChange("month")}} >חודש</Button>
-              <Button onClick={()=>{handleChange("year")}} >שנה</Button>
-              <Button onClick={()=>{handleChange("none")}} >ללא</Button>
-            </ButtonGroup>
+          קבץ לפי:
+          <ButtonGroup variant="outlined" fullWidth aria-label="Basic button group">
+            <Button
+              onClick={() => handleChange('day')}
+              sx={{ bgcolor: props.state === 'day' ? 'blue' : 'default' , color: props.state === 'day' ? 'white' : 'default'}}
+            >
+              יום
+            </Button>
+            <Button
+              onClick={() => handleChange('week')}
+              sx={{ bgcolor: props.state === 'week' ? 'blue' : 'default' ,color: props.state === 'week' ? 'white' : 'default'}}
+            >
+              שבוע
+            </Button>
+            <Button
+              onClick={() => handleChange('month')}
+              sx={{ bgcolor: props.state === 'month' ? 'blue' : 'default' ,color: props.state === 'month' ? 'white' : 'default'}}
+            >
+              חודש
+            </Button>
+            <Button
+              onClick={() => handleChange('year')}
+              sx={{ bgcolor: props.state === 'year' ? 'blue' : 'default' ,color: props.state === 'year' ? 'white' : 'default'}}
+            >
+              שנה
+            </Button>
+            <Button
+              onClick={() => handleChange('none')}
+              sx={{ bgcolor: props.state === 'none' ? 'blue' : 'default' ,color: props.state === 'none' ? 'white' : 'default'}}
+            >
+              ללא
+            </Button>
+          </ButtonGroup>
           </Grid>
         </Grid>
 </Box>        

@@ -170,16 +170,20 @@ let allStat={
               fromDate={fromDate} setFromDate={setFromDate}  
               toDate={toDate} setToDate={setToDate}  
              />
+             <GetDateGroup state={dateGroup} setter={setDateGroup}/>
           </Paper>
+          
         </Grid>
 
-        <GetDateGroup setter={setDateGroup}/>
+        
 
 
         <Grid item xs={12}>
           <Paper sx={{ padding: 2, textAlign: 'center' }}>
             <ButtonGroup variant="outlined" aria-label="Basic button group">
-              <Button onClick={fetchData}>הצג תוצאות</Button>
+              <Button onClick={fetchData}
+                sx={{ bgcolor: 'green',color:"white"}}
+              >הצג תוצאות</Button>
               
             </ButtonGroup>
           </Paper>
