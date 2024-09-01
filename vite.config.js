@@ -22,6 +22,9 @@ const manifestForPlugIn = {
 }
 
 export default defineConfig({
+  build: {
+    sourcemap: false,
+  },
   plugins: [
     react(),
     VitePWA(manifestForPlugIn),

@@ -91,8 +91,9 @@ async function generateRoutes(pagesDir, outputFile) {
   
   
     
-  let droutes = await generateRoutesContentDynamic()
-  const routes = [...droutes , ...generateRoutesContent(pagesDir)]
+  //let droutes = await generateRoutesContentDynamic()
+  //const routes = [...droutes , ...generateRoutesContent(pagesDir)]
+  const routes = [...generateRoutesContent(pagesDir)]
 
 
 

@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from 'react';
 import kdb from "../../kadabrix/kadabrix";
 import AddButton from './addButton';

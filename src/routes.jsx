@@ -2,8 +2,7 @@
   import React from 'react';
   import { Routes, Route } from 'react-router-dom';
 
-  import Cpage770Index from './app/page1/Main.jsx';
-import CartIndex from './pages/cart/index.jsx';
+  import CartIndex from './pages/cart/index.jsx';
 import CatalogIndex from './pages/catalog/index.jsx';
 import Catalog_budgetIndex from './pages/catalog_budget/index.jsx';
 import LoginIndex from './pages/login/index.jsx';
@@ -16,8 +15,7 @@ import UsersIndex from './pages/users/index.jsx';
   const AppRoutes = () => (
     <Routes>
       <Route path="/" element={<LoginIndex />} />
-      <Route path="page770" element={<Cpage770Index />} />
-<Route path="/cart" element={<CartIndex />} />
+      <Route path="/cart" element={<CartIndex />} />
 <Route path="/catalog" element={<CatalogIndex />} />
 <Route path="/catalog_budget" element={<Catalog_budgetIndex />} />
 <Route path="/login" element={<LoginIndex />} />
