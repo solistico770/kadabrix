@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { createClient } from '@supabase/supabase-js'
+import { defineConfig, loadEnv } from 'vite';
 
-export function createRoutesPlugin({ pagesDir, output }) {
+export  function createRoutesPlugin({ pagesDir, output }) {
   return {
     name: 'vite-plugin-routes',
     buildStart() {
@@ -9,18 +11,18 @@ export function createRoutesPlugin({ pagesDir, output }) {
     },
     handleHotUpdate({ file }) {
       if (file.startsWith(pagesDir)) {
-        generateRoutes(pagesDir, output);
+      //  generateRoutes(pagesDir, output);
       }
     },
     configureServer(server) {
       server.watcher.on('add', file => {
         if (file.startsWith(pagesDir)) {
-          generateRoutes(pagesDir, output);
+      //    generateRoutes(pagesDir, output);
         }
       });
       server.watcher.on('unlink', file => {
         if (file.startsWith(pagesDir)) {
-          generateRoutes(pagesDir, output);
+         // generateRoutes(pagesDir, output);
         }
       });
     },
@@ -30,7 +32,7 @@ export function createRoutesPlugin({ pagesDir, output }) {
   };
 }
 
-function generateRoutes(pagesDir, outputFile) {
+async function generateRoutes(pagesDir, outputFile) {
   const generateRoutesContent = (dir) => {
     const folders = fs.readdirSync(dir);
 
@@ -53,7 +55,44 @@ function generateRoutes(pagesDir, outputFile) {
     }, []);
   };
 
-  const routes = generateRoutesContent(pagesDir);
+
+  
+  async function generateRoutesContentDynamic() {
+    let path='./app/';
+    let viteEnv  = {...process.env, ...loadEnv( "" , process.cwd())};
+    const supabaseServiceClient = createClient(
+      viteEnv.VITE_supabaseUrl,
+      viteEnv.VITE_supabaseServiceKey
+    )
+    
+    const { data: kdbAppData, error } = await supabaseServiceClient
+    .from('kadabrix_app')
+    .select('*')
+    .eq('type', "ROUTE");
+    let routes=[]
+    for (let i=0;i<kdbAppData.length;i++){
+      let record = kdbAppData[i];
+      
+      routes.push({
+        path: `${record.data}`,
+        component: `./app/${record.module}/Main.jsx`,
+        importName: "C"+record.data + 'Index',
+      });
+  
+  
+    }
+    
+    return routes;
+  
+    
+    }
+  
+  
+    
+  let droutes = await generateRoutesContentDynamic()
+  const routes = [...droutes , ...generateRoutesContent(pagesDir)]
+
+
 
   const outputContent = `
   import React from 'react';
