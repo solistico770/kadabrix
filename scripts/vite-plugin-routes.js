@@ -7,6 +7,7 @@ export  function createRoutesPlugin({ pagesDir, output }) {
   return {
     name: 'vite-plugin-routes',
     buildStart() {
+      
       this.addWatchFile(pagesDir);
     },
     handleHotUpdate({ file }) {
@@ -27,6 +28,7 @@ export  function createRoutesPlugin({ pagesDir, output }) {
       });
     },
     buildEnd() {
+      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@1R@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
       generateRoutes(pagesDir, output);
     }
   };

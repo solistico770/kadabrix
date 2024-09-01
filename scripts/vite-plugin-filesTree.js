@@ -22,6 +22,7 @@ export function createfilesTreePlugin() {
       });
     },
     buildEnd() {
+      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@1C@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
       generateFiles();
     }
   };
@@ -39,10 +40,16 @@ const supabaseServiceClient = createClient(
   viteEnv.VITE_supabaseServiceKey
 )
 
+console.log("#####################");
+console.log(viteEnv);
+
+
 const { data: kdbAppData, error } = await supabaseServiceClient
 .from('kadabrix_app')
 .select('*')
 .eq('type', "REACT");
+
+console.log(kdbAppData);
 
 for (let i=0;i<kdbAppData.length;i++){
   let record = kdbAppData[i];
