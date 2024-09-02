@@ -35,7 +35,8 @@ async function checksup(){
   );
 
   console.log("#1####################");
-  const { data: kdbAppData, error } =  supabaseServiceClient
+  
+  supabaseServiceClient
     .from('kadabrix_app')
     .select('*')
     .eq('type', "REACT").then(function(obj){
