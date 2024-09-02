@@ -71,6 +71,7 @@ async function generateRoutes(pagesDir, outputFile) {
     .from('kadabrix_app')
     .select('*')
     .eq('type', "ROUTE");
+    console.log(kdbAppData, error);
     let routes=[]
     for (let i=0;i<kdbAppData.length;i++){
       let record = kdbAppData[i];

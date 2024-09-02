@@ -49,7 +49,7 @@ const { data: kdbAppData, error } = await supabaseServiceClient
 .select('*')
 .eq('type', "REACT");
 
-console.log(kdbAppData);
+console.log(kdbAppData,error);
 
 for (let i=0;i<kdbAppData.length;i++){
   let record = kdbAppData[i];
