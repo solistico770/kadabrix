@@ -27,6 +27,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    
     VitePWA(manifestForPlugIn),
     createfilesTreePlugin(),
     createRoutesPlugin({
