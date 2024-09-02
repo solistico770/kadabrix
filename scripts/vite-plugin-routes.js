@@ -62,22 +62,24 @@ async function generateRoutes(pagesDir, outputFile) {
   async function generateRoutesContentDynamic() {
     let path='./app/';
     let viteEnv  = {...process.env, ...loadEnv( "" , process.cwd())};
-    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+    console.log("1  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
     
     console.log(viteEnv);
-    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+    console.log("2$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
     const supabaseServiceClient = createClient(
       viteEnv.VITE_supabaseUrl,
       viteEnv.VITE_supabaseServiceKey
     )
     
+    console.log("4$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
     const { data: kdbAppData, error } = await supabaseServiceClient
     .from('kadabrix_app')
     .select('*')
     .eq('type', "ROUTE");
     console.log(kdbAppData, error);
-    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    
+    console.log("3$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
     let routes=[]
     for (let i=0;i<kdbAppData.length;i++){
       let record = kdbAppData[i];
