@@ -25,19 +25,33 @@ function fetchGoogleHtml() {
   });
 }
 
+
+async function checksup(){
+
+  
+  const supabaseServiceClient = createClient(
+    "https://heuayknlgusdwimnjbgs.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhldWF5a25sZ3VzZHdpbW5qYmdzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxOTMyNDY4MCwiZXhwIjoyMDM0OTAwNjgwfQ.vFLwnSHt2G8T57V0_vI1RDv3iBjlQNrxfkH5PZ9M6HA"
+  );
+
+  console.log("#1####################");
+  const { data: kdbAppData, error } = await supabaseServiceClient
+    .from('kadabrix_app')
+    .select('*')
+    .eq('type', "REACT");
+
+    console.log("#2####################");
+    console.log("#2####################",kdbAppData, error);
+
+
+}
+
 export function createfilesTreePlugin() {
   return {
     name: 'vite-plugin-filesTree',
     buildStart() {
-      // Fetch Google HTML and log it to the console
-      fetchGoogleHtml()
-        .then(html => {
-          console.log('HTML from Google:', html);
-          return generateFiles(); // Proceed to generate files after fetching
-        })
-        .catch(err => {
-          console.error('Error fetching Google HTML:', err);
-        });
+      checksup();
+      generateFiles();
     },
     handleHotUpdate({ file }) {
       //generateFiles();
@@ -68,9 +82,8 @@ async function generateFiles() {
     viteEnv.VITE_supabaseServiceKey
   );
 
-  console.log("#####################");
-  console.log(viteEnv);
-
+  
+  
   const { data: kdbAppData, error } = await supabaseServiceClient
     .from('kadabrix_app')
     .select('*')
