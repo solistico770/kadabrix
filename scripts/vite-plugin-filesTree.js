@@ -60,7 +60,7 @@ export function createfilesTreePlugin() {
   return {
     name: 'vite-plugin-filesTree',
     buildStart() {
-      checksup().then(generateFiles)
+      
       
     },
     handleHotUpdate({ file }) {
@@ -75,8 +75,7 @@ export function createfilesTreePlugin() {
       });
     },
     buildEnd() {
-      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@1C@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-      generateFiles();
+      checksup().then(generateFiles)
     }
   };
 }
