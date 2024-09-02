@@ -49,7 +49,8 @@ async function checksup(){
     })
 
     console.log("#2####################");
-    console.log("#2####################",kdbAppData, error);
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    console.log("#2####################");
 
 
 }
