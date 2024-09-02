@@ -73,13 +73,18 @@ async function generateRoutes(pagesDir, outputFile) {
     )
     
     console.log("4$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+    try{
     const { data: kdbAppData, error } = await supabaseServiceClient
     .from('kadabrix_app')
     .select('*')
     .eq('type', "ROUTE");
     console.log(kdbAppData, error);
     console.log("3$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-
+    } catch(err) {
+      console.log("63$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+      console.log(err)
+      console.log("63$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+    }
     let routes=[]
     for (let i=0;i<kdbAppData.length;i++){
       let record = kdbAppData[i];
