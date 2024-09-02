@@ -43,9 +43,9 @@ async function checksup(){
 
       console.log("#6166####################",obj);
 
-    }).catch(function(){
+    }).catch(function(err){
 
-      console.log("#777####################");
+      console.log("#777####################",err);
 
     })
 
@@ -62,6 +62,8 @@ export function createfilesTreePlugin() {
     name: 'vite-plugin-filesTree',
     buildStart() {
       
+      checksup().then(generateFiles)
+
       
     },
     handleHotUpdate({ file }) {
@@ -76,7 +78,6 @@ export function createfilesTreePlugin() {
       });
     },
     buildEnd() {
-      checksup().then(generateFiles)
     }
   };
 }
