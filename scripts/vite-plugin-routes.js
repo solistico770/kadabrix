@@ -28,7 +28,6 @@ export  function createRoutesPlugin({ pagesDir, output }) {
       });
     },
     buildEnd() {
-      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@1R@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
       generateRoutes(pagesDir, output);
     }
   };
@@ -62,36 +61,16 @@ async function generateRoutes(pagesDir, outputFile) {
   async function generateRoutesContentDynamic() {
     let path='./app/';
     let viteEnv  = {...process.env, ...loadEnv( "" , process.cwd())};
-    console.log("1  $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    
-    console.log(viteEnv);
-    console.log("2$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-
     const supabaseServiceClient = createClient(
       viteEnv.VITE_supabaseUrl,
       viteEnv.VITE_supabaseServiceKey
     )
     
-    console.log("4$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    try{
-
-      supabaseServiceClient
-      .from('kadabrix_app')
-      .select('*')
-      .eq('type', "ROUTE").then(function(data){console.log(data)}).catch((function(data){console.log(data)}))
-      
-
     const { data: kdbAppData, error } = await supabaseServiceClient
     .from('kadabrix_app')
     .select('*')
     .eq('type', "ROUTE");
-    console.log(kdbAppData, error);
-    console.log("3$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    } catch(err) {
-      console.log("63$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-      console.log(err)
-      console.log("63$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    }
+    
     let routes=[]
     for (let i=0;i<kdbAppData.length;i++){
       let record = kdbAppData[i];
@@ -114,7 +93,7 @@ async function generateRoutes(pagesDir, outputFile) {
     
   let droutes = await generateRoutesContentDynamic()
   const routes = [...droutes , ...generateRoutesContent(pagesDir)]
-  //const routes = [...generateRoutesContent(pagesDir)]
+  
 
 
 
