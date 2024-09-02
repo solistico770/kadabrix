@@ -63,7 +63,9 @@ async function generateRoutes(pagesDir, outputFile) {
     let path='./app/';
     let viteEnv  = {...process.env, ...loadEnv( "" , process.cwd())};
     console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+    
     console.log(viteEnv);
+    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
     const supabaseServiceClient = createClient(
       viteEnv.VITE_supabaseUrl,
       viteEnv.VITE_supabaseServiceKey
@@ -74,7 +76,8 @@ async function generateRoutes(pagesDir, outputFile) {
     .select('*')
     .eq('type', "ROUTE");
     console.log(kdbAppData, error);
-
+    console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+    
     let routes=[]
     for (let i=0;i<kdbAppData.length;i++){
       let record = kdbAppData[i];
