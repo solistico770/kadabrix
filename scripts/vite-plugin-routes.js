@@ -77,10 +77,12 @@ async function generateRoutes(pagesDir, outputFile) {
         }),
         method: "POST"
       });
-    
+
+
       // Check if the response is okay (status code 2xx)
       if (response.ok) {
-        const kdbAppData = await response.json();
+        const {data:kdbAppData} = await response.json();
+
     let routes=[]
     for (let i=0;i<kdbAppData.length;i++){
       let record = kdbAppData[i];

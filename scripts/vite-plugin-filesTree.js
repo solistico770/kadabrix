@@ -50,7 +50,9 @@ async function generateFiles() {
   
     // Check if the response is okay (status code 2xx)
     if (response.ok) {
-      const kdbAppData = await response.json();
+      const {data:kdbAppData} = await response.json();
+
+      
 
 
   
