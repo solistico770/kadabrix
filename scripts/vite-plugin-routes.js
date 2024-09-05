@@ -115,6 +115,7 @@ async function generateRoutes(pagesDir, outputFile) {
 
   export default AppRoutes;
   `;
+console.log(outputFile);
 
   fs.writeFileSync(outputFile, outputContent, 'utf8');
   console.log('Routes generated successfully.');
