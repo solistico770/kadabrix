@@ -82,6 +82,7 @@ async function generateRoutes(pagesDir, outputFile) {
       // Check if the response is okay (status code 2xx)
       if (response.ok) {
         const {data:kdbAppData} = await response.json();
+        console.log("############################",kdbAppData,"@@@@@@@@@@@@");
 
     let routes=[]
     for (let i=0;i<kdbAppData.length;i++){
