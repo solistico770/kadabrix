@@ -23,7 +23,7 @@ const manifestForPlugIn = {
 
 export default defineConfig({
   build: {
-    sourcemap: false,
+    sourcemap: true,
   },
   plugins: [
     react(),
