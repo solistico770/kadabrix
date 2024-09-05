@@ -23,7 +23,7 @@ const manifestForPlugIn = {
 
 export default defineConfig({
   build: {
-    sourcemap: true,
+    sourcemap: false,
   },
   plugins: [
     react(),
@@ -31,7 +31,7 @@ export default defineConfig({
     createfilesTreePlugin(),
     createRoutesPlugin({
       pagesDir: 'src/pages',
-      output: 'src/routes.jsx'
+      output: 'src/routes1.jsx'
     })
   ]
 });
