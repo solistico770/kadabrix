@@ -31,7 +31,7 @@ export default defineConfig({
     createfilesTreePlugin(),
     createRoutesPlugin({
       pagesDir: 'src/pages',
-      output: 'src/routes1.jsx'
+      output: 'src/routes.jsx'
     })
   ]
 });
