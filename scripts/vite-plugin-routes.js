@@ -62,16 +62,25 @@ async function generateRoutes(pagesDir, outputFile) {
   async function generateRoutesContentDynamic() {
     let path='./app/';
     let viteEnv  = {...process.env, ...loadEnv( "" , process.cwd())};
-    const supabaseServiceClient = createClient(
-      viteEnv.VITE_supabaseUrl,
-      viteEnv.VITE_supabaseServiceKey
-    )
+
+
+
+    try {
+      const response = await fetch(viteEnv.VITE_supabaseUrl+"/functions/v1/runkdb", {
+        headers: {
+          "authorization": "Bearer "+viteEnv.VITE_supabaseKey
+        },
+        body: JSON.stringify({
+          module: "frontendGate",
+          name: "getRoutes",
+          data: {}
+        }),
+        method: "POST"
+      });
     
-    const { data: kdbAppData, error } = await supabaseServiceClient
-    .from('kadabrix_app')
-    .select('*')
-    .eq('type', "ROUTE");
-    
+      // Check if the response is okay (status code 2xx)
+      if (response.ok) {
+        const kdbAppData = await response.json();
     let routes=[]
     for (let i=0;i<kdbAppData.length;i++){
       let record = kdbAppData[i];
@@ -88,7 +97,16 @@ async function generateRoutes(pagesDir, outputFile) {
     return routes;
   
     
+        console.log("Result:", kdbAppData);  // Handle success response
+      } else {
+        console.error("Error:", response.status, response.statusText);  // Handle non-2xx responses
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);  // Handle network errors
     }
+
+    
+  }
   
   
     

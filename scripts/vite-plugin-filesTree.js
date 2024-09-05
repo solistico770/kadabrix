@@ -3,66 +3,12 @@ import { createClient } from '@supabase/supabase-js';
 import { defineConfig, loadEnv } from 'vite';
 import https from 'https';
 
-// Function to fetch HTML from google.com
-function fetchGoogleHtml() {
-  return new Promise((resolve, reject) => {
-    https.get('https://www.google.com', (response) => {
-      let data = '';
-      
-      // Collect chunks of data
-      response.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      // Resolve promise with the full response
-      response.on('end', () => {
-        resolve(data);
-      });
-
-    }).on('error', (err) => {
-      reject(err);
-    });
-  });
-}
-
-
-async function checksup(){
-
-  
-  const supabaseServiceClient = createClient(
-    "https://heuayknlgusdwimnjbgs.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhldWF5a25sZ3VzZHdpbW5qYmdzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxOTMyNDY4MCwiZXhwIjoyMDM0OTAwNjgwfQ.vFLwnSHt2G8T57V0_vI1RDv3iBjlQNrxfkH5PZ9M6HA"
-  );
-
-  console.log("#1####################");
-  
-  supabaseServiceClient
-    .from('kadabrix_app')
-    .select('*')
-    .eq('type', "REACT").then(function(obj){
-
-      console.log("#6166####################",obj);
-
-    }).catch(function(err){
-
-      console.log("#777####################",err);
-
-    })
-
-
-    console.log("#2####################");
-    await new Promise(resolve => setTimeout(resolve, 10000));
-    console.log("#2####################");
-
-
-}
-
 export function createfilesTreePlugin() {
   return {
     name: 'vite-plugin-filesTree',
     buildStart() {
       
-      checksup().then(generateFiles)
+      generateFiles()
 
       
     },
@@ -88,26 +34,41 @@ async function generateFiles() {
   fs.mkdirSync(path);
 
   let viteEnv = { ...process.env, ...loadEnv("", process.cwd()) };
-  const supabaseServiceClient = createClient(
-    viteEnv.VITE_supabaseUrl,
-    viteEnv.VITE_supabaseServiceKey
-  );
+  
+  try {
+    const response = await fetch(viteEnv.VITE_supabaseUrl+"/functions/v1/runkdb", {
+      headers: {
+        "authorization": "Bearer "+viteEnv.VITE_supabaseKey
+      },
+      body: JSON.stringify({
+        module: "frontendGate",
+        name: "getReact",
+        data: {}
+      }),
+      method: "POST"
+    });
+  
+    // Check if the response is okay (status code 2xx)
+    if (response.ok) {
+      const kdbAppData = await response.json();
+
 
   
+      for (let i = 0; i < kdbAppData.length; i++) {
+        let record = kdbAppData[i];
+        fs.mkdirSync(`src/app/${record.module}`, { recursive: true });
+        fs.writeFileSync(`src/app/${record.module}/${record.name}.jsx`, record.data, { recursive: true });
+      }
+
+
+      console.log("Result:", kdbAppData);  // Handle success response
+    } else {
+      console.error("Error:", response.status, response.statusText);  // Handle non-2xx responses
+    }
+  } catch (error) {
+    console.error("Fetch error:", error);  // Handle network errors
+  }
+
   
-  const { data: kdbAppData, error } = await supabaseServiceClient
-    .from('kadabrix_app')
-    .select('*')
-    .eq('type', "REACT");
 
-  if (error) {
-    console.error("Error fetching data from Supabase:", error);
-    return;
-  }
-
-  for (let i = 0; i < kdbAppData.length; i++) {
-    let record = kdbAppData[i];
-    fs.mkdirSync(`src/app/${record.module}`, { recursive: true });
-    fs.writeFileSync(`src/app/${record.module}/${record.name}.jsx`, record.data, { recursive: true });
-  }
 }
