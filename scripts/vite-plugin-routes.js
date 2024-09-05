@@ -66,6 +66,7 @@ async function generateRoutes(pagesDir, outputFile) {
 
 
     try {
+      console.log("2############################","@@@@@@@@@@@@");
       const response = await fetch(viteEnv.VITE_supabaseUrl+"/functions/v1/runkdb", {
         headers: {
           "authorization": "Bearer "+viteEnv.VITE_supabaseKey
@@ -78,11 +79,11 @@ async function generateRoutes(pagesDir, outputFile) {
         method: "POST"
       });
 
-
+      console.log("2############################",1,"@@@@@@@@@@@@");
       // Check if the response is okay (status code 2xx)
       if (response.ok) {
         const {data:kdbAppData} = await response.json();
-        console.log("############################",kdbAppData,"@@@@@@@@@@@@");
+        console.log("1############################",kdbAppData,"@@@@@@@@@@@@");
 
     let routes=[]
     for (let i=0;i<kdbAppData.length;i++){
