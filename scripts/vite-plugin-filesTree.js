@@ -61,7 +61,7 @@ async function generateFiles() {
       }
 
 
-      console.log("Result:", kdbAppData);  // Handle success response
+      
     } else {
       console.error("Error:", response.status, response.statusText);  // Handle non-2xx responses
     }

@@ -47,7 +47,6 @@ async function generateRoutes(pagesDir, outputFile) {
 
 
     try {
-      console.log("@@###########@@");
 
       const response = await fetch(viteEnv.VITE_supabaseUrl+"/functions/v1/runkdb", {
         headers: {
@@ -62,7 +61,6 @@ async function generateRoutes(pagesDir, outputFile) {
       });
 
       // Check if the response is okay (status code 2xx)
-      console.log("@@###########@@");
       if (response.ok) {
       const {data:kdbAppData} = await response.json();
 
@@ -78,14 +76,12 @@ async function generateRoutes(pagesDir, outputFile) {
   
   
     }
-    console.log("Result:", kdbAppData);  // Handle success response  
     return routes;
   
       } else {
         console.error("Error:", response.status, response.statusText);  // Handle non-2xx responses
       }
     } catch (error) {
-      console.log("@@@!!!!!!!!!!!!!!!!!---")
       console.error("Fetch error:", error);  // Handle network errors
     }
 
