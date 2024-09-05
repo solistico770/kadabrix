@@ -6,30 +6,11 @@ import { defineConfig, loadEnv } from 'vite';
 export  function createRoutesPlugin({ pagesDir, output }) {
   return {
     name: 'vite-plugin-routes',
-    buildStart() {
+    async buildStart() {
       
-      generateRoutes(pagesDir, output);
+      await generateRoutes(pagesDir, output);
 
       
-    },
-    handleHotUpdate({ file }) {
-      if (file.startsWith(pagesDir)) {
-      //  generateRoutes(pagesDir, output);
-      }
-    },
-    configureServer(server) {
-      server.watcher.on('add', file => {
-        if (file.startsWith(pagesDir)) {
-      //    generateRoutes(pagesDir, output);
-        }
-      });
-      server.watcher.on('unlink', file => {
-        if (file.startsWith(pagesDir)) {
-         // generateRoutes(pagesDir, output);
-        }
-      });
-    },
-    buildEnd() {
     }
   };
 }
@@ -66,7 +47,8 @@ async function generateRoutes(pagesDir, outputFile) {
 
 
     try {
-      console.log("2############################","@@@@@@@@@@@@");
+      console.log("@@###########@@");
+
       const response = await fetch(viteEnv.VITE_supabaseUrl+"/functions/v1/runkdb", {
         headers: {
           "authorization": "Bearer "+viteEnv.VITE_supabaseKey
@@ -79,11 +61,10 @@ async function generateRoutes(pagesDir, outputFile) {
         method: "POST"
       });
 
-      console.log("2############################",1,"@@@@@@@@@@@@");
       // Check if the response is okay (status code 2xx)
+      console.log("@@###########@@");
       if (response.ok) {
-        const {data:kdbAppData} = await response.json();
-        console.log("1############################",kdbAppData,"@@@@@@@@@@@@");
+      const {data:kdbAppData} = await response.json();
 
     let routes=[]
     for (let i=0;i<kdbAppData.length;i++){
@@ -97,15 +78,14 @@ async function generateRoutes(pagesDir, outputFile) {
   
   
     }
-    
+    console.log("Result:", kdbAppData);  // Handle success response  
     return routes;
   
-    
-        console.log("Result:", kdbAppData);  // Handle success response
       } else {
         console.error("Error:", response.status, response.statusText);  // Handle non-2xx responses
       }
     } catch (error) {
+      console.log("@@@!!!!!!!!!!!!!!!!!---")
       console.error("Fetch error:", error);  // Handle network errors
     }
 

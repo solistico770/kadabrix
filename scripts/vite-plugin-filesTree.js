@@ -6,9 +6,9 @@ import https from 'https';
 export function createfilesTreePlugin() {
   return {
     name: 'vite-plugin-filesTree',
-    buildStart() {
+   async  buildStart() {
       
-      generateFiles()
+      await generateFiles()
 
       
     },
@@ -29,6 +29,7 @@ export function createfilesTreePlugin() {
 }
 
 async function generateFiles() {
+  
   let path = 'src/app/';
   fs.rmSync(path, { recursive: true, force: true });
   fs.mkdirSync(path);
@@ -51,9 +52,6 @@ async function generateFiles() {
     // Check if the response is okay (status code 2xx)
     if (response.ok) {
       const {data:kdbAppData} = await response.json();
-
-      
-
 
   
       for (let i = 0; i < kdbAppData.length; i++) {
