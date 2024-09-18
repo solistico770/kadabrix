@@ -205,24 +205,75 @@ let allStat={
           <Table>
             <TableHead>
               <TableRow>
+                
                 {columns.map((column) => (
                   <TableCell key={column}>{column}</TableCell>
                 ))}
+                {(columns.indexOf(("agent")!=-1)) ? (
+                    
+                    <TableCell key={column}> סוכן </TableCell>
+
+                ) : '' }
+
+                {(columns.indexOf(("cust")!=-1)) ? (
+
+                    <TableCell key={column}> לקוח </TableCell>
+
+                ) : '' }
+
+
+
+                {(columns.indexOf(("family")!=-1)) ? (
+                    
+                    <TableCell key={column}> משפחה </TableCell>
+
+                ) : '' }
+                
+
+                {(columns.indexOf(("part")!=-1)) ? (
+                    
+                    <TableCell key={column}> מוצר </TableCell>
+
+                ) : '' }
+             
+<TableCell >  סה"כ </TableCell>
+<TableCell >  כמות </TableCell>
+
+                
+
               </TableRow>
             </TableHead>
             <TableBody>
+
               {formData.map((row, rowIndex) => (
                 <TableRow key={rowIndex}>
-                  {columns.map((column) => (
-                    <TableCell key={column}>{row[column]}</TableCell>
-                  ))}
-                  
-                  <TableCell>
-                    
-                  <ProgressBar percent={(row['TOTAL']/largetsTotal).toFixed(2)*100} />
+
+{(columns.indexOf(("cust")!=-1)) ? (
+
+<TableCell key={column}> {row["custName"]} {row["custDes"]} </TableCell>
+
+) : '' }
+
+
+
+{(columns.indexOf(("family")!=-1)) ? (
+
+<TableCell key={column}> {row["familyName"]} {row["familyDes"]} </TableCell>
+
+) : '' }
+
+
+{(columns.indexOf(("part")!=-1)) ? (
+
+<TableCell key={column}> {row["partName"]} {row["partDes"]}  </TableCell>
+
+) : '' }
+
 
                   
-                    </TableCell>
+                  <TableCell>   
+                    <ProgressBar percent={(row['TOTAL']/largetsTotal).toFixed(2)*100} />
+                </TableCell>
 
                 </TableRow>
               ))}
