@@ -1,6 +1,7 @@
+import { flushSync } from 'react-dom';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import React, { useState } from 'react';
+import React, { useState ,useEffect } from 'react';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -41,7 +42,17 @@ const ProgressBar = ({ percent }) => {
 //** */
 
 const Users = () => {
-  
+  const [doRefresh, setDoRefresh] = useState(false);
+  useEffect(()=>{
+
+    if (doRefresh){
+      fetchData();
+    }
+
+  },[doRefresh]);
+
+
+
   const [groupAgent, setGroupAgent] = useState(false);
   const [groupCustType,setGroupCustType] = useState(false);
   const [groupCust, setGroupCust] = useState(false);
@@ -62,8 +73,17 @@ const Users = () => {
   const [formData, setFormData] = useState([]);
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [dateGroup, setDateGroup] = useState("month");
+  const [dateGroup, setDateGroup] = useState("none");
+/*
 
+  useEffect(() => {
+
+      fetchData();
+
+  
+  }, [groupAgent,groupCust,groupPart,groupFamily,getAgent,getCustType,getCust,getFamily,getPart,fromDate,toDate]);
+
+  */
   
   
   const fetchData = async () => {
@@ -201,38 +221,39 @@ let allStat={
 
 
   <Container component="section">
+    {JSON.stringify(getPart)}
+    {JSON.stringify(getCust)}
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
                 
-                {columns.map((column) => (
-                  <TableCell key={column}>{column}</TableCell>
-                ))}
-                {(columns.indexOf(("agent")!=-1)) ? (
+              
+                
+                {(columns.indexOf("agent")!=-1) ? (
                     
-                    <TableCell key={column}> סוכן </TableCell>
+                    <TableCell key="סוכן"> סוכן </TableCell>
 
                 ) : '' }
 
-                {(columns.indexOf(("cust")!=-1)) ? (
+                {(columns.indexOf("cust")!=-1) ? (
 
-                    <TableCell key={column}> לקוח </TableCell>
+                    <TableCell key="לקוח"> לקוח </TableCell>
 
                 ) : '' }
 
 
 
-                {(columns.indexOf(("family")!=-1)) ? (
+                {(columns.indexOf("family")!=-1) ? (
                     
-                    <TableCell key={column}> משפחה </TableCell>
+                    <TableCell key="משפחה"> משפחה </TableCell>
 
                 ) : '' }
                 
 
-                {(columns.indexOf(("part")!=-1)) ? (
+                {(columns.indexOf("part")!=-1) ? (
                     
-                    <TableCell key={column}> מוצר </TableCell>
+                    <TableCell key="מוצר"> מוצר </TableCell>
 
                 ) : '' }
              
@@ -250,7 +271,25 @@ let allStat={
 
 {(columns.indexOf(("cust")!=-1)) ? (
 
-<TableCell key={column}> {row["custName"]} {row["custDes"]} </TableCell>
+<TableCell onClick={()=>{
+
+
+
+
+
+  setGetCust({
+    "cust": row["cust"],
+    "custName": row["custName"],
+    "custDes": row["custDes"]
+  });
+  
+  setDoRefresh({})
+
+
+  
+
+
+}} key={row}>{row["custName"]} {row["custDes"]} </TableCell>
 
 ) : '' }
 
@@ -258,14 +297,35 @@ let allStat={
 
 {(columns.indexOf(("family")!=-1)) ? (
 
-<TableCell key={column}> {row["familyName"]} {row["familyDes"]} </TableCell>
+<TableCell key={row}> {row["familyName"]} {row["familyDes"]} </TableCell>
 
 ) : '' }
 
 
 {(columns.indexOf(("part")!=-1)) ? (
 
-<TableCell key={column}> {row["partName"]} {row["partDes"]}  </TableCell>
+<TableCell 
+  
+
+onClick={()=>{
+
+
+  setGetPart({
+    "part":row["part"],
+    "partName":row["partName"],
+    "partDes":row["partDes"]
+})
+
+    
+setDoRefresh({})
+
+    
+
+  
+
+}}
+
+key={row}> {row["partName"]} {row["partDes"]}  </TableCell>
 
 ) : '' }
 

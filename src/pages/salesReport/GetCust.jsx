@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import kdb from '../../kadabrix/kadabrix';
-import { Autocomplete, TextField, CircularProgress } from '@mui/material';
+import { Autocomplete, TextField, CircularProgress,Button } from '@mui/material';
 
 const Data = (props) => {
   
@@ -56,6 +56,24 @@ const Data = (props) => {
 
   return (
     <div>
+
+    { (props.state!=null) ? 
+    (<div> 
+         <Button onClick={()=>{
+
+            props.setter(null);
+            fetchData();
+            
+
+            
+
+
+         }}>X</Button>
+         {props.state.custName} {props.state.custDes }
+
+
+    </div>)  : 
+    (<div>
     <Autocomplete
       options={data}
       onChange={(event, newValue) => {
@@ -85,7 +103,8 @@ const Data = (props) => {
       )}
       
     />
-    </div>
+    </div>)}
+  </div>
   );
 };
 
