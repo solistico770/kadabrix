@@ -53,6 +53,27 @@ const Menu = () => {
       );
     }
 
+    
+
+  
+      if (roles.includes('kadmin')) {
+        menuItems.push(
+          <Grid item key="codeEditor">
+            <Button
+              onClick={() => navigate('/codeEditor')}
+              variant="contained"
+              startIcon={<PeopleIcon />}
+              fullWidth
+            >
+              codeEditor
+            </Button>
+          </Grid>
+        );
+      }
+
+
+      
+
     if (roles.includes('kagent') || roles.includes('kb2b')) {
       menuItems.push(
         <Grid item key="cart">

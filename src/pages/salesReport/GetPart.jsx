@@ -7,7 +7,7 @@ const Data = (props) => {
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [debouncedValue, setDebouncedValue] = useState(inputValue);
-
+  const [isShrink,setIsShrink] = useState(inputValue);
   const fetchData = async (searchTerm = '') => {
     setLoading(true);
     try {
@@ -64,6 +64,7 @@ const Data = (props) => {
     </div>)  : 
     (<div>
     <Autocomplete
+      lablel="בחר לקוח"
       options={data}
       onChange={(event, newValue) => {
         props.setter(newValue); // Update selected item state

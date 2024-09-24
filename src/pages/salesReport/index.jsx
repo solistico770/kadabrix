@@ -46,7 +46,7 @@ const Users = () => {
   useEffect(()=>{
 
     if (doRefresh){
-      fetchData();
+      // fetchData();
     }
 
   },[doRefresh]);
@@ -58,6 +58,7 @@ const Users = () => {
   const [groupCust, setGroupCust] = useState(false);
   const [groupFamily, setGroupFamily] = useState(false);
   const [groupPart, setGroupPart] = useState(false);
+  const [groupDocname, setGroupDocname] = useState(false);
   
   const [fromDate, setFromDate] = useState(moment().startOf('month'));
   const [toDate, setToDate] = useState(moment().endOf('month'));
@@ -103,6 +104,7 @@ const Users = () => {
               groupCust:groupCust,
               groupFamily:groupFamily,
               groupPart:groupPart,
+              groupDocname:groupDocname,
               fromDate:fromDate.unix(),
               toDate:toDate.unix(),
               dateGroup:dateGroup
@@ -135,57 +137,27 @@ let allStat={
 
   return (
 <Container >
-
-<Tabs aria-label="basic tabs example" value={tabValue} onChange={(event, newValue)=>{setTabValue(newValue);}} >
-    <Tab label="חיפוש"/>
-    <Tab label="תוצאות"/>
-</Tabs>
-
-  
-
-<div   style={{ display: 0 === tabValue ? 'block' : 'none' }}   >
-
+    {JSON.stringify(getPart)}
   <Container component="main" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ padding: 2 }}>
-            <GetPart state={getPart} setter={setGetPart} />
-            <GroupBy  state={groupPart} setter={setGroupPart} />
-          </Paper>
-        </Grid>
-        
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ padding: 2 }}>
-            <GetFamily state={getFamily} setter={setGetFamily} />
-            <GroupBy  state={groupFamily} setter={setGroupFamily} />
-          </Paper>
-        </Grid>
-        
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ padding: 2 }}>
-            <GetCust state={getCust} setter={setGetCust} />
-            <GroupBy  state={groupCust} setter={setGroupCust} />
-          </Paper>
-        </Grid>
-        
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ padding: 2 }}>
-            <GetCustType state={getCustType} setter={setGetCustType} />
-            <GroupBy  state={groupCustType} setter={setGroupCustType} />
-          </Paper>
-        </Grid>
-        
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ padding: 2 }}>
-            <GetAgent state={getAgent} setter={setGetAgent} />
-            <GroupBy var="groupAgent" state={groupAgent} setter={setGroupAgent} />
-          </Paper>
-        </Grid>
-
-        
+       
         
         <Grid item xs={12} md={12}>
-          <Paper sx={{ padding: 2 }}>
+        <Paper sx={{ padding: 2 }}>
+        <GetPart state={getPart} setter={setGetPart} />
+        <GroupBy  state={groupPart} setter={setGroupPart} />
+        <GetFamily state={getFamily} setter={setGetFamily} />
+        <GroupBy  state={groupCustType} setter={setGroupCustType} />
+        <GetCust state={getCust} setter={setGetCust} />
+        <GroupBy  state={groupCust} setter={setGroupCust} />
+        <GetAgent state={getAgent} setter={setGetAgent} />
+        <GroupBy var="groupAgent" state={groupAgent} setter={setGroupAgent} />
+        
+      <box>
+        קבץ לפי מסמך 
+        <GroupBy var="groupDocname" state={groupDocname} setter={setGroupDocname} />
+      </box>
+
             <GetDate 
               fromDate={fromDate} setFromDate={setFromDate}  
               toDate={toDate} setToDate={setToDate}  
@@ -216,21 +188,24 @@ let allStat={
 
   
 
-</div>
-<div   style={{ display: 1 === tabValue ? 'block' : 'none' }}   >
 
 
   <Container component="section">
-    {JSON.stringify(getPart)}
-    {JSON.stringify(getCust)}
+  
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
                 
               
+              {(columns.indexOf("docName")!=-1) ? (
+                    
+                    <TableCell key="סוכן"> מסמך </TableCell>
+
+                ) : '' }
+
                 
-                {(columns.indexOf("agent")!=-1) ? (
+                {(columns.indexOf("agentName")!=-1) ? (
                     
                     <TableCell key="סוכן"> סוכן </TableCell>
 
@@ -266,14 +241,46 @@ let allStat={
             </TableHead>
             <TableBody>
 
-              {formData.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
+             {formData.map((row, rowIndex) => (
+               <TableRow key={rowIndex}>
 
-{(columns.indexOf(("cust")!=-1)) ? (
+
+      
+
+{(columns.indexOf("docName")!=-1) ? (
+
+<TableCell  key={row}>{row["docName"]}</TableCell>
+
+) : '' }
+
+
+
+
+{(columns.indexOf("agentName")!=-1) ? (
 
 <TableCell onClick={()=>{
 
 
+
+  setGetAgent({
+    "agent": row["agent"],
+    "agentName": row["agentName"],
+    "agentDes": row["agentDes"]
+  });
+  
+  
+  
+
+
+}} key={row}>{row["agentName"]} {row["agentDes"]}</TableCell>
+
+) : '' }
+
+
+
+{(columns.indexOf("cust")!=-1) ? (
+
+<TableCell onClick={()=>{
 
 
 
@@ -283,9 +290,7 @@ let allStat={
     "custDes": row["custDes"]
   });
   
-  setDoRefresh({})
-
-
+  
   
 
 
@@ -295,20 +300,20 @@ let allStat={
 
 
 
-{(columns.indexOf(("family")!=-1)) ? (
+
+{(columns.indexOf("family")!=-1) ? (
 
 <TableCell key={row}> {row["familyName"]} {row["familyDes"]} </TableCell>
 
 ) : '' }
 
 
-{(columns.indexOf(("part")!=-1)) ? (
+{(columns.indexOf("part")!=-1) ? (
 
 <TableCell 
   
 
 onClick={()=>{
-
 
   setGetPart({
     "part":row["part"],
@@ -317,7 +322,6 @@ onClick={()=>{
 })
 
     
-setDoRefresh({})
 
     
 
@@ -328,6 +332,14 @@ setDoRefresh({})
 key={row}> {row["partName"]} {row["partDes"]}  </TableCell>
 
 ) : '' }
+
+
+<TableCell>   
+                   {row['TOTALQ'].toFixed(2)}
+</TableCell>
+<TableCell>   
+                   {row['TOTAL'].toFixed(2)}
+</TableCell>
 
 
                   
@@ -341,10 +353,6 @@ key={row}> {row["partName"]} {row["partDes"]}  </TableCell>
           </Table>
         </TableContainer>
       </Container>
-
-
-</div>
-
 
 
 

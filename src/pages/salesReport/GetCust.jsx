@@ -62,8 +62,6 @@ const Data = (props) => {
          <Button onClick={()=>{
 
             props.setter(null);
-            fetchData();
-            
 
             
 
