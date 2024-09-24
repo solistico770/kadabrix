@@ -52,9 +52,6 @@ const Menu = () => {
         </Grid>
       );
     }
-
-    
-
       if (roles.includes('kadmin')) {
         menuItems.push(
           <Grid item key="codeEditor">
