@@ -257,7 +257,7 @@ let allStat={
 
 <TableBody>    
 
-{(formData.lengt>1)?(
+{(formData.length>1)?(
 
 <TableRow>
 
