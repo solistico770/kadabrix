@@ -75,6 +75,10 @@ const Users = () => {
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
   const [dateGroup, setDateGroup] = useState("none");
+
+  const [orderBy, setOrderBy] = useState("TOTAL");
+
+
 /*
 
   useEffect(() => {
@@ -86,7 +90,51 @@ const Users = () => {
 
   */
   
+  const sortData = (data, orderBy) => {
+    const sortData = (data, orderBy) => {
+  if (!data || data.length === 0 || !orderBy) {
+    return data;
+  }
+
+    const sortedData = [...data].sort((a, b) => {
+    if (a[orderBy] < b[orderBy]) {
+      return -1;
+    }
+    if (a[orderBy] > b[orderBy]) {
+      return 1;
+    }
+    return 0; // If equal, no change
+  });
+
+  return sortedData;
+};
+
+
+    if (!data || data.length === 0 || !orderBy) {
+      return data;
+    }
   
+    // Sort the data array by the key specified in orderBy
+    const sortedData = [...data].sort((a, b) => {
+      if (a[orderBy] < b[orderBy]) {
+        return -1;
+      }
+      if (a[orderBy] > b[orderBy]) {
+        return 1;
+      }
+      return 0; // If equal, no change
+    });
+  
+    return sortedData;
+  };
+  
+  
+  useEffect(()=>{
+    setFormData(sortData(formData,orderBy));
+  },[orderBy])
+
+
+
   const fetchData = async () => {
     try {
       setLoading(true)
@@ -111,7 +159,7 @@ const Users = () => {
          },
       });
       setLoading(false);
-      setFormData(response);
+      setFormData(sortData(response,orderBy));
       setTabValue(1);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -127,13 +175,13 @@ const Users = () => {
   },0);
 
   
-  let totalV = formData.reduce((max, entry) => {
+  let totalV = Number(formData.reduce((max, entry) => {
     return entry.TOTAL+max
-  },0).toFixed(0);
+  },0).toFixed(0)).toLocaleString();
 
-  let totalA = formData.reduce((max, entry) => {
+  let totalA = Number(formData.reduce((max, entry) => {
     return entry.TOTALQ+ max;
-  },0).toFixed(0);
+  },0).toFixed(0)).toLocaleString();
 
 
 
@@ -205,30 +253,30 @@ let allStat={
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
-              <TableRow>
+              <TableRow >
                 
               {(columns.indexOf("groupDate")!=-1) ? (
                     
-                    <TableCell key="תאריך"> תאריך </TableCell>
+                    <TableCell key="תאריך" onClick={()=>{setOrderBy("dateGroup")}}> תאריך </TableCell>
 
                 ) : '' }
 
               {(columns.indexOf("docName")!=-1) ? (
                     
-                    <TableCell key="סוכן"> מסמך </TableCell>
+                    <TableCell key="סוכן" onClick={()=>{setOrderBy("docName")}}> מסמך </TableCell>
 
                 ) : '' }
 
                 
                 {(columns.indexOf("agentName")!=-1) ? (
                     
-                    <TableCell key="סוכן"> סוכן </TableCell>
+                    <TableCell key="סוכן" onClick={()=>{setOrderBy("agentDes")}}> סוכן </TableCell>
 
                 ) : '' }
 
                 {(columns.indexOf("cust")!=-1) ? (
 
-                    <TableCell key="לקוח"> לקוח </TableCell>
+                    <TableCell key="לקוח" onClick={()=>{setOrderBy("custDes")}}> לקוח </TableCell>
 
                 ) : '' }
 
@@ -236,19 +284,19 @@ let allStat={
 
                 {(columns.indexOf("familyName")!=-1) ? (
                     
-                    <TableCell key="משפחה"> משפחה </TableCell>
+                    <TableCell key="משפחה" onClick={()=>{setOrderBy("familyName")}}> משפחה </TableCell>
 
                 ) : '' }
                 
 
                 {(columns.indexOf("part")!=-1) ? (
                     
-                    <TableCell key="מוצר"> מוצר </TableCell>
+                    <TableCell key="מוצר" onClick={()=>{setOrderBy("partDes")}}> מוצר </TableCell>
 
                 ) : '' }
              
-<TableCell >  סה"כ </TableCell>
-<TableCell >  כמות </TableCell>
+<TableCell onClick={()=>{setOrderBy("TOTAL")}}  >  סה"כ </TableCell>
+<TableCell onClick={()=>{setOrderBy("TOTALQ")}} >  כמות </TableCell>
 
                 
 
@@ -414,10 +462,10 @@ onClick={()=>{
 
 
 <TableCell>   
-                   {row['TOTAL'].toFixed(2)}
+                   {Number(row['TOTAL'].toFixed(2)).toLocaleString()}
 </TableCell>
 <TableCell>   
-                   {row['TOTALQ'].toFixed(2)}
+                   {Number(row['TOTALQ'].toFixed(2)).toLocaleString()}
 </TableCell>
 
 

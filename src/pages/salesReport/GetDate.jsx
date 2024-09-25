@@ -11,6 +11,7 @@ import 'moment-timezone';
 
 const Data = (props) => {
   
+  const [currentDateType,setCurrentDateType] = useState("none")
   
   useEffect(() => {
     setMonth();
@@ -21,41 +22,44 @@ const Data = (props) => {
     const endOfYear = moment().utc().endOf('year');
     props.setFromDate(startOfYear)
     props.setToDate(endOfYear)
+    setCurrentDateType("year")
     
     
   };
 
   const setAllYear = () => {
-    
+    setCurrentDateType("allYear")
     props.setFromDate( moment().utc().subtract(1, 'years'));
     props.setToDate(moment().utc().endOf('day'));
   };
 
   const setMonth = () => {
-    
+    setCurrentDateType("month")
     props.setFromDate(moment().utc().startOf('month'));
     props.setToDate(moment().utc().endOf('month'));
   };
 
   const setDay = () => {
-
+    setCurrentDateType("day")
     props.setFromDate(moment().utc().startOf('day'));
     props.setToDate(moment().utc().endOf('day'));
   };
 
   const setWeek = () => {
-    
+    setCurrentDateType("week")
     props.setFromDate(moment().utc().startOf('week'));
     props.setToDate(moment().utc().endOf('week'));
   };
 
   const handleFromDateChange = (date) => {
+    setCurrentDateType("none")
     const unixTime = date;
     props.setFromDate(date);
     
   };
 
   const handleToDateChange = (date) => {
+    setCurrentDateType("none")
     const unixTime = date;
     props.setToDate(date);
   };
@@ -88,11 +92,52 @@ const Data = (props) => {
         <Grid container spacing={2} sx={{ marginTop: 2 }}>
           <Grid item xs={12}>
             <ButtonGroup variant="outlined" fullWidth aria-label="Basic button group">
-              <Button onClick={setAllYear}>שנה אחורה</Button>
-              <Button onClick={setYear}>כל השנה</Button>
-              <Button onClick={setMonth}>החודש</Button>
-              <Button onClick={setWeek}>השבוע</Button>
-              <Button onClick={setDay}>היום</Button>
+              
+              
+            <Button 
+              sx={{ 
+                bgcolor: currentDateType === 'day' ? 'blue' : 'default', 
+                color: currentDateType === 'day' ? 'white' : 'black' 
+              }}
+
+              onClick={setDay}>היום</Button>
+
+
+              <Button 
+              sx={{ 
+              bgcolor: currentDateType === 'week' ? 'blue' : 'default', 
+              color: currentDateType === 'week' ? 'white' : 'black' 
+              }}
+              onClick={setWeek}>השבוע</Button>
+
+              <Button 
+              sx={{ 
+              bgcolor: currentDateType === 'month' ? 'blue' : 'default', 
+              color: currentDateType === 'month' ? 'white' : 'black' 
+              }}
+
+              onClick={setMonth}>החודש</Button>
+
+              
+              <Button onClick={setAllYear}
+              
+              sx={{ 
+                bgcolor: currentDateType === 'allYear' ? 'blue' : 'default', 
+                color: currentDateType === 'allYear' ? 'white' : 'black' 
+              }}
+
+              >12 חודשים</Button> 
+              <Button 
+              
+              sx={{ 
+                bgcolor: currentDateType === 'year' ? 'blue' : 'default', 
+                color: currentDateType === 'year' ? 'white' : 'black' 
+              }}
+
+              onClick={setYear}>מתחילת השנה</Button>
+     
+       
+              
             </ButtonGroup>
           </Grid>
         </Grid>
