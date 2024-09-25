@@ -147,7 +147,7 @@ let allStat={
 
   return (
 <Container >
-    
+    !!!!!!!!!!123
   <Container component="main" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={3}>
        
@@ -207,7 +207,12 @@ let allStat={
             <TableHead>
               <TableRow>
                 
-              
+              {(columns.indexOf("dateGroup")!=-1) ? (
+                    
+                    <TableCell key="תאריך"> תאריך </TableCell>
+
+                ) : '' }
+
               {(columns.indexOf("docName")!=-1) ? (
                     
                     <TableCell key="סוכן"> מסמך </TableCell>
@@ -248,12 +253,20 @@ let allStat={
                 
 
               </TableRow>
-           
+  </TableHead>
+
+<TableBody>    
 
 {(formData.lengt>1)?(
 
 <TableRow>
-                
+
+    
+{(columns.indexOf("dateGroup")!=-1) ? (
+    
+    <TableCell key="תאריך"> תאריך </TableCell>
+
+) : '' }               
               
 {(columns.indexOf("docName")!=-1) ? (
       
@@ -299,19 +312,23 @@ let allStat={
 ):''}
 
 
-            </TableHead>
-
-            <TableBody>
+          
 
              {formData.map((row, rowIndex) => (
                <TableRow key={rowIndex}>
 
 
-      
+
+  
+          {(columns.indexOf("dateGroup")!=-1) ? (
+                
+                <TableCell key="תאריך"> {row["dateGroup"]} </TableCell>
+
+            ) : '' }   
 
 {(columns.indexOf("docName")!=-1) ? (
 
-<TableCell  key={row}>{row["docName"]}</TableCell>
+<TableCell  >{row["docName"]}</TableCell>
 
 ) : '' }
 
@@ -334,7 +351,7 @@ let allStat={
   
 
 
-}} key={row}>{row["agentName"]} {row["agentDes"]}</TableCell>
+}} >{row["agentName"]} {row["agentDes"]}</TableCell>
 
 ) : '' }
 
@@ -356,7 +373,7 @@ let allStat={
   
 
 
-}} key={row}>{row["custName"]} {row["custDes"]} </TableCell>
+}} >{row["custName"]} {row["custDes"]} </TableCell>
 
 ) : '' }
 
@@ -365,7 +382,7 @@ let allStat={
 
 {(columns.indexOf("familyName")!=-1) ? (
 
-<TableCell key={row}> {row["familyName"]} {row["familyDes"]} </TableCell>
+<TableCell > {row["familyName"]} {row["familyDes"]} </TableCell>
 
 ) : '' }
 
@@ -391,7 +408,7 @@ onClick={()=>{
 
 }}
 
-key={row}> {row["partName"]} {row["partDes"]}  </TableCell>
+> {row["partName"]} {row["partDes"]}  </TableCell>
 
 ) : '' }
 
