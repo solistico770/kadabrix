@@ -105,7 +105,7 @@ const doSave = async (record)=>{
   });
 
   fetchApp();
-  setIsEditorOpen(false);
+  //setIsEditorOpen(false);
 
 
 }

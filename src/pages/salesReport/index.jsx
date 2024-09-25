@@ -147,7 +147,7 @@ let allStat={
 
   return (
 <Container >
-    !!!!!!!!!!123
+    
   <Container component="main" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={3}>
        
@@ -207,7 +207,7 @@ let allStat={
             <TableHead>
               <TableRow>
                 
-              {(columns.indexOf("dateGroup")!=-1) ? (
+              {(columns.indexOf("groupDate")!=-1) ? (
                     
                     <TableCell key="תאריך"> תאריך </TableCell>
 
@@ -262,7 +262,7 @@ let allStat={
 <TableRow>
 
     
-{(columns.indexOf("dateGroup")!=-1) ? (
+{(columns.indexOf("groupDate")!=-1) ? (
     
     <TableCell key="תאריך"> תאריך </TableCell>
 
@@ -320,9 +320,9 @@ let allStat={
 
 
   
-          {(columns.indexOf("dateGroup")!=-1) ? (
+          {(columns.indexOf("groupDate")!=-1) ? (
                 
-                <TableCell key="תאריך"> {row["dateGroup"]} </TableCell>
+                <TableCell key="תאריך"> {row["groupDate"]} </TableCell>
 
             ) : '' }   
 
