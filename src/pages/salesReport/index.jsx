@@ -126,6 +126,16 @@ const Users = () => {
     return entry.TOTAL > max ? entry.TOTAL : max;
   },0);
 
+  
+  let totalV = formData.reduce((max, entry) => {
+    return entry.TOTAL+max
+  },0).toFixed(0);
+
+  let totalA = formData.reduce((max, entry) => {
+    return entry.TOTALQ+ max;
+  },0).toFixed(0);
+
+
 
 let allStat={
 
@@ -137,7 +147,7 @@ let allStat={
 
   return (
 <Container >
-    {JSON.stringify(getPart)}
+    
   <Container component="main" sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={3}>
        
@@ -147,16 +157,16 @@ let allStat={
         <GetPart state={getPart} setter={setGetPart} />
         <GroupBy  state={groupPart} setter={setGroupPart} />
         <GetFamily state={getFamily} setter={setGetFamily} />
-        <GroupBy  state={groupCustType} setter={setGroupCustType} />
+        <GroupBy  state={groupFamily} setter={setGroupFamily} />
         <GetCust state={getCust} setter={setGetCust} />
         <GroupBy  state={groupCust} setter={setGroupCust} />
         <GetAgent state={getAgent} setter={setGetAgent} />
         <GroupBy var="groupAgent" state={groupAgent} setter={setGroupAgent} />
         
-      <box>
+      <Box>
         קבץ לפי מסמך 
         <GroupBy var="groupDocname" state={groupDocname} setter={setGroupDocname} />
-      </box>
+      </Box>
 
             <GetDate 
               fromDate={fromDate} setFromDate={setFromDate}  
@@ -219,7 +229,7 @@ let allStat={
 
 
 
-                {(columns.indexOf("family")!=-1) ? (
+                {(columns.indexOf("familyName")!=-1) ? (
                     
                     <TableCell key="משפחה"> משפחה </TableCell>
 
@@ -238,7 +248,59 @@ let allStat={
                 
 
               </TableRow>
+           
+
+{(formData.lengt>1)?(
+
+<TableRow>
+                
+              
+{(columns.indexOf("docName")!=-1) ? (
+      
+      <TableCell key="סוכן">  </TableCell>
+
+  ) : '' }
+
+  
+  {(columns.indexOf("agentName")!=-1) ? (
+      
+      <TableCell key="סוכן">  </TableCell>
+
+  ) : '' }
+
+  {(columns.indexOf("cust")!=-1) ? (
+
+      <TableCell key="לקוח">  </TableCell>
+
+  ) : '' }
+
+
+
+  {(columns.indexOf("familyName")!=-1) ? (
+      
+      <TableCell key="משפחה">  </TableCell>
+
+  ) : '' }
+  
+
+  {(columns.indexOf("part")!=-1) ? (
+      
+      <TableCell key="מוצר">  </TableCell>
+
+  ) : '' }
+
+<TableCell > <b>{totalV}</b> </TableCell>
+<TableCell > <b>{totalA} </b></TableCell>
+<TableCell >          </TableCell>
+  
+
+</TableRow>
+
+):''}
+
+
             </TableHead>
+
             <TableBody>
 
              {formData.map((row, rowIndex) => (
@@ -301,7 +363,7 @@ let allStat={
 
 
 
-{(columns.indexOf("family")!=-1) ? (
+{(columns.indexOf("familyName")!=-1) ? (
 
 <TableCell key={row}> {row["familyName"]} {row["familyDes"]} </TableCell>
 
@@ -335,10 +397,10 @@ key={row}> {row["partName"]} {row["partDes"]}  </TableCell>
 
 
 <TableCell>   
-                   {row['TOTALQ'].toFixed(2)}
+                   {row['TOTAL'].toFixed(2)}
 </TableCell>
 <TableCell>   
-                   {row['TOTAL'].toFixed(2)}
+                   {row['TOTALQ'].toFixed(2)}
 </TableCell>
 
 
@@ -350,6 +412,11 @@ key={row}> {row["partName"]} {row["partDes"]}  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
+
+
+     
+
+
           </Table>
         </TableContainer>
       </Container>
