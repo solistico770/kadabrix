@@ -64,11 +64,14 @@ const Data = (props) => {
     props.setToDate(date);
   };
 
+  const differenceInTime = props.toDate - props.fromDate;
+  const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24))+1 ;
+
   return (
     <Box sx={{ padding: 2 }}>
       <LocalizationProvider dateAdapter={AdapterMoment}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={5}>
             <DatePicker
               format="DD/MM/YYYY"
               label="מתאריך"
@@ -77,7 +80,13 @@ const Data = (props) => {
               renderInput={(params) => <TextField {...params} fullWidth />}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={2}>
+
+          <b> { differenceInDays } ימים </b>
+
+
+          </Grid>
+          <Grid item xs={12} sm={5}>
             <DatePicker
               format="DD/MM/YYYY"
               adapterLocale="he"

@@ -43,12 +43,6 @@ const Data = (props) => {
             >
               שנה
             </Button>
-            <Button
-              onClick={() => handleChange('none')}
-              sx={{ bgcolor: props.state === 'none' ? 'blue' : 'default' ,color: props.state === 'none' ? 'white' : 'default'}}
-            >
-              ללא
-            </Button>
           </ButtonGroup>
           </Grid>
         </Grid>

@@ -1,8 +1,8 @@
+import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { flushSync } from 'react-dom';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import React, { useState ,useEffect } from 'react';
-
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -18,6 +18,7 @@ import GetFamily from "./GetFamily";
 import GetAgent from "./GetAgent";
 import GetDate from "./GetDate";
 import GroupBy from "./GroupBy";
+import GroupByBlock from "./groupByBlock";
 
 import ButtonGroup from '@mui/material/ButtonGroup';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -53,13 +54,8 @@ const Users = () => {
 
 
 
-  const [groupAgent, setGroupAgent] = useState(false);
-  const [groupCustType,setGroupCustType] = useState(false);
-  const [groupCust, setGroupCust] = useState(false);
-  const [groupFamily, setGroupFamily] = useState(false);
-  const [groupPart, setGroupPart] = useState(false);
-  const [groupDocname, setGroupDocname] = useState(false);
-  
+  const [groupBy, setGroupBy] = useState([]);
+ 
   const [fromDate, setFromDate] = useState(moment().startOf('month'));
   const [toDate, setToDate] = useState(moment().endOf('month'));
 
@@ -69,27 +65,12 @@ const Users = () => {
   const [getFamily, setGetFamily] = useState(null);
   const [getPart, setGetPart] = useState(null);
 
-
-
   const [formData, setFormData] = useState([]);
-  const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [dateGroup, setDateGroup] = useState("none");
-
+  const [dateGroup, setDateGroup] = useState("month");
   const [orderBy, setOrderBy] = useState("TOTAL");
 
 
-/*
-
-  useEffect(() => {
-
-      fetchData();
-
-  
-  }, [groupAgent,groupCust,groupPart,groupFamily,getAgent,getCustType,getCust,getFamily,getPart,fromDate,toDate]);
-
-  */
-  
   const sortData = (data, orderBy) => {
     const sortData = (data, orderBy) => {
   if (!data || data.length === 0 || !orderBy) {
@@ -147,12 +128,7 @@ const Users = () => {
               getCust:getCust,
               getFamily:getFamily,
               getPart:getPart,
-              groupAgent:groupAgent,
-              groupCustType:groupCustType,
-              groupCust:groupCust,
-              groupFamily:groupFamily,
-              groupPart:groupPart,
-              groupDocname:groupDocname,
+              groupBy:groupBy,
               fromDate:fromDate.unix(),
               toDate:toDate.unix(),
               dateGroup:dateGroup
@@ -185,66 +161,36 @@ const Users = () => {
 
 
 
-let allStat={
-
-  groupAgent,
-  groupCustType,
-  groupCust,
-  dateGroup,
-}
-
   return (
-<Container >
-    
-  <Container component="main" sx={{ mt: 4, mb: 4 }}>
-      <Grid container spacing={3}>
-       
-        
-        <Grid item xs={12} md={12}>
-        <Paper sx={{ padding: 2 }}>
-        <GetPart state={getPart} setter={setGetPart} />
-        <GroupBy  state={groupPart} setter={setGroupPart} />
-        <GetFamily state={getFamily} setter={setGetFamily} />
-        <GroupBy  state={groupFamily} setter={setGroupFamily} />
-        <GetCust state={getCust} setter={setGetCust} />
-        <GroupBy  state={groupCust} setter={setGroupCust} />
-        <GetAgent state={getAgent} setter={setGetAgent} />
-        <GroupBy var="groupAgent" state={groupAgent} setter={setGroupAgent} />
-        
-      <Box>
-        קבץ לפי מסמך 
-        <GroupBy var="groupDocname" state={groupDocname} setter={setGroupDocname} />
-      </Box>
+  <Container> 
 
-            <GetDate 
-              fromDate={fromDate} setFromDate={setFromDate}  
-              toDate={toDate} setToDate={setToDate}  
-             />
-             <GetDateGroup state={dateGroup} setter={setDateGroup}/>
-          </Paper>
-          
-        </Grid>
+  
+      
+      
+      <GetDate 
+      fromDate={fromDate} setFromDate={setFromDate}  
+      toDate={toDate} setToDate={setToDate}  
+      />
+ 
+      
+       <GroupByBlock state={groupBy} setter={setGroupBy}/>
 
-        
+       {(groupBy.indexOf("date")!=-1) ? (<GetDateGroup state={dateGroup} setter={setDateGroup}/>) : ''}
 
 
-        <Grid item xs={12}>
-          <Paper sx={{ padding: 2, textAlign: 'center' }}>
+
+
             <ButtonGroup variant="outlined" aria-label="Basic button group">
               <Button onClick={fetchData}
                 sx={{ bgcolor: 'green',color:"white"}}
               >הצג תוצאות</Button>
               
             </ButtonGroup>
-          </Paper>
-        </Grid>
-      </Grid>
 
      {( loading ? <CircularProgress /> : '')}
 
-    </Container>
 
-  
+
 
 
 
@@ -257,26 +203,45 @@ let allStat={
                 
               {(columns.indexOf("groupDate")!=-1) ? (
                     
-                    <TableCell key="תאריך" onClick={()=>{setOrderBy("dateGroup")}}> תאריך </TableCell>
+                    <TableCell key="תאריך" onClick={()=>{setOrderBy("groupDate")}}> 
+                    <SwapVertIcon 
+                            style={{ color: orderBy === 'groupDate' ? 'blue' : 'lightgray' }}
+                    />
+                     תאריך </TableCell>
 
                 ) : '' }
 
+
               {(columns.indexOf("docName")!=-1) ? (
                     
-                    <TableCell key="סוכן" onClick={()=>{setOrderBy("docName")}}> מסמך </TableCell>
+                    <TableCell key="מסמך" onClick={()=>{setOrderBy("docName")}}> 
+                     <SwapVertIcon 
+                            style={{ color: orderBy === 'docName' ? 'blue' : 'lightgray' }}
+                    />
+                    מסמך </TableCell>
+                    
 
                 ) : '' }
 
                 
                 {(columns.indexOf("agentName")!=-1) ? (
                     
-                    <TableCell key="סוכן" onClick={()=>{setOrderBy("agentDes")}}> סוכן </TableCell>
+                    <TableCell key="סוכן" onClick={()=>{setOrderBy("agentDes")}}> 
+                      <SwapVertIcon 
+                            style={{ color: orderBy === 'agentDes' ? 'blue' : 'lightgray' }}
+                    />
+
+                    סוכן </TableCell>
 
                 ) : '' }
 
                 {(columns.indexOf("cust")!=-1) ? (
 
-                    <TableCell key="לקוח" onClick={()=>{setOrderBy("custDes")}}> לקוח </TableCell>
+                    <TableCell key="לקוח" onClick={()=>{setOrderBy("custDes")}}> 
+                      <SwapVertIcon 
+                            style={{ color: orderBy === 'custDes' ? 'blue' : 'lightgray' }}
+                    />
+                    לקוח </TableCell>
 
                 ) : '' }
 
@@ -284,21 +249,38 @@ let allStat={
 
                 {(columns.indexOf("familyName")!=-1) ? (
                     
-                    <TableCell key="משפחה" onClick={()=>{setOrderBy("familyName")}}> משפחה </TableCell>
+                    <TableCell key="משפחה" onClick={()=>{setOrderBy("familyName")}}> 
+                      <SwapVertIcon 
+                            style={{ color: orderBy === 'familyName' ? 'blue' : 'lightgray' }}
+                    />
+
+                    משפחה </TableCell>
 
                 ) : '' }
                 
 
                 {(columns.indexOf("part")!=-1) ? (
                     
-                    <TableCell key="מוצר" onClick={()=>{setOrderBy("partDes")}}> מוצר </TableCell>
+                    <TableCell key="מוצר" onClick={()=>{setOrderBy("partDes")}}> 
+                      <SwapVertIcon 
+                            style={{ color: orderBy === 'partDes' ? 'blue' : 'lightgray' }}
+                    />
+                    מוצר </TableCell>
 
                 ) : '' }
              
-<TableCell onClick={()=>{setOrderBy("TOTAL")}}  >  סה"כ </TableCell>
-<TableCell onClick={()=>{setOrderBy("TOTALQ")}} >  כמות </TableCell>
+<TableCell onClick={()=>{setOrderBy("TOTAL")}}  > 
+<SwapVertIcon 
+                            style={{ color: orderBy === 'TOTAL' ? 'blue' : 'lightgray' }}
+                    />
+   סה"כ </TableCell>
+<TableCell onClick={()=>{setOrderBy("TOTALQ")}} >  
+<SwapVertIcon 
+                            style={{ color: orderBy === 'TOTALQ' ? 'blue' : 'lightgray' }}
+                    />
+  כמות </TableCell>
 
-                
+  <TableCell> </TableCell>
 
               </TableRow>
   </TableHead>
@@ -430,7 +412,17 @@ let allStat={
 
 {(columns.indexOf("familyName")!=-1) ? (
 
-<TableCell > {row["familyName"]} {row["familyDes"]} </TableCell>
+<TableCell
+
+onClick={()=>{
+  setGetFamily({
+    "family":row["family"],
+    "familyName":row["familyName"],
+    "familyDes":row["familyDes"]
+})}}
+
+
+> {row["familyName"]} {row["familyDes"]} </TableCell>
 
 ) : '' }
 
@@ -487,12 +479,7 @@ onClick={()=>{
       </Container>
 
 
-
-
-
-</Container >
-
-
+</Container>
 
   );
 };
