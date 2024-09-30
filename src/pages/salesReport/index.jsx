@@ -1,4 +1,6 @@
 import SwapVertIcon from '@mui/icons-material/SwapVert';
+
+
 import { flushSync } from 'react-dom';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -10,6 +12,13 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import kdb from '../../kadabrix/kadabrix';
+
+import GetSelectedCust from "./getSelectedCust";
+import GetSelectedPart from "./GetSelectedPart";
+import GetSelectedAgent from "./GetSelectedAgent";
+import GetSelectedFamily from "./GetSelectedFamily";
+
+
 import GetPart from "./GetPart";
 import GetCust from "./GetCust";
 import GetCustType from "./GetCustType";
@@ -69,39 +78,20 @@ const Users = () => {
   const [loading, setLoading] = useState(false);
   const [dateGroup, setDateGroup] = useState("month");
   const [orderBy, setOrderBy] = useState("TOTAL");
+  const [orderByD, setOrderByD] = useState(false);
 
-
-  const sortData = (data, orderBy) => {
-    const sortData = (data, orderBy) => {
-  if (!data || data.length === 0 || !orderBy) {
-    return data;
-  }
-
-    const sortedData = [...data].sort((a, b) => {
-    if (a[orderBy] < b[orderBy]) {
-      return -1;
-    }
-    if (a[orderBy] > b[orderBy]) {
-      return 1;
-    }
-    return 0; // If equal, no change
-  });
-
-  return sortedData;
-};
-
-
+  const sortData = (data) => {
     if (!data || data.length === 0 || !orderBy) {
-      return data;
+      return data; // Return original data if conditions are not met
     }
   
     // Sort the data array by the key specified in orderBy
     const sortedData = [...data].sort((a, b) => {
       if (a[orderBy] < b[orderBy]) {
-        return -1;
+        return orderByD ? -1 : 1;
       }
       if (a[orderBy] > b[orderBy]) {
-        return 1;
+        return orderByD ? 1 : -1;
       }
       return 0; // If equal, no change
     });
@@ -110,9 +100,10 @@ const Users = () => {
   };
   
   
+  
   useEffect(()=>{
-    setFormData(sortData(formData,orderBy));
-  },[orderBy])
+    setFormData(sortData(formData));
+  },[orderBy,orderByD])
 
 
 
@@ -135,8 +126,7 @@ const Users = () => {
          },
       });
       setLoading(false);
-      setFormData(sortData(response,orderBy));
-      setTabValue(1);
+      setFormData(sortData(response));
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -159,26 +149,46 @@ const Users = () => {
     return entry.TOTALQ+ max;
   },0).toFixed(0)).toLocaleString();
 
+  const doOrderBy = (col)=>{
 
+    if (col==orderBy) {
+
+      setOrderByD(!orderByD);
+
+    } else {
+
+      setOrderBy(col)
+    }
+
+  }
 
   return (
   <Container> 
 
   
-      
-      
+    <Box>
       <GetDate 
       fromDate={fromDate} setFromDate={setFromDate}  
       toDate={toDate} setToDate={setToDate}  
       />
- 
-      
+    </Box>
+
+    <Box>
+    
        <GroupByBlock state={groupBy} setter={setGroupBy}/>
 
        {(groupBy.indexOf("date")!=-1) ? (<GetDateGroup state={dateGroup} setter={setDateGroup}/>) : ''}
+    </Box>
+    
+    <Box>
+      <GetSelectedCust state={getCust} setter={setGetCust} />
+      <GetSelectedPart state={getPart} setter={setGetPart} />
+      <GetSelectedAgent state={getAgent} setter={setGetAgent} />
+      <GetSelectedFamily state={getFamily} setter={setGetFamily} />
+    </Box>
 
-
-
+    <Box>
+    
 
             <ButtonGroup variant="outlined" aria-label="Basic button group">
               <Button onClick={fetchData}
@@ -186,14 +196,11 @@ const Users = () => {
               >הצג תוצאות</Button>
               
             </ButtonGroup>
+    </Box>
 
      {( loading ? <CircularProgress /> : '')}
 
-
-
-
-
-
+{formData.length==0?'':(
   <Container component="section">
   
         <TableContainer component={Paper}>
@@ -203,7 +210,7 @@ const Users = () => {
                 
               {(columns.indexOf("groupDate")!=-1) ? (
                     
-                    <TableCell key="תאריך" onClick={()=>{setOrderBy("groupDate")}}> 
+                    <TableCell key="תאריך" onClick={()=>{doOrderBy("groupDate")}}> 
                     <SwapVertIcon 
                             style={{ color: orderBy === 'groupDate' ? 'blue' : 'lightgray' }}
                     />
@@ -214,7 +221,7 @@ const Users = () => {
 
               {(columns.indexOf("docName")!=-1) ? (
                     
-                    <TableCell key="מסמך" onClick={()=>{setOrderBy("docName")}}> 
+                    <TableCell key="מסמך" onClick={()=>{doOrderBy("docName")}}> 
                      <SwapVertIcon 
                             style={{ color: orderBy === 'docName' ? 'blue' : 'lightgray' }}
                     />
@@ -226,7 +233,7 @@ const Users = () => {
                 
                 {(columns.indexOf("agentName")!=-1) ? (
                     
-                    <TableCell key="סוכן" onClick={()=>{setOrderBy("agentDes")}}> 
+                    <TableCell key="סוכן" onClick={()=>{doOrderBy("agentDes")}}> 
                       <SwapVertIcon 
                             style={{ color: orderBy === 'agentDes' ? 'blue' : 'lightgray' }}
                     />
@@ -237,7 +244,7 @@ const Users = () => {
 
                 {(columns.indexOf("cust")!=-1) ? (
 
-                    <TableCell key="לקוח" onClick={()=>{setOrderBy("custDes")}}> 
+                    <TableCell key="לקוח" onClick={()=>{doOrderBy("custDes")}}> 
                       <SwapVertIcon 
                             style={{ color: orderBy === 'custDes' ? 'blue' : 'lightgray' }}
                     />
@@ -249,7 +256,7 @@ const Users = () => {
 
                 {(columns.indexOf("familyName")!=-1) ? (
                     
-                    <TableCell key="משפחה" onClick={()=>{setOrderBy("familyName")}}> 
+                    <TableCell key="משפחה" onClick={()=>{doOrderBy("familyName")}}> 
                       <SwapVertIcon 
                             style={{ color: orderBy === 'familyName' ? 'blue' : 'lightgray' }}
                     />
@@ -261,7 +268,7 @@ const Users = () => {
 
                 {(columns.indexOf("part")!=-1) ? (
                     
-                    <TableCell key="מוצר" onClick={()=>{setOrderBy("partDes")}}> 
+                    <TableCell key="מוצר" onClick={()=>{doOrderBy("partDes")}}> 
                       <SwapVertIcon 
                             style={{ color: orderBy === 'partDes' ? 'blue' : 'lightgray' }}
                     />
@@ -269,12 +276,12 @@ const Users = () => {
 
                 ) : '' }
              
-<TableCell onClick={()=>{setOrderBy("TOTAL")}}  > 
+<TableCell onClick={()=>{doOrderBy("TOTAL")}}  > 
 <SwapVertIcon 
                             style={{ color: orderBy === 'TOTAL' ? 'blue' : 'lightgray' }}
                     />
    סה"כ </TableCell>
-<TableCell onClick={()=>{setOrderBy("TOTALQ")}} >  
+<TableCell onClick={()=>{doOrderBy("TOTALQ")}} >  
 <SwapVertIcon 
                             style={{ color: orderBy === 'TOTALQ' ? 'blue' : 'lightgray' }}
                     />
@@ -476,8 +483,7 @@ onClick={()=>{
 
           </Table>
         </TableContainer>
-      </Container>
-
+      </Container>)}
 
 </Container>
 

@@ -14,10 +14,6 @@ const Data = (props) => {
 
   return (
     
-<Box sx={{ padding: 2 }}>
-        <Grid container spacing={2} sx={{ marginTop: 2 }}>
-          <Grid item xs={12}>
-          קבץ לפי:
           <ButtonGroup variant="outlined" fullWidth aria-label="Basic button group">
             <Button
               onClick={() => handleChange('day')}
@@ -44,9 +40,6 @@ const Data = (props) => {
               שנה
             </Button>
           </ButtonGroup>
-          </Grid>
-        </Grid>
-</Box>        
  
   );
 };

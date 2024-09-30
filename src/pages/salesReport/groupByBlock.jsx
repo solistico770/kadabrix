@@ -3,7 +3,15 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import PersonIcon from '@mui/icons-material/Person';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import AppsIcon from '@mui/icons-material/Apps';
+import DescriptionIcon from '@mui/icons-material/Description';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+
+
 
 
 const Data = (props) => {
@@ -31,7 +39,7 @@ const Data = (props) => {
           <ButtonGroup variant="outlined" fullWidth aria-label="Basic button group">
            
             <Button
-             startIcon={<CloudUploadIcon />}
+             startIcon={<PersonIcon />}
              onClick={() => handleChange('customer')}
              sx={{ bgcolor: isChecked('customer') ? 'blue' : 'default' ,
                    color: isChecked('customer') ? 'white' : 'default'}}
@@ -40,7 +48,7 @@ const Data = (props) => {
             </Button>
 
             <Button
-             startIcon={<CloudUploadIcon />}
+             startIcon={<SupportAgentIcon />}
              onClick={() => handleChange('agent')}
              sx={{ bgcolor: isChecked('agent') ? 'blue' : 'default' ,
                    color: isChecked('agent') ? 'white' : 'default'}}
@@ -49,7 +57,7 @@ const Data = (props) => {
             </Button>
 
             <Button
-             startIcon={<CloudUploadIcon />}
+             startIcon={<ShoppingCartIcon />}
              onClick={() => handleChange('product')}
              sx={{ bgcolor: isChecked('product') ? 'blue' : 'default' ,
                    color: isChecked('product') ? 'white' : 'default'}}
@@ -58,7 +66,7 @@ const Data = (props) => {
             </Button>
 
             <Button
-             startIcon={<CloudUploadIcon />}
+             startIcon={<AppsIcon />}
              onClick={() => handleChange('family')}
              sx={{ bgcolor: isChecked('family') ? 'blue' : 'default' ,
                    color: isChecked('family') ? 'white' : 'default'}}
@@ -66,7 +74,7 @@ const Data = (props) => {
             משפחת מוצר
             </Button>
             <Button
-             startIcon={<CloudUploadIcon />}
+             startIcon={<DescriptionIcon />}
              onClick={() => handleChange('docName')}
              sx={{ bgcolor: isChecked('docName') ? 'blue' : 'default' ,
                    color: isChecked('docName') ? 'white' : 'default'}}
@@ -77,7 +85,7 @@ const Data = (props) => {
             </Button>
 
             <Button
-             startIcon={<CloudUploadIcon />}
+             startIcon={<CalendarMonthIcon />}
              onClick={() => handleChange('date')}
              sx={{ bgcolor: isChecked('date') ? 'blue' : 'default' ,
                    color: isChecked('date') ? 'white' : 'default'}}
