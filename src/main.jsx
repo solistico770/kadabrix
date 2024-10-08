@@ -1,13 +1,36 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+import './index.css';
 import { CartProvider } from './kadabrix/cartState';
+import { ThemeProvider, CssBaseline } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
+import rtlPlugin from 'stylis-plugin-rtl';
+import { prefixer } from 'stylis';
+import { CacheProvider } from '@emotion/react';
+import createCache from '@emotion/cache';
+
+// Create an RTL theme
+const theme = createTheme({
+  direction: 'rtl',
+});
+
+const cacheRtl = createCache({
+  key: 'muirtl',
+  stylisPlugins: [prefixer, rtlPlugin],
+});
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <CartProvider>
-         <App />
-    </CartProvider>
+  <CacheProvider value={cacheRtl}>
+
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <CartProvider>
+        <App />
+      </CartProvider>
+    </ThemeProvider>
+    </CacheProvider>
   </React.StrictMode>,
-)
+);

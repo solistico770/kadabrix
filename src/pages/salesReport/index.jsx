@@ -1,6 +1,4 @@
 import SwapVertIcon from '@mui/icons-material/SwapVert';
-
-
 import { flushSync } from 'react-dom';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -164,7 +162,6 @@ const Users = () => {
 
   return (
   <Container> 
-
   
     <Box>
       <GetDate 
@@ -187,9 +184,7 @@ const Users = () => {
       <GetSelectedFamily state={getFamily} setter={setGetFamily} />
     </Box>
 
-    <Box>
-    
-
+    <Box sx={{ py: 2 }}>
             <ButtonGroup variant="outlined" aria-label="Basic button group">
               <Button onClick={fetchData}
                 sx={{ bgcolor: 'green',color:"white"}}
@@ -198,13 +193,14 @@ const Users = () => {
             </ButtonGroup>
     </Box>
 
+
      {( loading ? <CircularProgress /> : '')}
 
 {formData.length==0?'':(
   <Container component="section">
   
         <TableContainer component={Paper}>
-          <Table>
+          <Table dir="rtl">
             <TableHead>
               <TableRow >
                 
@@ -212,7 +208,7 @@ const Users = () => {
                     
                     <TableCell key="תאריך" onClick={()=>{doOrderBy("groupDate")}}> 
                     <SwapVertIcon 
-                            style={{ color: orderBy === 'groupDate' ? 'blue' : 'lightgray' }}
+                            sx={{ color: orderBy === 'groupDate' ? 'blue' : 'lightgray' }}
                     />
                      תאריך </TableCell>
 
@@ -223,7 +219,7 @@ const Users = () => {
                     
                     <TableCell key="מסמך" onClick={()=>{doOrderBy("docName")}}> 
                      <SwapVertIcon 
-                            style={{ color: orderBy === 'docName' ? 'blue' : 'lightgray' }}
+                            sx={{ color: orderBy === 'docName' ? 'blue' : 'lightgray' }}
                     />
                     מסמך </TableCell>
                     
@@ -235,7 +231,7 @@ const Users = () => {
                     
                     <TableCell key="סוכן" onClick={()=>{doOrderBy("agentDes")}}> 
                       <SwapVertIcon 
-                            style={{ color: orderBy === 'agentDes' ? 'blue' : 'lightgray' }}
+                            sx={{ color: orderBy === 'agentDes' ? 'blue' : 'lightgray' }}
                     />
 
                     סוכן </TableCell>
@@ -246,7 +242,7 @@ const Users = () => {
 
                     <TableCell key="לקוח" onClick={()=>{doOrderBy("custDes")}}> 
                       <SwapVertIcon 
-                            style={{ color: orderBy === 'custDes' ? 'blue' : 'lightgray' }}
+                            sx={{ color: orderBy === 'custDes' ? 'blue' : 'lightgray' }}
                     />
                     לקוח </TableCell>
 
@@ -258,7 +254,7 @@ const Users = () => {
                     
                     <TableCell key="משפחה" onClick={()=>{doOrderBy("familyName")}}> 
                       <SwapVertIcon 
-                            style={{ color: orderBy === 'familyName' ? 'blue' : 'lightgray' }}
+                            sx={{ color: orderBy === 'familyName' ? 'blue' : 'lightgray' }}
                     />
 
                     משפחה </TableCell>
@@ -270,7 +266,7 @@ const Users = () => {
                     
                     <TableCell key="מוצר" onClick={()=>{doOrderBy("partDes")}}> 
                       <SwapVertIcon 
-                            style={{ color: orderBy === 'partDes' ? 'blue' : 'lightgray' }}
+                            sx={{ color: orderBy === 'partDes' ? 'blue' : 'lightgray' }}
                     />
                     מוצר </TableCell>
 
@@ -278,12 +274,12 @@ const Users = () => {
              
 <TableCell onClick={()=>{doOrderBy("TOTAL")}}  > 
 <SwapVertIcon 
-                            style={{ color: orderBy === 'TOTAL' ? 'blue' : 'lightgray' }}
+                            sx={{ color: orderBy === 'TOTAL' ? 'blue' : 'lightgray' }}
                     />
    סה"כ </TableCell>
 <TableCell onClick={()=>{doOrderBy("TOTALQ")}} >  
 <SwapVertIcon 
-                            style={{ color: orderBy === 'TOTALQ' ? 'blue' : 'lightgray' }}
+                            sx={{ color: orderBy === 'TOTALQ' ? 'blue' : 'lightgray' }}
                     />
   כמות </TableCell>
 
@@ -352,20 +348,28 @@ const Users = () => {
           
 
              {formData.map((row, rowIndex) => (
-               <TableRow key={rowIndex}>
+               <TableRow 
+               
+               key={rowIndex}>
 
 
 
   
           {(columns.indexOf("groupDate")!=-1) ? (
                 
-                <TableCell key="תאריך"> {row["groupDate"]} </TableCell>
+                <TableCell 
+                sx={{ cursor: 'pointer',direction:'ltr' }}
+                key="תאריך"> {row["groupDate"]} </TableCell>
 
             ) : '' }   
 
 {(columns.indexOf("docName")!=-1) ? (
 
-<TableCell  >{row["docName"]}</TableCell>
+<TableCell  
+
+sx={{ direction:'ltr' }}
+
+>{row["docName"]}</TableCell>
 
 ) : '' }
 
@@ -374,7 +378,10 @@ const Users = () => {
 
 {(columns.indexOf("agentName")!=-1) ? (
 
-<TableCell onClick={()=>{
+<TableCell 
+
+sx={{ cursor: 'pointer' ,direction:'rtl'}}
+onClick={()=>{
 
 
 
@@ -396,7 +403,9 @@ const Users = () => {
 
 {(columns.indexOf("cust")!=-1) ? (
 
-<TableCell onClick={()=>{
+<TableCell 
+sx={{ cursor: 'pointer' ,direction:'rtl'}}
+onClick={()=>{
 
 
 
@@ -420,7 +429,7 @@ const Users = () => {
 {(columns.indexOf("familyName")!=-1) ? (
 
 <TableCell
-
+sx={{ cursor: 'pointer',direction:'rtl' }}
 onClick={()=>{
   setGetFamily({
     "family":row["family"],
@@ -437,7 +446,7 @@ onClick={()=>{
 {(columns.indexOf("part")!=-1) ? (
 
 <TableCell 
-  
+  sx={{ cursor: 'pointer' ,direction:'rtl'}}
 
 onClick={()=>{
 
@@ -460,10 +469,17 @@ onClick={()=>{
 ) : '' }
 
 
-<TableCell>   
+<TableCell 
+  sx={{ direction:'ltr'}}
+
+>
+     
                    {Number(row['TOTAL'].toFixed(2)).toLocaleString()}
 </TableCell>
-<TableCell>   
+<TableCell
+  sx={{ direction:'ltr'}}
+
+>   
                    {Number(row['TOTALQ'].toFixed(2)).toLocaleString()}
 </TableCell>
 

@@ -19,7 +19,7 @@ const Data = (props) => {
 
   const setYear = () => {
     const startOfYear = moment().utc().startOf('year');
-    const endOfYear = moment().utc().endOf('year');
+    const endOfYear = moment().utc();
     props.setFromDate(startOfYear)
     props.setToDate(endOfYear)
     setCurrentDateType("year")
