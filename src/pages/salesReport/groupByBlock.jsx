@@ -3,6 +3,7 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import PersonIcon from '@mui/icons-material/Person';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -35,8 +36,8 @@ const Data = (props) => {
     <Grid item xs={12}>
       קבץ לפי:
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} md={4}>
-          <Button
+        <Grid item xs={6} sm={2}>
+          <Button variant="outlined"
             startIcon={<PersonIcon />}
             onClick={() => handleChange('customer')}
             sx={{
@@ -49,8 +50,8 @@ const Data = (props) => {
           </Button>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <Button
+        <Grid item xs={6} sm={2}>
+          <Button variant="outlined"
             startIcon={<SupportAgentIcon />}
             onClick={() => handleChange('agent')}
             sx={{
@@ -63,8 +64,8 @@ const Data = (props) => {
           </Button>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <Button
+        <Grid item xs={6} sm={2}>
+          <Button variant="outlined"
             startIcon={<ShoppingCartIcon />}
             onClick={() => handleChange('product')}
             sx={{
@@ -77,8 +78,8 @@ const Data = (props) => {
           </Button>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <Button
+        <Grid item xs={6} sm={2}>
+          <Button variant="outlined"
             startIcon={<AppsIcon />}
             onClick={() => handleChange('family')}
             sx={{
@@ -91,8 +92,8 @@ const Data = (props) => {
           </Button>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <Button
+        <Grid item xs={6} sm={2}>
+          <Button variant="outlined"
             startIcon={<DescriptionIcon />}
             onClick={() => handleChange('docName')}
             sx={{
@@ -105,8 +106,8 @@ const Data = (props) => {
           </Button>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          <Button
+        <Grid item xs={6} sm={2}>
+          <Button variant="outlined"
             startIcon={<CalendarMonthIcon />}
             onClick={() => handleChange('date')}
             sx={{
@@ -123,19 +124,6 @@ const Data = (props) => {
   </Grid>
 </Box>
 
-           
-
-
-
-
-          </ButtonGroup>
-
-
-          
-          </Grid>
-        </Grid>
-</Box>        
- 
   );
 };
 
