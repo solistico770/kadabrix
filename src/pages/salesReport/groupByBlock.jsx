@@ -1,129 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import React from 'react';
+import { Button, Box, Grid } from '@mui/material';
+import {
+  SupportAgent as SupportAgentIcon,
+  Person as PersonIcon,
+  ShoppingCart as ShoppingCartIcon,
+  Apps as AppsIcon,
+  Description as DescriptionIcon,
+  CalendarMonth as CalendarMonthIcon
+} from '@mui/icons-material';
 
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
-import PersonIcon from '@mui/icons-material/Person';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import AppsIcon from '@mui/icons-material/Apps';
-import DescriptionIcon from '@mui/icons-material/Description';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+const buttonsData = [
+  { label: 'לקוח', value: 'customer', icon: <PersonIcon /> },
+  { label: 'סוכן', value: 'agent', icon: <SupportAgentIcon /> },
+  { label: 'מוצר', value: 'product', icon: <ShoppingCartIcon /> },
+  { label: 'משפחת מוצר', value: 'family', icon: <AppsIcon /> },
+  { label: 'מספר מסמך', value: 'docName', icon: <DescriptionIcon /> },
+  { label: 'תאריך', value: 'date', icon: <CalendarMonthIcon /> }
+];
 
+const Data = ({ state, setter }) => {
 
-
-
-const Data = (props) => {
-  
-  const handleChange = (data) => {
-    if (props.state.indexOf(data)==-1) {
-      props.setter([...props.state,data])
-    } else {
-       props.setter([...props.state.filter((i)=>i!=data)])
-    }
+  const handleChange = (value) => {
+    setter(state.includes(value) ? state.filter((i) => i !== value) : [...state, value]);
   };
 
-  const isChecked = (data) => {
-    return (props.state.indexOf(data)!=-1)
-  };
-
-  
+  const isChecked = (value) => state.includes(value);
 
   return (
-    <Box sx={{ padding: 2, direction: "ltr" }}>
-  <Grid container spacing={2} sx={{ marginTop: 2 }}>
-    <Grid item xs={12}>
-      קבץ לפי:
-      <Grid container spacing={2}>
-        <Grid item xs={6} sm={2}>
-          <Button variant="outlined"
-            startIcon={<PersonIcon />}
-            onClick={() => handleChange('customer')}
-            sx={{
-              bgcolor: isChecked('customer') ? 'blue' : 'default',
-              color: isChecked('customer') ? 'white' : 'default',
-              width: '100%',
-            }}
-          >
-            לקוח
-          </Button>
-        </Grid>
-
-        <Grid item xs={6} sm={2}>
-          <Button variant="outlined"
-            startIcon={<SupportAgentIcon />}
-            onClick={() => handleChange('agent')}
-            sx={{
-              bgcolor: isChecked('agent') ? 'blue' : 'default',
-              color: isChecked('agent') ? 'white' : 'default',
-              width: '100%',
-            }}
-          >
-            סוכן
-          </Button>
-        </Grid>
-
-        <Grid item xs={6} sm={2}>
-          <Button variant="outlined"
-            startIcon={<ShoppingCartIcon />}
-            onClick={() => handleChange('product')}
-            sx={{
-              bgcolor: isChecked('product') ? 'blue' : 'default',
-              color: isChecked('product') ? 'white' : 'default',
-              width: '100%',
-            }}
-          >
-            מוצר
-          </Button>
-        </Grid>
-
-        <Grid item xs={6} sm={2}>
-          <Button variant="outlined"
-            startIcon={<AppsIcon />}
-            onClick={() => handleChange('family')}
-            sx={{
-              bgcolor: isChecked('family') ? 'blue' : 'default',
-              color: isChecked('family') ? 'white' : 'default',
-              width: '100%',
-            }}
-          >
-            משפחת מוצר
-          </Button>
-        </Grid>
-
-        <Grid item xs={6} sm={2}>
-          <Button variant="outlined"
-            startIcon={<DescriptionIcon />}
-            onClick={() => handleChange('docName')}
-            sx={{
-              bgcolor: isChecked('docName') ? 'blue' : 'default',
-              color: isChecked('docName') ? 'white' : 'default',
-              width: '100%',
-            }}
-          >
-            מספר מסמך
-          </Button>
-        </Grid>
-
-        <Grid item xs={6} sm={2}>
-          <Button variant="outlined"
-            startIcon={<CalendarMonthIcon />}
-            onClick={() => handleChange('date')}
-            sx={{
-              bgcolor: isChecked('date') ? 'blue' : 'default',
-              color: isChecked('date') ? 'white' : 'default',
-              width: '100%',
-            }}
-          >
-            תאריך
-          </Button>
+    <Box sx={{ padding: 2, direction: 'ltr' }}>
+      <Grid container spacing={2} sx={{ marginTop: 2 }}>
+        <Grid item xs={12}>
+          קבץ לפי:
+          <Grid container spacing={2}>
+            {buttonsData.map(({ label, value, icon }) => (
+              <Grid item xs={6} sm={2} key={value}>
+                <Button
+                  variant="outlined"
+                  startIcon={icon}
+                  onClick={() => handleChange(value)}
+                  sx={{
+                    bgcolor: isChecked(value) ? 'blue' : 'default',
+                    color: isChecked(value) ? 'white' : 'default',
+                    width: '100%'
+                  }}
+                >
+                  {label}
+                </Button>
+              </Grid>
+            ))}
+          </Grid>
         </Grid>
       </Grid>
-    </Grid>
-  </Grid>
-</Box>
-
+    </Box>
   );
 };
 
