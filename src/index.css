@@ -3,3 +3,8 @@ body {
     direction: rtl;
     text-align: right;
 }
+
+html, body {
+    overscroll-behavior-y: contain;
+  }
+  
