@@ -15,6 +15,8 @@ import GetSelectedCust from "./getSelectedCust";
 import GetSelectedPart from "./GetSelectedPart";
 import GetSelectedAgent from "./GetSelectedAgent";
 import GetSelectedFamily from "./GetSelectedFamily";
+import GetSelectedDocName from "./GetSelectedDocName";
+import GetSelectedDate from "./GetSelectedDate";
 
 
 import GetPart from "./GetPart";
@@ -71,6 +73,9 @@ const Users = () => {
   const [getCust, setGetCust] = useState(null);
   const [getFamily, setGetFamily] = useState(null);
   const [getPart, setGetPart] = useState(null);
+  const [getDocName, setGetDocName] = useState(null);
+  const [getDate, setGetDate] = useState(null);
+  
 
   const [formData, setFormData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -115,6 +120,8 @@ const Users = () => {
               getAgent:getAgent,
               getCustType:getCustType,
               getCust:getCust,
+              getDocName:getDocName,
+              getDate:getDate,
               getFamily:getFamily,
               getPart:getPart,
               groupBy:groupBy,
@@ -182,6 +189,9 @@ const Users = () => {
       <GetSelectedPart state={getPart} setter={setGetPart} />
       <GetSelectedAgent state={getAgent} setter={setGetAgent} />
       <GetSelectedFamily state={getFamily} setter={setGetFamily} />
+      <GetSelectedDocName state={getDocName} setter={setGetDocName} />
+      <GetSelectedDate state={getDate} setter={setGetDate} />
+      
     </Box>
 
     <Box sx={{ py: 2 }}>
@@ -204,9 +214,42 @@ const Users = () => {
             <TableHead>
               <TableRow >
                 
-              {(columns.indexOf("groupDate")!=-1) ? (
+              {(columns.indexOf("groupDate_day")!=-1) ? (
                     
-                    <TableCell key="תאריך" onClick={()=>{doOrderBy("groupDate")}}> 
+                    <TableCell key="תאריך" onClick={()=>{doOrderBy("groupDate_day")}}> 
+                    <SwapVertIcon 
+                            sx={{ color: orderBy === 'groupDate' ? 'blue' : 'lightgray' }}
+                    />
+                     תאריך </TableCell>
+
+                ) : '' }
+
+              {(columns.indexOf("groupDate_week")!=-1) ? (
+                    
+                    <TableCell key="תאריך" onClick={()=>{doOrderBy("groupDate_week")}}> 
+                    <SwapVertIcon 
+                            sx={{ color: orderBy === 'groupDate' ? 'blue' : 'lightgray' }}
+                    />
+                     תאריך </TableCell>
+
+                ) : '' }
+
+
+{(columns.indexOf("groupDate_month")!=-1) ? (
+                    
+                    <TableCell key="תאריך" onClick={()=>{doOrderBy("groupDate_month")}}> 
+                    <SwapVertIcon 
+                            sx={{ color: orderBy === 'groupDate' ? 'blue' : 'lightgray' }}
+                    />
+                     תאריך </TableCell>
+
+                ) : '' }
+
+
+
+{(columns.indexOf("groupDate_year")!=-1) ? (
+                    
+                    <TableCell key="תאריך" onClick={()=>{doOrderBy("groupDate_year")}}> 
                     <SwapVertIcon 
                             sx={{ color: orderBy === 'groupDate' ? 'blue' : 'lightgray' }}
                     />
@@ -295,7 +338,12 @@ const Users = () => {
 <TableRow>
 
     
-{(columns.indexOf("groupDate")!=-1) ? (
+{ ((columns.indexOf("groupDate_day")!=-1)
+   ||(columns.indexOf("groupDate_weel")!=-1)
+   ||(columns.indexOf("groupDate_month")!=-1)
+   ||(columns.indexOf("groupDate_year")!=-1)
+  
+  ) ? (
     
     <TableCell key="תאריך"> תאריך </TableCell>
 
@@ -303,7 +351,7 @@ const Users = () => {
               
 {(columns.indexOf("docName")!=-1) ? (
       
-      <TableCell key="סוכן">  </TableCell>
+      <TableCell key="מסמך">  </TableCell>
 
   ) : '' }
 
@@ -355,19 +403,118 @@ const Users = () => {
 
 
   
-          {(columns.indexOf("groupDate")!=-1) ? (
+  
+{(columns.indexOf("groupDate_year")!=-1) ? (
                 
                 <TableCell 
                 sx={{ cursor: 'pointer',direction:'ltr' }}
-                key="תאריך"> {row["groupDate"]} </TableCell>
+                onClick={()=>{
+
+                const date = moment(row["groupDate_year"], "YYYY");
+                const startOfDayUnix = date.startOf('year').unix();
+                const endOfDayUnix = date.endOf('year').unix();
+
+                  setGetDate({
+                    "fromDate": startOfDayUnix,
+                    "toDate": endOfDayUnix,
+                    });
+                }} 
+
+                key="תאריך"> {row["groupDate_year"]} </TableCell>
 
             ) : '' }   
+
+
+
+
+{(columns.indexOf("groupDate_day")!=-1) ? (
+                
+                <TableCell 
+                sx={{ cursor: 'pointer',direction:'ltr' }}
+                onClick={()=>{
+
+                const date = moment(row["groupDate_day"], "DD/MM/YY");
+                const startOfDayUnix = date.startOf('day').unix();
+                const endOfDayUnix = date.endOf('day').unix();
+
+                  setGetDate({
+                    "fromDate": startOfDayUnix,
+                    "toDate": endOfDayUnix,
+                    });
+                }} 
+
+                key="תאריך"> {row["groupDate_day"]} </TableCell>
+
+            ) : '' }   
+
+
+
+          {(columns.indexOf("groupDate_week")!=-1) ? (
+                
+                <TableCell 
+                sx={{ cursor: 'pointer',direction:'ltr' }}
+                onClick={()=>{
+
+                const date = moment(row["groupDate_week"], "YYYY-WW");
+                const startOfDayUnix = date.startOf('week').unix();
+                const endOfDayUnix = date.endOf('week').unix();
+
+                  setGetDate({
+                    "fromDate": startOfDayUnix,
+                    "toDate": endOfDayUnix,
+                    });
+                }} 
+
+                key="תאריך"> {row["groupDate_week"]} </TableCell>
+
+            ) : '' }   
+
+
+
+          {(columns.indexOf("groupDate_month")!=-1) ? (
+                
+                <TableCell 
+                sx={{ cursor: 'pointer',direction:'ltr' }}
+                onClick={()=>{
+
+                const date = moment(row["groupDate_month"], "MM/YY");
+                const startOfDayUnix = date.startOf('month').unix();
+                const endOfDayUnix = date.endOf('month').unix();
+
+                  setGetDate({
+                    "fromDate": startOfDayUnix,
+                    "toDate": endOfDayUnix,
+                    });
+                }} 
+
+                key="תאריך"> {row["groupDate_month"]} </TableCell>
+
+            ) : '' }   
+
+
+
 
 {(columns.indexOf("docName")!=-1) ? (
 
 <TableCell  
 
-sx={{ direction:'ltr' }}
+sx={{  cursor: 'pointer' , direction:'ltr' }}
+
+onClick={()=>{
+
+
+
+  setGetDocName({
+    "docName": row["docName"],
+    });
+  
+  
+  
+
+
+}} 
+
+
 
 >{row["docName"]}</TableCell>
 

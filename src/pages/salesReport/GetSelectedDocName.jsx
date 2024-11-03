@@ -29,7 +29,7 @@ const Data = (props) => {
          ></Button>
 
       
-         {props.state.partName} {props.state.partDes }
+         { props.state.docName }
 
 
     </div>)  : ''    }
