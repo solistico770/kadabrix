@@ -7,7 +7,6 @@ const Data = (props) => {
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [debouncedValue, setDebouncedValue] = useState(inputValue);
-  const [isShrink,setIsShrink] = useState(inputValue);
   const fetchData = async (searchTerm = '') => {
     setLoading(true);
     try {
@@ -43,7 +42,7 @@ const Data = (props) => {
 
   // Fetch data when debounced value changes
   useEffect(() => {
-    if (debouncedValue) {
+    if (debouncedValue=='' || debouncedValue) {
       fetchData(debouncedValue);
     } else {
       setData([]); // Clear data if input is empty
@@ -52,22 +51,13 @@ const Data = (props) => {
 
   return (
     <div>
-        { (props.state!=null) ? 
-    (<div> 
-         <Button onClick={()=>{
-            props.setter(null);
-            fetchData();
-         }}>X</Button>
-         {props.state.partName} {props.state.partDes }
-
-
-    </div>)  : 
-    (<div>
     <Autocomplete
+    
       lablel="בחר לקוח"
       options={data}
       onChange={(event, newValue) => {
         props.setter(newValue); // Update selected item state
+        setInputValue('');
       }}
       getOptionLabel={(option) => `${option.partName} ${option.partDes || ''}`}
       filterOptions={(x) => x} // Disable built-in filtering to rely on server-side filtering
@@ -93,9 +83,8 @@ const Data = (props) => {
       )}
       
     />
-       </div>)}
+       </div>
 
-  </div>
   );
 };
 

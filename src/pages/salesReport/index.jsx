@@ -98,7 +98,7 @@ const Users = () => {
 
 
   const [groupBy, setGroupBy] = useState([]);
-  const [docType, setDocType] = useState('invoiceMap');
+  const [docType, setDocType] = useState('invoicesMap');
   const [fromDate, setFromDate] = useState(moment().startOf('month'));
   const [toDate, setToDate] = useState(moment().endOf('month'));
 
@@ -212,7 +212,7 @@ const Users = () => {
 
 
             <Button 
-                sx={{ bgcolor: docType === 'invoicesMap' ? 'blue' : 'default' , color: docType === 'invoicseMap' ? 'white' : 'default'}}
+                sx={{ bgcolor: docType === 'invoicesMap' ? 'blue' : 'default' , color: docType === 'invoicesMap' ? 'white' : 'default'}}
                 onClick={() => setDocType('invoicesMap')}
 
               >
@@ -261,17 +261,19 @@ const Users = () => {
     </Box>
 
     <Box>
-    
+
        <GroupByBlock state={groupBy} setter={setGroupBy}/>
 
        {(groupBy.indexOf("date")!=-1) ? (<GetDateGroup state={dateGroup} setter={setDateGroup}/>) : ''}
     </Box>
     <Box>
-
-        <GetPart/>
+       {(groupBy.indexOf("family")==-1)? null : (<GetFamily setter={setGetFamily}/>) }
+        {(groupBy.indexOf("product")==-1)? null : (<GetPart setter={setGetPart}/>) }
+        {(groupBy.indexOf("customer")==-1)? null : (<GetCust setter={setGetCust}/>) }
+        {(groupBy.indexOf("agent")==-1)? null : (<GetAgent setter={setGetAgent}/>) }
 
     </Box>
-    <Box>
+    <Box sx={{ py: 2 }}>
       <GetSelectedCust state={getCust} setter={setGetCust} />
       <GetSelectedPart state={getPart} setter={setGetPart} />
       <GetSelectedAgent state={getAgent} setter={setGetAgent} />

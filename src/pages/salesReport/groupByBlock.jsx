@@ -27,10 +27,8 @@ const Data = ({ state, setter }) => {
   const isChecked = (value) => state.includes(value);
 
   return (
-    <Box sx={{ padding: 2, direction: 'ltr' }}>
-      <Grid container spacing={2} sx={{ marginTop: 2 }}>
+      <Grid container spacing={2} sx={{ py: 2 }}>
         <Grid item xs={12}>
-          קבץ לפי:
           <Grid container spacing={2}>
             {buttonsData.map(({ label, value, icon }) => (
               <Grid item xs={6} sm={2} key={value}>
@@ -51,7 +49,7 @@ const Data = ({ state, setter }) => {
           </Grid>
         </Grid>
       </Grid>
-    </Box>
+   
   );
 };
 
