@@ -1,3 +1,4 @@
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { flushSync } from 'react-dom';
 import Tabs from '@mui/material/Tabs';
@@ -39,6 +40,39 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#007bff', // Adjust primary color
+      contrastText: '#ffffff', // Text color on primary
+      dark: '#0056b3', // Darker shade for hover
+      light: '#66b2ff', // Lighter shade for active
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            backgroundColor: '#0056b3', // Darker hover background
+            color: '#ffffff',
+          },
+          '&:active': {
+            backgroundColor: '#66b2ff', // Lighter active background
+            color: '#ffffff',
+          },
+        },
+      },
+    },
+  },
+});
+
+
+
+
+
+
+
 const ProgressBar = ({ percent }) => {
   return (
     <Box display="flex" alignItems="center" width="100%">
@@ -64,7 +98,7 @@ const Users = () => {
 
 
   const [groupBy, setGroupBy] = useState([]);
- 
+  const [docType, setDocType] = useState('invoiceMap');
   const [fromDate, setFromDate] = useState(moment().startOf('month'));
   const [toDate, setToDate] = useState(moment().endOf('month'));
 
@@ -117,6 +151,7 @@ const Users = () => {
         module: 'salesReport',
         name: 'getReport',
         data: { 
+              docType:docType,    
               getAgent:getAgent,
               getCustType:getCustType,
               getCust:getCust,
@@ -168,8 +203,56 @@ const Users = () => {
   }
 
   return (
+<ThemeProvider theme={theme}>
   <Container> 
-  
+        <Box sx={{ py: 2 }}>
+            <ButtonGroup fullWidth variant="outlined" aria-label="Basic button group">
+
+
+
+
+            <Button 
+                sx={{ bgcolor: docType === 'invoicesMap' ? 'blue' : 'default' , color: docType === 'invoicseMap' ? 'white' : 'default'}}
+                onClick={() => setDocType('invoicesMap')}
+
+              >
+              חשבוניות                 
+            </Button>
+
+            
+            <Button 
+                sx={{ bgcolor: docType === 'ordersMap' ? 'blue' : 'default' , color: docType === 'ordersMap' ? 'white' : 'default'}}
+                onClick={() => setDocType('ordersMap')}
+
+              >
+              הזמנות                 
+            </Button>
+
+            
+            <Button 
+                sx={{ bgcolor: docType === 'shipDocMap' ? 'blue' : 'default' , color: docType === 'shipDocMap' ? 'white' : 'default'}}
+                onClick={() => setDocType('shipDocMap')}
+
+              >
+              ת.משלוח                 
+            </Button>
+
+            
+            <Button 
+                sx={{ bgcolor: docType === 'proposalMap' ? 'blue' : 'default' , color: docType === 'proposalMap' ? 'white' : 'default'}}
+                onClick={() => setDocType('proposalMap')}
+
+              >
+              הצעות מחיר                 
+            </Button>
+
+
+
+
+              
+            </ButtonGroup>
+    </Box>
+    
     <Box>
       <GetDate 
       fromDate={fromDate} setFromDate={setFromDate}  
@@ -183,7 +266,11 @@ const Users = () => {
 
        {(groupBy.indexOf("date")!=-1) ? (<GetDateGroup state={dateGroup} setter={setDateGroup}/>) : ''}
     </Box>
-    
+    <Box>
+
+        <GetPart/>
+
+    </Box>
     <Box>
       <GetSelectedCust state={getCust} setter={setGetCust} />
       <GetSelectedPart state={getPart} setter={setGetPart} />
@@ -649,6 +736,7 @@ onClick={()=>{
       </Container>)}
 
 </Container>
+</ThemeProvider>
 
   );
 };
