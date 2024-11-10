@@ -73,7 +73,11 @@ const Data = (props) => {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={5}>
             <DatePicker
+              views={['year', 'month', 'day']}
+
               format="DD/MM/YYYY"
+              
+
               label="מתאריך"
               value={props.fromDate}
               onChange={handleFromDateChange}
@@ -88,6 +92,8 @@ const Data = (props) => {
           </Grid>
           <Grid item xs={12} sm={5}>
             <DatePicker
+              views={['year', 'month', 'day']}
+
               format="DD/MM/YYYY"
               adapterLocale="he"
               label="עד תאריך"

@@ -181,6 +181,12 @@ const Users = () => {
   },0);
 
   
+  let totalR = Number(formData.reduce((max, entry) => {
+    return entry.TOTALR+max
+  },0).toFixed(0)).toLocaleString();
+
+
+  
   let totalV = Number(formData.reduce((max, entry) => {
     return entry.TOTAL+max
   },0).toFixed(0)).toLocaleString();
@@ -404,16 +410,38 @@ const Users = () => {
 
                 ) : '' }
              
-<TableCell onClick={()=>{doOrderBy("TOTAL")}}  > 
+
+
+
+             <TableCell onClick={()=>{doOrderBy("TOTALR")}} >  
 <SwapVertIcon 
-                            sx={{ color: orderBy === 'TOTAL' ? 'blue' : 'lightgray' }}
+                            sx={{ color: orderBy === 'TOTALR' ? 'blue' : 'lightgray' }}
                     />
-   סה"כ </TableCell>
+                    רווח
+   </TableCell>
+
+   
+<TableCell onClick={()=>{doOrderBy("TOTALRP")}} >  
+<SwapVertIcon 
+                            sx={{ color: orderBy === 'TOTALRP' ? 'blue' : 'lightgray' }}
+                    />
+                     % רווח
+   </TableCell>
+
+
 <TableCell onClick={()=>{doOrderBy("TOTALQ")}} >  
 <SwapVertIcon 
                             sx={{ color: orderBy === 'TOTALQ' ? 'blue' : 'lightgray' }}
                     />
-  כמות </TableCell>
+                    כמות
+   </TableCell>
+
+
+   <TableCell onClick={()=>{doOrderBy("TOTAL")}}  > 
+<SwapVertIcon 
+                            sx={{ color: orderBy === 'TOTAL' ? 'blue' : 'lightgray' }}
+                    />
+   סה"כ </TableCell>
 
   <TableCell> </TableCell>
 
@@ -472,6 +500,9 @@ const Users = () => {
 
   ) : '' }
 
+<TableCell ><b>{totalR}</b></TableCell>
+
+<TableCell > </TableCell>
 <TableCell > <b>{totalV}</b> </TableCell>
 <TableCell > <b>{totalA} </b></TableCell>
 <TableCell >          </TableCell>
@@ -704,6 +735,27 @@ onClick={()=>{
 
 ) : '' }
 
+<TableCell
+  sx={{ direction:'ltr'}}
+
+>   
+                   {Number(row['TOTALR'].toFixed(2)).toLocaleString()}
+</TableCell>
+
+<TableCell
+  sx={{ direction:'ltr'}}
+
+>   
+                   {Number(row['TOTALRP'].toFixed(2)).toLocaleString()}
+</TableCell>
+
+
+<TableCell
+  sx={{ direction:'ltr'}}
+
+>   
+                   {Number(row['TOTALQ'].toFixed(2)).toLocaleString()}
+</TableCell>
 
 <TableCell 
   sx={{ direction:'ltr'}}
@@ -712,12 +764,7 @@ onClick={()=>{
      
                    {Number(row['TOTAL'].toFixed(2)).toLocaleString()}
 </TableCell>
-<TableCell
-  sx={{ direction:'ltr'}}
 
->   
-                   {Number(row['TOTALQ'].toFixed(2)).toLocaleString()}
-</TableCell>
 
 
                   
