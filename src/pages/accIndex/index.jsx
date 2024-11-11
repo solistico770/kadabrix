@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState} from 'react';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Button ,ButtonGroup} from '@mui/material';
+import { Box,Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Button ,ButtonGroup} from '@mui/material';
 import kdb from '../../kadabrix/kadabrix';
 
 
@@ -90,25 +90,19 @@ const getDate = (unixTIme) =>  {
   return `${day}/${month}/${year}`
 
 }
-
+const screenHeight=window.innerHeight
   return (
     <div>
 
         
-
-<Container style={{ marginTop: '20px', width: 'auto' }}>
-      <Typography variant="h5" color="textPrimary" gutterBottom>
-        כרטסת
+<Container style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Typography variant="h5" color="primary" gutterBottom style={{ fontWeight: 'bold', textAlign: 'center' }}>
+        כרטסת לקוח
       </Typography>
-      <Typography variant="body1">
-
-      להלן כרטסת תנועות לפי שנים 
-      <br />
-      הדף בבניה ונתונים נוספים כגון חוב פתוח יתווספו בהמשך 
-      
+      <Typography variant="body1" style={{ textAlign: 'center' }}>
+        {/* Add any subtext or description here */}
       </Typography>
-</Container>
-
+    </Container>
 
       <ButtonGroup variant="contained" aria-label="outlined primary button group">
         {years.map((year) => (
@@ -124,18 +118,45 @@ const getDate = (unixTIme) =>  {
 
 
  <Typography variant="body2">
-  שנה: {selectedYear} &nbsp;&nbsp;&nbsp;
   {filteredData.length>0 ? (
     <span>
     
     
 
-    
-יתרת פתיחה : {filteredData[0].balance-filteredData[0].price} 
-&nbsp;&nbsp;&nbsp;
-יתרת סגירה : {filteredData[filteredData.length-1].balance} 
- 
-   
+    <Container>
+<Box
+        sx={{
+          marginTop: '20px',
+          padding: '16px',
+          borderRadius: '8px',
+          backgroundColor: '#f0f0f0',
+          display: 'flex',
+          justifyContent: 'center',
+          fontSize: '1.2rem', // Larger font size
+          fontWeight: 'bold', // Bold text
+        }}
+      >
+
+
+
+
+<Typography variant="body1" component="span" sx={{ marginRight: '10px' }}>
+שנה: {selectedYear}
+
+</Typography>
+
+
+        <Typography variant="body1" component="span" sx={{ marginRight: '10px' }}>
+          יתרת פתיחה: {filteredData[0].balance - filteredData[0].price}
+        </Typography>
+        
+        <Typography variant="body1" component="span" sx={{ marginLeft: '20px' }}>
+          יתרת סגירה: {filteredData[filteredData.length - 1].balance}
+        </Typography>
+      </Box>
+      
+
+</Container> 
 
 
    
@@ -149,33 +170,38 @@ const getDate = (unixTIme) =>  {
 
 </Typography>
 
-      <TableContainer component={Paper}>
-        <Table aria-label="simple table">
-          <TableHead>
-            <TableRow>
+      <TableContainer style={{ maxHeight: screenHeight }} component={Paper}>
+        <Table stickyHeader   
+        aria-label="simple table">
+          <TableHead  sx={{
+              backgroundColor: '#3f51b5',
+              '& .MuiTableCell-root': { backgroundColor: '#3f51b5' ,color: '#ffffff', fontWeight: 'bold' },
+            }}>
+            <TableRow style={{ backgroundColor: '#3f51b5' }}>
               <TableCell>מספר תנועה</TableCell>
+              <TableCell align="right">תאריך </TableCell>
               <TableCell align="right">שם מסמך</TableCell>
               <TableCell align="right">זכות</TableCell>
               <TableCell align="right">חובה</TableCell>
               <TableCell align="right">יתרה</TableCell>
-              
-
-              <TableCell align="right">תאריך ערך</TableCell>
-              <TableCell align="right">פרטים</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredData.map((row) => (
-              <TableRow key={row.id}>
+            {filteredData.map((row,index) => (
+              <TableRow 
+              style={{
+                backgroundColor: index % 2 === 0 ? '#f0f0f0' : '#e0e0e0', // Alternate row colors
+              }}
+              
+              key={row.id}>
                 <TableCell component="th" scope="row">
                   {row.transId}
                 </TableCell>
+                <TableCell align="right">{getDate(row.valueDate)}</TableCell>
                 <TableCell align="right">{row.docName}</TableCell>
                 <TableCell align="right">{row.C}</TableCell>
                 <TableCell align="right">{row.D}</TableCell>
                 <TableCell align="right">{row.balance}</TableCell>
-                <TableCell align="right">{getDate(row.valueDate)}</TableCell>
-                <TableCell align="right">{row.details}</TableCell>
               </TableRow>
             ))}
           </TableBody>
