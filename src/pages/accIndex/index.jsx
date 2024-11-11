@@ -109,7 +109,16 @@ const totalC = filteredData.reduce((sum, row) => sum + row.C, 0);
 
       <ButtonGroup variant="contained" aria-label="outlined primary button group">
         {years.map((year) => (
-          <Button key={year} onClick={() => setSelectedYear(year)}>
+          <Button 
+          sx={{
+            backgroundColor: year === selectedYear ? 'green' : 'primary.main',
+            '&:hover': {
+              backgroundColor: year === selectedYear ? 'darkgreen' : 'primary.dark',
+            },
+            color: 'white',
+          }}
+
+          key={year} onClick={() => setSelectedYear(year)}>
             {year} 
           </Button>
         ))}
@@ -181,8 +190,9 @@ const totalC = filteredData.reduce((sum, row) => sum + row.C, 0);
               '& .MuiTableCell-root': { backgroundColor: '#3f51b5' ,color: '#ffffff', fontWeight: 'bold' },
             }}>
             <TableRow style={{ backgroundColor: '#3f51b5' }}>
+            <TableCell align="right">תאריך </TableCell>
               <TableCell>מספר תנועה</TableCell>
-              <TableCell align="right">תאריך </TableCell>
+              
               <TableCell align="right">שם מסמך</TableCell>
               <TableCell align="right">זכות</TableCell>
               <TableCell align="right">חובה</TableCell>
@@ -197,14 +207,15 @@ const totalC = filteredData.reduce((sum, row) => sum + row.C, 0);
               }}
               
               key={row.id}>
+                <TableCell align="right">{getDate(row.valueDate)}</TableCell>
                 <TableCell component="th" scope="row">
                   {row.transId}
                 </TableCell>
-                <TableCell align="right">{getDate(row.valueDate)}</TableCell>
+                
                 <TableCell align="right">{row.docName}</TableCell>
-                <TableCell sx={{ direction: 'ltr' }} align="right">{row.C}</TableCell>
-                <TableCell sx={{ direction: 'ltr' }} align="right">{row.D}</TableCell>
-                <TableCell sx={{ direction: 'ltr' }} align="right">{row.balance}</TableCell>
+                <TableCell style={{ direction: 'ltr' }} align="right">{row.C}</TableCell>
+                <TableCell style={{ direction: 'ltr' }}  align="right">{row.D}</TableCell>
+                <TableCell style={{ direction: 'ltr' }}  align="right">{row.balance}</TableCell>
               </TableRow>
             ))}
 
