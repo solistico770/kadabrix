@@ -138,6 +138,7 @@ const totalC = filteredData.reduce((sum, row) => sum + row.C, 0);
     <Container>
 <Box
         sx={{
+          direction:'ltr',
           marginTop: '20px',
           padding: '16px',
           borderRadius: '8px',
@@ -152,19 +153,18 @@ const totalC = filteredData.reduce((sum, row) => sum + row.C, 0);
 
 
 
-<Typography variant="body1" component="span" sx={{ marginRight: '10px' }}>
+<Typography variant="body1" component="span" sx={{ margin: '10px' }}>
 שנה: {selectedYear}
-
 </Typography>
-
-
-        <Typography variant="body1" component="span" sx={{ marginRight: '10px' }}>
-          יתרת פתיחה: {filteredData[0].balance - filteredData[0].price}
+   
+        <Typography variant="body1" component="span" style={{ margin: '10px' }}>
+          יתרת פתיחה: {'\u200E'}{filteredData[0].balance - filteredData[0].price}
         </Typography>
         
-        <Typography variant="body1" component="span" sx={{ marginLeft: '20px' }}>
-          יתרת סגירה: {filteredData[filteredData.length - 1].balance}
+        <Typography variant="body1" component="span" style={{ margin: '10px'  }}>
+          יתרת סגירה: {'\u200E'}{filteredData[filteredData.length - 1].balance}
         </Typography>
+
       </Box>
       
 
@@ -223,9 +223,9 @@ const totalC = filteredData.reduce((sum, row) => sum + row.C, 0);
                 <TableCell component="th" scope="row">
                 </TableCell>
                 <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell sx={{ direction: 'ltr' }} align="right">{totalC}</TableCell>
-                <TableCell sx={{ direction: 'ltr' }} align="right">{totalD}</TableCell>
+                <TableCell align="right"> סה"כ</TableCell>
+                <TableCell sx={{ direction: 'ltr' }} align="right">{'\u200E'}{totalC}</TableCell>
+                <TableCell sx={{ direction: 'ltr' }} align="right">{'\u200E'}{totalD}</TableCell>
                 <TableCell sx={{ direction: 'ltr' }} align="right"></TableCell>
               </TableRow>
 
