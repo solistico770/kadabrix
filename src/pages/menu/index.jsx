@@ -102,6 +102,22 @@ const Menu = () => {
     }
 
 
+    if (roles.includes('kadmin')) {
+      menuItems.push(
+        <Grid item key="accIndex">
+          <Button
+            onClick={() => navigate('/accIndex')}
+            variant="contained"
+            startIcon={<PeopleIcon />}
+            fullWidth
+          >
+            כרטסת 
+          </Button>
+        </Grid>
+      );
+    }
+
+
     if (roles.includes('ksalesAdmin')) {
       menuItems.push(
         <Grid item key="salesReport">

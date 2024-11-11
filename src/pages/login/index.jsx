@@ -64,6 +64,8 @@ const Login = () => {
           autoFocus
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          inputProps={{ dir: 'ltr' }}
+
         />
         <TextField
           margin="normal"
@@ -76,6 +78,8 @@ const Login = () => {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          inputProps={{ dir: 'ltr' }}
+
         />
         <Button
           type="submit"

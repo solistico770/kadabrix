@@ -15,6 +15,7 @@ const Data = (props) => {
         name: 'getPart',
         data: { search: searchTerm },
       });
+      
       setData(response);
     } catch (error) {
       console.error('Error fetching data:', error);
