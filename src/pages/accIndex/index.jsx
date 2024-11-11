@@ -192,7 +192,6 @@ const totalC = filteredData.reduce((sum, row) => sum + row.C, 0);
             <TableRow style={{ backgroundColor: '#3f51b5' }}>
             <TableCell align="right">תאריך </TableCell>
               <TableCell>מספר תנועה</TableCell>
-              
               <TableCell align="right">שם מסמך</TableCell>
               <TableCell align="right">זכות</TableCell>
               <TableCell align="right">חובה</TableCell>
