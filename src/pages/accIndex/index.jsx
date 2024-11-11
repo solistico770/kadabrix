@@ -91,6 +91,9 @@ const getDate = (unixTIme) =>  {
 
 }
 const screenHeight=window.innerHeight
+const totalD = filteredData.reduce((sum, row) => sum + row.D, 0);
+const totalC = filteredData.reduce((sum, row) => sum + row.C, 0);
+
   return (
     <div>
 
@@ -199,11 +202,24 @@ const screenHeight=window.innerHeight
                 </TableCell>
                 <TableCell align="right">{getDate(row.valueDate)}</TableCell>
                 <TableCell align="right">{row.docName}</TableCell>
-                <TableCell align="right">{row.C}</TableCell>
-                <TableCell align="right">{row.D}</TableCell>
-                <TableCell align="right">{row.balance}</TableCell>
+                <TableCell sx={{ direction: 'ltr' }} align="right">{row.C}</TableCell>
+                <TableCell sx={{ direction: 'ltr' }} align="right">{row.D}</TableCell>
+                <TableCell sx={{ direction: 'ltr' }} align="right">{row.balance}</TableCell>
               </TableRow>
             ))}
+
+
+<TableRow >
+                <TableCell component="th" scope="row">
+                </TableCell>
+                <TableCell align="right"></TableCell>
+                <TableCell align="right"></TableCell>
+                <TableCell sx={{ direction: 'ltr' }} align="right">{totalC}</TableCell>
+                <TableCell sx={{ direction: 'ltr' }} align="right">{totalD}</TableCell>
+                <TableCell sx={{ direction: 'ltr' }} align="right"></TableCell>
+              </TableRow>
+
+
           </TableBody>
         </Table> 
       </TableContainer>
