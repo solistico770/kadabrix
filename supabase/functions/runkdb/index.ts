@@ -9,14 +9,13 @@ const supabaseServiceClient = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
 )
 
-let appConfig = null;
 
 async function getConfig() {
-  if (appConfig == null ) {
-    return new Promise(async (resolve, reject) => {
+  
+   
       let config = {};
 
-      try {
+     
         // Fetch data from kadabrix_config
         const { data: configData, error: configError } = await supabaseServiceClient
           .from('kadabrix_config')
@@ -28,7 +27,7 @@ async function getConfig() {
 
         // Populate config with default values
         configData.forEach(item => {
-          config[item.var] = item.val;
+          config[item.name] = item.value;
         });
 
         // Fetch data from kadabix_config_custom collections
@@ -43,19 +42,13 @@ async function getConfig() {
 
         // Override default values with custom values
         customConfigData.forEach(item => {
-          config[item.var] = item.val;
+          config[item.name] = item.value;
         });
 
-        appConfig = { ...config  };
-        resolve(appConfig);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  } else {
-    return Promise.resolve(appConfig);
-  }
+        return (config);
 }
+ 
+
 
 async function getController(module,name,req) {
     
