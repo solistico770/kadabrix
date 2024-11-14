@@ -52,6 +52,25 @@ const Menu = () => {
         </Grid>
       );
     }
+
+    if (roles.includes('kadmin')) {
+      menuItems.push(
+        <Grid item key="users">
+          <Button
+            onClick={() => navigate('/editCatalogCats')}
+            variant="contained"
+            startIcon={<PeopleIcon />}
+            fullWidth
+          >
+            ניהול קטגוריות
+          </Button>
+        </Grid>
+      );
+    }
+
+    
+
+
       if (roles.includes('kadmin')) {
         menuItems.push(
           <Grid item key="codeEditor">
@@ -96,6 +115,23 @@ const Menu = () => {
             fullWidth
           >
             קטלוג מוצרים
+          </Button>
+        </Grid>
+      );
+    }
+
+
+    if (roles.includes('kadmin')) {
+      menuItems.push(
+        <Grid item key="accIndex">
+          <Button
+            onClick={() => navigate('/invoices')}
+            variant="contained"
+            startIcon={<PeopleIcon />}
+            fullWidth
+          >
+            חשבוניות 
+
           </Button>
         </Grid>
       );

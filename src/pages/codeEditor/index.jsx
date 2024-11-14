@@ -25,30 +25,28 @@ const Users = () => {
   const [searchAll, setSearchAll] = useState();
 
   const searchInLines = (searchCriteria, searchAll, lines) => {
+    const lowerCaseSearchAll = searchAll ? searchAll.toLowerCase() : null;
+    const lowerCaseCriteria = Object.fromEntries(
+        Object.entries(searchCriteria).map(([key, value]) => [key, value ? value.toLowerCase() : ''])
+    );
+
     return lines.filter((line) => {
-      // If searchAll is true, check if any field in the line contains any of the search terms
-      if (searchAll) {
-        return Object.values(line).some((field) =>
-          Object.values(searchCriteria).some((criteria) =>
-            criteria ? field.includes(criteria) : false
-          )
-        );
-      }
-  
-      // Otherwise, search based on specific fields in searchCriteria
-      let match = true;
-  
-      // Loop over each key in searchCriteria and check for matching in the line object
-      Object.keys(searchCriteria).forEach((key) => {
-        const criteria = searchCriteria[key];
-        if (criteria && line[key] && !line[key].includes(criteria)) {
-          match = false;
+        // If searchAll is specified, check that at least one field contains it (case-insensitive)
+        if (lowerCaseSearchAll) {
+            const matchAll = Object.values(line).some((field) =>
+                typeof field === 'string' && field.toLowerCase().includes(lowerCaseSearchAll)
+            );
+            if (!matchAll) return false;
         }
-      });
-  
-      return match;
+
+        // Otherwise, match based on specific fields in searchCriteria
+        return Object.keys(lowerCaseCriteria).every((key) => {
+            const criteria = lowerCaseCriteria[key];
+            return !criteria || (line[key] && line[key].toLowerCase().includes(criteria));
+        });
     });
-  };
+};
+
 
   
   useEffect(()=>{
@@ -131,6 +129,7 @@ const addRecord = async (record)=>{
         module:searchModule,
     }
   });
+  fetchApp();
 }
 
 
