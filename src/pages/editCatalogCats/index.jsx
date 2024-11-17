@@ -13,14 +13,46 @@ const Users = () => {
   const [editing, setEditing] = useState(null);
   const [newErpCust, setNewErpCust] = useState('');
 
+  function buildTree(items, fatherId, level = 0) {
+    return items
+        .filter(item => item.father === fatherId)
+        .sort((a, b) => (b.priority || 0) - (a.priority || 0)) // Sort children by priority (DESC)
+        .map(item => ({
+            ...item,
+            level: level, // Add level property to indicate depth in hierarchy
+            children: buildTree(items, item.id, level + 1)
+        }));
+}
+
+// Helper function to flatten the tree into a sorted list
+function flattenTree(tree) {
+    let result = [];
+    for (const node of tree) {
+        result.push({
+            id: node.id,
+            name: node.name,
+            query: node.query,
+            priority: node.priority,
+            active: node.active,
+            father: node.father,
+            level: node.level // Include level in the output
+        });
+        if (node.children.length > 0) {
+            result = result.concat(flattenTree(node.children));
+        }
+    }
+    return result;
+}
+
   const fetchUsers = async () => {
     try {
       const data = await kdb.run({
         "module": "editCatalogCats",
         "name": "getCats"
       });
-
-      setUsers(data);
+    const tree = buildTree(data, 0);
+    const sortedList = flattenTree(tree);
+      setUsers(sortedList);
     } catch (err) {
       setError(err);
     }
@@ -69,6 +101,24 @@ const Users = () => {
       setError(err.message);
     }
   };
+
+
+  const handleDelCat = async (id) => {
+    try {
+
+      await kdb.run({
+        "module": "editCatalogCats",
+        "name": "delCat",
+        "data":{id:id}
+      });
+
+      fetchUsers();
+      setEditing(null);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
 
 
   
@@ -151,16 +201,23 @@ const Users = () => {
         <Table>
           <TableHead>
             <TableRow>
+             <TableCell>רמה</TableCell>
               <TableCell>מספר</TableCell>
               <TableCell>שם </TableCell>
+              <TableCell>אב</TableCell>
+              <TableCell>קדימות</TableCell>
+              <TableCell>פעיל?</TableCell>
               <TableCell>שאילתא</TableCell>
-              <TableCell>ת</TableCell>
-              <TableCell>ת</TableCell>
+              <TableCell></TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.map((user) => (
+
               <TableRow key={user.id}>
+                <TableCell>{">".repeat(user.level)}</TableCell>
+
                 <TableCell>{user.id}</TableCell>
                 <TableCell>
                   
@@ -172,15 +229,54 @@ const Users = () => {
 
                 </TableCell>
                 <TableCell>
-   
+            
+            <KdbInput 
+              
+              initialValue={user.father} 
+                idValue={user.id}  
+                editField="father" />
+
+
+            </TableCell>
+            <TableCell>
+
                 <KdbInput 
                   
-                  initialValue={user.query} 
+                  initialValue={user.priority} 
                    idValue={user.id}  
-                   editField="query" />
+                   editField="priority" />
 
 
                 </TableCell>
+
+                <TableCell>
+   
+   <KdbInput 
+     
+     initialValue={user.active} 
+      idValue={user.id}  
+      editField="active" />
+
+
+   </TableCell>
+
+
+                  <TableCell>
+
+                <KdbInput 
+
+                initialValue={user.query} 
+                idValue={user.id}  
+                editField="query" />
+
+
+                </TableCell>
+
+
+
+   
+
+
                 <TableCell>
                 <img
                 
@@ -197,6 +293,17 @@ const Users = () => {
 
 
                 </TableCell>
+
+                <TableCell>
+
+                <Button onClick={()=>{handleDelCat(user.id)}} variant="contained" color="primary">
+                X
+                </Button>
+
+
+
+                </TableCell>
+
 
               </TableRow>
             ))}

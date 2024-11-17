@@ -23,6 +23,7 @@ import {
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
+  const [catId, setCatId] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
 
@@ -32,6 +33,9 @@ const ProductList = () => {
   const [hasMore, setHasMore] = useState(true);
   const limit = 20 ;
 
+  useEffect(() => {
+    fetchProducts();
+  },[catId]);
 
 
   
@@ -60,12 +64,12 @@ const ProductList = () => {
     let data = await kdb.run({
       "module": "catalog",
       "name": "getProducts",
-      "data": { searchTerm: searchTerm,limit:limit,page:page}
+      "data": { cat:catId,searchTerm: searchTerm,limit:limit,page:page}
     });
 
 
     setLoading(false);
-    setProducts([ ...data] );
+    setProducts([ ...data ] );
     setHasMore(data.length === limit);
     setPage(page + 1);
 
@@ -104,7 +108,7 @@ const ProductList = () => {
       </div>
       <div>
 
-        <CatalogCats/>
+        <CatalogCats setCat={setCatId}/>
 
       </div>
       <div >
@@ -126,11 +130,11 @@ const ProductList = () => {
                 </TableRow>
               </TableHead>)}
               <TableBody>
-                {products.map((product) => (
-                  <TableRow key={product.part}>
+                {products.map((product,index) => (
+                  <TableRow key={index}>
                     <TableCell>
                       <img
-                        src={`${supabaseUrl}/storage/v1/render/image/public/cats/${product.part}.jpg?width=200&height=200`}
+                        src={`${supabaseUrl}/storage/v1/render/image/public/images/${product.part}.jpg?width=200&height=200`}
                         alt={product.partName}
                         style={{ width: '100px', height: 'auto' }}
                         onError={imageOnError}
@@ -138,8 +142,21 @@ const ProductList = () => {
                     </TableCell>
                     <TableCell>{product.partName}</TableCell>
                     <TableCell>{product.partDes}</TableCell>
-                    <TableCell>{currencyFormat(product.price)}</TableCell>
-                    <TableCell><AddButton item={product} ></AddButton></TableCell>
+                    <TableCell>
+
+                    {product.price>0?currencyFormat(product.price):"*"}
+
+                    </TableCell>
+                    <TableCell>
+                      
+                    {product.price>0?(
+                      <AddButton item={product} ></AddButton>
+
+                    ):"בקש הצעת מחיר"}
+
+                      
+                      
+                      </TableCell>
                     <TableCell><DetailsButton partName={product.partName} partDes={product.partDes}  part={product.part} ></DetailsButton></TableCell>
                   </TableRow>
                 ))}
