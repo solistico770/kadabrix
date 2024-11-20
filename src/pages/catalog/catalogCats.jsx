@@ -73,7 +73,14 @@ const CatalogCats = (props) => {
                 <Card
                     key={index}
                     onClick={() => props.setCat(category.id)}
-                    style={{ width: '118px', cursor: 'pointer' }}
+                    sx={{
+                        width: '118px',
+                        cursor: 'pointer',
+                        transition: 'transform 0.3s ease-in-out', // Smooth transition
+                        '&:hover': {
+                            transform: 'scale(1.05)', // Grow slightly on hover
+                        },
+                    }}
                 >
                     <CardMedia
                         component="img"
@@ -82,7 +89,13 @@ const CatalogCats = (props) => {
                         alt={category.name}
                     />
                     <CardContent style={{ padding: '4px' }}>
-                        <Typography variant="subtitle2" component="div">
+
+                        <Typography
+                            variant="subtitle2"
+                            component="div"
+                            align="center"
+                            sx={{ fontWeight: 'bold', mt: 1 }}
+                        >
                             {category.name}
                         </Typography>
                         <Typography variant="body2" color="text.secondary" style={{ fontSize: '0.75rem' }}>
