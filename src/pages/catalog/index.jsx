@@ -11,9 +11,10 @@ import {
   Button,
   CircularProgress,
   TextField,
-  Paper,
   Typography
 } from '@mui/material';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -22,7 +23,6 @@ const ProductList = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [totalResults, setTotalResults] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const limit = 20;
 
@@ -90,42 +90,64 @@ const ProductList = () => {
         {loading && page === 1 ? (
           <CircularProgress />
         ) : (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center' }}>
+          <TransitionGroup style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center' }}>
             {products.map((product, index) => (
-              <div key={index} style={{ width: '200px', border: '1px solid #ddd', borderRadius: '8px', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '16px', textAlign: 'center' }}>
-                <div>
-                  <img
-                    src={`${supabaseUrl}/storage/v1/render/image/public/images/${product.part}.jpg?width=200&height=200`}
-                    alt={product.partName}
-                    style={{ width: '100%', height: 'auto', marginBottom: '8px' }}
-                    onError={imageOnError}
-                  />
-                  <Typography variant="h6" component="div">
-                    {product.partName}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" style={{ marginBottom: '8px' }}>
-                    {product.partDes}
-                  </Typography>
-                  <Typography variant="body1" color="text.primary" style={{ marginBottom: '8px' }}>
-                    {product.price > 0 ? currencyFormat(product.price) : "*"}
-                  </Typography>
+              <CSSTransition key={product.part} timeout={500} classNames="fade">
+                <div style={{ 
+                    width: '200px', 
+                    border: '1px solid #ddd', 
+                    borderRadius: '8px', 
+                    position: 'relative', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    padding: '5px', 
+                    textAlign: 'center' 
+                }}>
+                  
+                  {/* Image Container with Fixed Height */}
+                  <div style={{ height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
+                    <img
+                      src={`${supabaseUrl}/storage/v1/render/image/public/images/${product.part}.jpg?width=200&height=200`}
+                      alt={product.partName}
+                      style={{ maxWidth: '100%', maxHeight: '100%' }}
+                      onError={imageOnError}
+                    />
+                  </div>
+                  
+                  {/* Product Info */}
+                  <div style={{ flexGrow: 1 }}>
+                    <Typography variant="body2" component="div">
+                      {product.partName}
+                    </Typography>
+                    <Typography variant="subtitle2" color="text.secondary" style={{ marginBottom: '8px' }}>
+                      {product.partDes}
+                    </Typography>
+                  </div>
+                  
+                  {/* Price and Buttons Container */}
+                  <div style={{ marginTop: 'auto', marginBottom: 'auto' }}>
+                    <Typography variant="body1" color="text.primary" style={{ marginBottom: '8px' }}>
+                      {product.price > 0 ? currencyFormat(product.price) : "*"}
+                    </Typography>
+                    
+                    <div style={{ margin: "10px" }}>
+                      {product.price > 0 ? (
+                        <AddButton item={product} />
+                      ) : (
+                        <Button variant="outlined" size="small" style={{ marginBottom: '8px' }}>
+                          בקש הצעת מחיר
+                        </Button>
+                      )}
+                    </div>
+                    
+                    <DetailsButton partName={product.partName} partDes={product.partDes} part={product.part} />
+                  </div>
                 </div>
-                <div style={{ marginTop: 'auto' }}>
-                  {product.price > 0 ? (
-                    <AddButton item={product} />
-                  ) : (
-                    <Button variant="outlined" size="small" style={{ marginBottom: '8px' }}>
-                      בקש הצעת מחיר
-                    </Button>
-                  )}
-                  <DetailsButton partName={product.partName} partDes={product.partDes} part={product.part} />
-                </div>
-              </div>
+              </CSSTransition>
             ))}
-          </div>
+          </TransitionGroup>
         )}
         {loading && page > 1 && <CircularProgress />}
-      
       </div>
     </Container>
   );

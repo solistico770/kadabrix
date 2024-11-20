@@ -1,29 +1,4 @@
 
-/* CatalogCats.css */
-.catalog-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;
-  gap: 16px;
-  padding: 16px;
-}
-
-.catalog-item {
-  flex: 1 1 calc(20% - 16px);
-  max-width: 200px;
-  box-sizing: border-box;
-}
-
-.catalog-card {
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.catalog-card:hover {
-  transform: scale(1.05);
-}
-
-
 
 .results {
     flex: 1 1 auto;
@@ -31,3 +6,23 @@
     padding: 10px;
     background-color: #fff;
   }
+
+  .fade-enter {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  .fade-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: pacity 200ms ease-in-out, transform 200ms ease-in-out;
+  }
+  .fade-exit {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .fade-exit-active {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+  }
+  

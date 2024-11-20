@@ -68,17 +68,17 @@ const CatalogCats = (props) => {
     }, []);
 
     return (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
             {cats.filter((cat) => cat.father === 0).map((category, index) => (
                 <Card
                     key={index}
                     onClick={() => props.setCat(category.id)}
-                    style={{ width: '150px', cursor: 'pointer' }}
+                    style={{ width: '118px', cursor: 'pointer' }}
                 >
                     <CardMedia
                         component="img"
-                        height="100"
-                        image={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=80&height=80`}
+                        height="120"
+                        image={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=280&height=280`}
                         alt={category.name}
                     />
                     <CardContent style={{ padding: '4px' }}>
