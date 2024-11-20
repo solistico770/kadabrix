@@ -12,6 +12,7 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import kdb from '../../kadabrix/kadabrix';
+import logo from '../../assets/logo.png';
 
 const mockMenuItems = [
   { key: 'users', label: 'ניהול משתמשים', icon: <PeopleIcon fontSize="inherit" />, route: '/users', role: 'kadmin', color: '#f0f4f8' },
@@ -94,12 +95,13 @@ const Menu = () => {
           bgcolor: 'background.paper',
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-          <DashboardIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-          תפריט ראשי
-        </Typography>
+        
+        <img 
+                src={logo} 
+                alt="Logo" 
+                style={{ width: 160, height: 'auto', marginRight: '16px', mixBlendMode: 'multiply' }} 
+              />
+
         {error && (
           <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
             {error}
