@@ -34,43 +34,52 @@ const Layout = () => {
 
   return (
     <Box>
-      <AppBar position="static">
+      <AppBar position="static" sx={{ backgroundColor: '#c8e6c9'}}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {/* Logo on the left */}
+          {/* Left Section - Logo and Cart */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Button color="inherit" onClick={() => navigate('/menu')}>
-                
-                
-            <img 
-              src={logo} 
-              alt="Logo" 
-              style={{ width: 60, height: 'auto', marginRight: '16px' ,  mixBlendMode: 'multiply'
-              }} 
-            />
+            <Button color="inherit" onClick={() => navigate('/menu')}>
+              <img 
+                src={logo} 
+                alt="Logo" 
+                style={{ width: 60, height: 'auto', marginRight: '16px', mixBlendMode: 'multiply' }} 
+              />
             </Button>
+            
+            {/* Cart Component Button */}
             
           </Box>
 
-          {/* Center Cart Component */}
+          {/* Right Section - Login/Logout Button */}
           <Box>
-            <Typography variant="h6">
-              <Button color="inherit">
-                <CartComponent />
-              </Button>
-            </Typography>
-          </Box>
-
-          {/* Login/Logout Button on the right */}
-          <Box>
+         
+            
             {user ? (
-              <Button color="inherit" onClick={handleLogout}>
+              <div>
+
+            <Button 
+              color="success" 
+              sx={{ fontSize: '1.1rem', marginLeft: '16px', color: 'green' }}
+            >
+              <CartComponent />
+            </Button>
+              
+              <Button 
+                sx={{ color: 'black', fontWeight: 'bold' }} 
+                onClick={handleLogout}
+              >
                 יציאה
               </Button>
+              </div>
             ) : (
-              <Button color="inherit" onClick={() => navigate('/login')}>
-                כניסה
+              <Button 
+              sx={{ color: 'black', fontWeight: 'bold' }} 
+
+              color="inherit" onClick={() => navigate('/login')}>
+                
               </Button>
             )}
+            
           </Box>
         </Toolbar>
       </AppBar>
