@@ -52,7 +52,7 @@ const Users = (props) => {
 
   return (
     <div>
-    <Button onClick={handleOpen} variant="outlined" startIcon={<SecurityIcon />}>מלאי</Button>
+    <Button onClick={handleOpen} variant="outlined" startIcon={<SecurityIcon />}>פרטים</Button>
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>פרטי מלאי {props.partName} {props.partDes}  </DialogTitle>
       {isLoading?

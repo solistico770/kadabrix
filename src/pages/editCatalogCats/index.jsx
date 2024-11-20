@@ -50,9 +50,9 @@ function flattenTree(tree) {
         "module": "editCatalogCats",
         "name": "getCats"
       });
-    const tree = buildTree(data, 0);
-    const sortedList = flattenTree(tree);
-      setUsers(sortedList);
+    
+    
+      setUsers(data);
     } catch (err) {
       setError(err);
     }
@@ -62,6 +62,7 @@ function flattenTree(tree) {
     fetchUsers();
   }, []);
 
+
   const handleEdit = (email) => {
     setEditing(email);
     const user = users.find(user => user.email === email);
@@ -69,22 +70,7 @@ function flattenTree(tree) {
   };
 
 
-  const handleSave = async (email) => {
-    try {
-
-      await kdb.run({
-        "module": "kdb_users",
-        "name": "setUser",
-        "data": { email: email, erpcust: newErpCust }
-      });
-
-      fetchUsers();
-      setEditing(null);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
+  
 
   
   const handleAddCat = async () => {
@@ -213,7 +199,7 @@ function flattenTree(tree) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user) => (
+            {flattenTree(buildTree(users, 0)).map((user) => (
 
               <TableRow key={user.id}>
                 <TableCell>{">".repeat(user.level)}</TableCell>
@@ -222,7 +208,7 @@ function flattenTree(tree) {
                 <TableCell>
                   
                   <KdbInput 
-                  
+                  refresh={fetchUsers}
                    initialValue={user.name} 
                     idValue={user.id}  
                     editField="name" />
@@ -231,7 +217,7 @@ function flattenTree(tree) {
                 <TableCell>
             
             <KdbInput 
-              
+              refresh={fetchUsers}
               initialValue={user.father} 
                 idValue={user.id}  
                 editField="father" />
@@ -241,7 +227,7 @@ function flattenTree(tree) {
             <TableCell>
 
                 <KdbInput 
-                  
+                  refresh={fetchUsers}
                   initialValue={user.priority} 
                    idValue={user.id}  
                    editField="priority" />
@@ -252,7 +238,7 @@ function flattenTree(tree) {
                 <TableCell>
    
    <KdbInput 
-     
+     refresh={fetchUsers}
      initialValue={user.active} 
       idValue={user.id}  
       editField="active" />
@@ -264,6 +250,7 @@ function flattenTree(tree) {
                   <TableCell>
 
                 <KdbInput 
+                refresh={fetchUsers}
 
                 initialValue={user.query} 
                 idValue={user.id}  

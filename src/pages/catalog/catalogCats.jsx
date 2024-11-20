@@ -1,18 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import kdb from '../../kadabrix/kadabrix';
-import { Grid, Typography, Card, CardContent, CardMedia } from '@mui/material';
-import {supabaseUrl} from "../../kadabrix/kdbConfig"
+import { Typography, Card, CardContent, CardMedia, IconButton, Menu, MenuItem } from '@mui/material';
+import { supabaseUrl } from "../../kadabrix/kdbConfig";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+const SubCats = (props) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleClickCat = (catId, e) => {
+        handleClose();
+        e.stopPropagation();
+        props.setCat(catId);
+    };
+
+    return (
+        <div>
+            <IconButton onClick={handleClick} size="small">
+                {Array.isArray(props.children) && props.children.length > 0 && (
+                    <ExpandMoreIcon fontSize="small" />
+                )}
+            </IconButton>
+            <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+                {props.children && Array.isArray(props.children) ? (
+                    props.children.map((child, index) => (
+                        <MenuItem key={index} onClick={(e) => handleClickCat(child.id, e)}>
+                            {child.name}
+                        </MenuItem>
+                    ))
+                ) : (
+                    <MenuItem onClick={handleClose}>
+                        {props.children ? props.children.name : 'No subcategories available'}
+                    </MenuItem>
+                )}
+            </Menu>
+        </div>
+    );
+};
 
 const CatalogCats = (props) => {
     const [cats, setCats] = useState([]);
+    const childrenOf = (father) => {
+        return cats.filter((cat) => cat.father === father);
+    };
 
     useEffect(() => {
         const fetchCats = async () => {
             try {
                 let data = await kdb.run({
                     module: "catalog",
-                    name: "getCats"
+                    name: "getCats",
                 });
                 setCats(data);
             } catch (error) {
@@ -23,34 +68,32 @@ const CatalogCats = (props) => {
     }, []);
 
     return (
-        <Grid container spacing={4}>
-            {cats.filter((cat)=>{return cat.father===0}).map((category, index) => (
-                <Grid item xs={12} sm={2} md={2} key={index}>
-                    <Card onClick={()=>{
-
-                        props.setCat(category.id)
-
-                    }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center' }}>
+            {cats.filter((cat) => cat.father === 0).map((category, index) => (
+                <Card
+                    key={index}
+                    onClick={() => props.setCat(category.id)}
+                    style={{ width: '150px', cursor: 'pointer' }}
+                >
                     <CardMedia
                         component="img"
-                        height="110"
-                        image={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=101&height=101`}
+                        height="100"
+                        image={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=80&height=80`}
                         alt={category.name}
-                        />
-
-                        <CardContent>
-                            <Typography variant="h7" component="div">
-                                {category.name}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {category.description}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                    />
+                    <CardContent style={{ padding: '4px' }}>
+                        <Typography variant="subtitle2" component="div">
+                            {category.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" style={{ fontSize: '0.75rem' }}>
+                            {category.description}
+                        </Typography>
+                        <SubCats setCat={props.setCat} children={childrenOf(category.id)} />
+                    </CardContent>
+                </Card>
             ))}
-        </Grid>
+        </div>
     );
-}
+};
 
 export default CatalogCats;

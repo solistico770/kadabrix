@@ -32,7 +32,8 @@ const Users = (props) => {
                  newValue:newValue
                 }
       });
-
+      props.refresh();
+      
       setEditing(false);
     } catch (err) {
       alert(err);

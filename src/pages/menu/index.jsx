@@ -1,10 +1,30 @@
-import React, { useState, useEffect , useContext } from 'react';
-import { Button, Grid, Box, Typography, Avatar, Alert } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Button, Grid, Container, Box, Typography, Avatar, Alert, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
+import CategoryIcon from '@mui/icons-material/Category';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import CodeIcon from '@mui/icons-material/Code';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import kdb from '../../kadabrix/kadabrix';
+
+const mockMenuItems = [
+  { key: 'users', label: 'ניהול משתמשים', icon: <PeopleIcon fontSize="inherit" />, route: '/users', role: 'kadmin', color: '#f0f4f8' },
+  { key: 'editCatalogCats', label: 'ניהול קטגוריות', icon: <CategoryIcon fontSize="inherit" />, route: '/editCatalogCats', role: 'kadmin', color: '#e8f0f4' },
+  { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/selectBudget', role: 'kadmin', color: '#f0f0f0' },
+  { key: 'editBudgets', label: 'ניהול תקציבים', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/editBudgets', role: 'kadmin', color: '#eaf3f5' },
+  { key: 'codeEditor', label: 'עורך קוד', icon: <CodeIcon fontSize="inherit" />, route: '/codeEditor', role: 'kadmin', color: '#eef2f3' },
+  { key: 'cart', label: 'סל הקניות', icon: <ShoppingCartIcon fontSize="inherit" />, route: '/cart', role: 'kb2b', color: '#f5f7f8' },
+  { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/catalog', role: 'kb2b', color: '#edf3f5' },
+  { key: 'invoices', label: 'חשבוניות', icon: <ReceiptIcon fontSize="inherit" />, route: '/invoices', role: 'kadmin', color: '#f2f5f6' },
+  { key: 'accIndex', label: 'כרטסת', icon: <AccountBalanceIcon fontSize="inherit" />, route: '/accIndex', role: 'kadmin', color: '#e9f1f3' },
+  { key: 'salesReport', label: 'דוח מכירות', icon: <BarChartIcon fontSize="inherit" />, route: '/salesReport', role: 'ksalesAdmin', color: '#f1f4f5' },
+];
 
 const Menu = () => {
   const [roles, setRoles] = useState([]);
@@ -13,196 +33,83 @@ const Menu = () => {
 
   useEffect(() => {
     const fetchRoles = async () => {
-
       try {
-    let data = await kdb.run({
-      "module": "kdb_users",
-      "name": "getRoles",
-      "data": {}
-    });
-    
-    setRoles(data.map(item => item.role));
-
-  } catch(err){
-
-    setError(err);
-
-  }
-
-   
+        let data = await kdb.run({
+          "module": "kdb_users",
+          "name": "getRoles",
+          "data": {}
+        });
+        setRoles(data.map(item => item.role));
+      } catch (err) {
+        setError(err);
+      }
     };
-
     fetchRoles();
   }, []);
 
   const renderMenuItems = () => {
-    const menuItems = [];
-
-    if (roles.includes('kadmin')) {
-      menuItems.push(
-        <Grid item key="users">
-          <Button
-            onClick={() => navigate('/users')}
-            variant="contained"
-            startIcon={<PeopleIcon />}
-            fullWidth
-          >
-            ניהול משתמשים
-          </Button>
-        </Grid>
-      );
-    }
-
-    if (roles.includes('kadmin')) {
-      menuItems.push(
-        <Grid item key="users">
-          <Button
-            onClick={() => navigate('/editCatalogCats')}
-            variant="contained"
-            startIcon={<PeopleIcon />}
-            fullWidth
-          >
-            ניהול קטגוריות
-          </Button>
-        </Grid>
-      );
-    }
-
-    
-
-
-      if (roles.includes('kadmin')) {
-        menuItems.push(
-          <Grid item key="codeEditor">
-            <Button
-              onClick={() => navigate('/codeEditor')}
-              variant="contained"
-              startIcon={<PeopleIcon />}
-              fullWidth
-            >
-              codeEditor
-            </Button>
-          </Grid>
-        );
-      }
- 
-
-      
-
-    if (roles.includes('kagent') || roles.includes('kb2b')) {
-      menuItems.push(
-        <Grid item key="cart">
-          <Button
-            onClick={() => navigate('/cart')}
-            variant="contained"
-            startIcon={<ShoppingCartIcon />}
-            fullWidth
-          >
-            סל הקניות
-
-          </Button>
-        </Grid>
-      );
-    }
-
-    if (roles.includes('kagent') || roles.includes('kb2b')) {
-      menuItems.push(
-        <Grid item key="catalog">
-          <Button
-            onClick={() => navigate('/catalog')}
-            variant="contained"
-            startIcon={<ShoppingCartIcon />}
-            fullWidth
-          >
-            קטלוג מוצרים
-          </Button>
-        </Grid>
-      );
-    }
-
-
-    if (roles.includes('kadmin')) {
-      menuItems.push(
-        <Grid item key="accIndex">
-          <Button
-            onClick={() => navigate('/invoices')}
-            variant="contained"
-            startIcon={<PeopleIcon />}
-            fullWidth
-          >
-            חשבוניות 
-
-          </Button>
-        </Grid>
-      );
-    }
-
-
-    if (roles.includes('kadmin')) {
-      menuItems.push(
-        <Grid item key="accIndex">
-          <Button
-            onClick={() => navigate('/accIndex')}
-            variant="contained"
-            startIcon={<PeopleIcon />}
-            fullWidth
-          >
-            כרטסת 
-          </Button>
-        </Grid>
-      );
-    }
-
-
-    if (roles.includes('ksalesAdmin')) {
-      menuItems.push(
-        <Grid item key="salesReport">
-          <Button
-            onClick={() => navigate('/salesReport')}
-            variant="contained"
-            startIcon={<ShoppingCartIcon />}
-            fullWidth
-          >
-            דוח מכירות
-          </Button>
-        </Grid>
-      );
-    }
-
-
-
-    return menuItems;
+    return mockMenuItems.filter(item => roles.includes(item.role)).map((item) => (
+      <Grid key={item.key} item xs={12} sm={6} md={4} lg={3}>
+        <Box
+          onClick={() => navigate(item.route)}
+          sx={{
+            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            p: 2,
+            border: '1px solid #e0e0e0',
+            borderRadius: '12px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            transition: 'transform 0.3s, box-shadow 0.3s',
+            backgroundColor: item.color, // Assigning specific color to each box
+            '&:hover': {
+              transform: 'scale(1.05)',
+              boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+            },
+          }}
+        >
+          <IconButton color="primary" size="large" sx={{ transform: 'scale(1.6)' }}>
+            {item.icon}
+          </IconButton>
+          <Typography variant="subtitle1" align="center" sx={{ mt: 1 }}>
+            {item.label}
+          </Typography>
+        </Box>
+      </Grid>
+    ));
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        mt: 8,
-        p: 3,
-        borderRadius: 2,
-        boxShadow: 3,
-        bgcolor: 'background.paper',
-      }}
-    >
-
-      <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-        <DashboardIcon />
-      </Avatar>
-      <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-        תפריט ראשי
-      </Typography>
-      {error && (
-        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-      <Grid container spacing={2}>
-        {renderMenuItems()}
-      </Grid>
-    </Box>
+    <Container>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          mt: 8,
+          p: 3,
+          borderRadius: 2,
+          boxShadow: 3,
+          bgcolor: 'background.paper',
+        }}
+      >
+        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+          <DashboardIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
+          תפריט ראשי
+        </Typography>
+        {error && (
+          <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        <Grid container spacing={3} justifyContent="center">
+          {renderMenuItems()}
+        </Grid>
+      </Box>
+    </Container>
   );
 };
 
