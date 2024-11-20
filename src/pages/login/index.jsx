@@ -1,11 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Button, TextField, Grid, Box, Typography, Avatar, Alert } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate } from 'react-router-dom';
 import kdb from '../../kadabrix/kadabrix';
 import { jwtDecode } from 'jwt-decode';
 
+
 const Login = () => {
+
+
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await kdb.auth.getSession();
+      if (session?.user) {
+        navigate('/menu');
+      }
+    };
+    
+    checkSession();
+  }, []);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
