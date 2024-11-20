@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import kdb from '../../kadabrix/kadabrix';
+import React, { useState, useEffect } from 'react';
 import {
   TextField,
   RadioGroup,
@@ -20,32 +21,13 @@ import {
   IconButton,
   Grid,
   Typography,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 const BudgetScreen = () => {
-  const [budgets, setBudgets] = useState([
-    {
-      id: 1,
-      email: 'user1@example.com',
-      type: 1,
-      val: 1000,
-      status: 1,
-      start: '1672531200',
-      end: '1675123200',
-    },
-    {
-      id: 2,
-      email: 'user2@example.com',
-      type: 2,
-      val: 2000,
-      status: 2,
-      start: '1672531200',
-      end: '1677705600',
-    },
-    // Additional mock data...
-  ]);
-
+  const [budgets, setBudgets] = useState([]);
   const [newBudget, setNewBudget] = useState({
     id: '',
     email: '',
@@ -56,11 +38,47 @@ const BudgetScreen = () => {
     end: '',
   });
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  const handleUpdateBudget = (index, field, value) => {
+  useEffect(() => {
+    const fetchBudgets = async () => {
+      try {
+        const data = await kdb.run({
+          module: 'kdb_budget',
+          name: 'getBudgets',
+        });
+        setBudgets(data);
+      } catch (error) {
+        console.error('Failed to fetch budgets:', error);
+        setError('שגיאה בטעינת התקציבים');
+        setSnackbarOpen(true);
+      }
+    };
+
+    fetchBudgets();
+  }, [kdb]);
+
+  const handleUpdateBudget = async (index, field, value) => {
     const updatedBudgets = [...budgets];
     updatedBudgets[index][field] = value;
     setBudgets(updatedBudgets);
+
+    try {
+      await kdb.run({
+        module: 'kdb_budget',
+        name: 'setValue',
+        data: {
+          editField: field,
+          idValue: budgets[index].id,
+          newValue: value,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to update budget:', error);
+      setError(`שגיאה בעדכון שדה ${field}`);
+      setSnackbarOpen(true);
+    }
   };
 
   const handleAddBudget = () => {
@@ -79,6 +97,10 @@ const BudgetScreen = () => {
 
   const convertToUnix = (dateString) => {
     return Math.floor(new Date(dateString).getTime() / 1000);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -137,9 +159,9 @@ const BudgetScreen = () => {
                 <TableCell>
                   <TextField
                     type="date"
-                    value={new Date(budget.start * 1000).toISOString().substr(0, 10)}
-                    error={!isValidDate(new Date(budget.start * 1000).toISOString().substr(0, 10))}
-                    helperText={!isValidDate(new Date(budget.start * 1000).toISOString().substr(0, 10)) ? 'תאריך לא חוקי' : ''}
+                    value={budget.start ? new Date(budget.start * 1000).toISOString().substr(0, 10) : ''}
+                    error={budget.start && !isValidDate(new Date(budget.start * 1000).toISOString().substr(0, 10))}
+                    helperText={budget.start && !isValidDate(new Date(budget.start * 1000).toISOString().substr(0, 10)) ? 'תאריך לא חוקי' : ''}
                     onChange={(e) => handleUpdateBudget(index, 'start', convertToUnix(e.target.value))}
                     fullWidth
                   />
@@ -147,9 +169,9 @@ const BudgetScreen = () => {
                 <TableCell>
                   <TextField
                     type="date"
-                    value={new Date(budget.end * 1000).toISOString().substr(0, 10)}
-                    error={!isValidDate(new Date(budget.end * 1000).toISOString().substr(0, 10))}
-                    helperText={!isValidDate(new Date(budget.end * 1000).toISOString().substr(0, 10)) ? 'תאריך לא חוקי' : ''}
+                    value={budget.end ? new Date(budget.end * 1000).toISOString().substr(0, 10) : ''}
+                    error={budget.end && !isValidDate(new Date(budget.end * 1000).toISOString().substr(0, 10))}
+                    helperText={budget.end && !isValidDate(new Date(budget.end * 1000).toISOString().substr(0, 10)) ? 'תאריך לא חוקי' : ''}
                     onChange={(e) => handleUpdateBudget(index, 'end', convertToUnix(e.target.value))}
                     fullWidth
                   />
@@ -233,6 +255,12 @@ const BudgetScreen = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
