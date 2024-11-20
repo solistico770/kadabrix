@@ -73,7 +73,7 @@ const Menu = () => {
           <IconButton color="primary" size="large" sx={{ transform: 'scale(1.6)' }}>
             {item.icon}
           </IconButton>
-          <Typography variant="subtitle1" align="center" sx={{ mt: 1 }}>
+          <Typography variant="subtitle" align="center" sx={{  fontWeight: 'bold',mt: 1 }}>
             {item.label}
           </Typography>
         </Box>
