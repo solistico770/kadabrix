@@ -55,7 +55,7 @@ const BudgetPage = () => {
   return (
     <Box sx={{ padding: theme.spacing(4), backgroundColor: theme.palette.background.default }}>
       <Typography variant="h3" gutterBottom sx={{ textAlign: 'center', marginBottom: theme.spacing(5) }}>
-        בחירת תקציב
+        בחירת תקציב!
       </Typography>
 
       {loading ? (
