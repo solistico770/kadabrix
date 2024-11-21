@@ -1,225 +1,124 @@
-import React, { useState, useEffect , useContext } from 'react';
-import { Button, Grid, Box, Typography, Avatar, Alert } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import PeopleIcon from '@mui/icons-material/People';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import React, { useState, useEffect } from 'react';
 import kdb from '../../kadabrix/kadabrix';
+import { Box, Button, CircularProgress, Typography, Paper, Grid, Divider } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import './index.css'; // For custom animations
 
-const Menu = () => {
-  const [roles, setRoles] = useState([]);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+const BudgetPage = () => {
+  const [budgets, setBudgets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const theme = useTheme();
 
   useEffect(() => {
-    const fetchRoles = async () => {
-
+    const fetchBudgets = async () => {
       try {
-    let data = await kdb.run({
-      "module": "kdb_users",
-      "name": "getRoles",
-      "data": {}
-    });
-    
-    setRoles(data.map(item => item.role));
-
-  } catch(err){
-
-    setError(err);
-
-  }
-
-   
+        const response = await kdb.run({
+          module: 'kdb_budget',
+          name: 'getUserBudgets',
+        });
+        // Sort budgets to make valid ones appear first
+        const sortedBudgets = response.sort((a, b) => b.status - a.status);
+        setBudgets(sortedBudgets);
+      } catch (error) {
+        console.error('Error fetching budgets:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchRoles();
+    fetchBudgets();
   }, []);
 
-  const renderMenuItems = () => {
-    const menuItems = [];
+  const formatBudgetType = (type) => {
+    return type === 1 ? 'תקציב חד פעמי' : 'תקציב רב פעמי';
+  };
 
-    if (roles.includes('kadmin')) {
-      menuItems.push(
-        <Grid item key="users">
-          <Button
-            onClick={() => navigate('/users')}
-            variant="contained"
-            startIcon={<PeopleIcon />}
-            fullWidth
-          >
-            ניהול משתמשים
-          </Button>
-        </Grid>
-      );
-    }
+  const formatStatus = (status) => {
+    return status === 0 ? 'לא פעיל' : 'פעיל';
+  };
 
-    if (roles.includes('kadmin')) {
-      menuItems.push(
-        <Grid item key="users">
-          <Button
-            onClick={() => navigate('/editCatalogCats')}
-            variant="contained"
-            startIcon={<PeopleIcon />}
-            fullWidth
-          >
-            ניהול קטגוריות
-          </Button>
-        </Grid>
-      );
-    }
-
-    
-    if (roles.includes('kadmin')) {
-      menuItems.push(
-        <Grid item key="users">
-          <Button
-            onClick={() => navigate('/editBudgets')}
-            variant="contained"
-            startIcon={<PeopleIcon />}
-            fullWidth
-          >
-            ניהול תקציבים
-          </Button>
-        </Grid>
-      );
-    }
-
-
-
-
-      if (roles.includes('kadmin')) {
-        menuItems.push(
-          <Grid item key="codeEditor">
-            <Button
-              onClick={() => navigate('/codeEditor')}
-              variant="contained"
-              startIcon={<PeopleIcon />}
-              fullWidth
-            >
-              codeEditor
-            </Button>
-          </Grid>
-        );
-      }
- 
-
-      
-
-    if (roles.includes('kagent') || roles.includes('kb2b')) {
-      menuItems.push(
-        <Grid item key="cart">
-          <Button
-            onClick={() => navigate('/cart')}
-            variant="contained"
-            startIcon={<ShoppingCartIcon />}
-            fullWidth
-          >
-            סל הקניות
-
-          </Button>
-        </Grid>
-      );
-    }
-
-    if (roles.includes('kagent') || roles.includes('kb2b')) {
-      menuItems.push(
-        <Grid item key="catalog">
-          <Button
-            onClick={() => navigate('/catalog')}
-            variant="contained"
-            startIcon={<ShoppingCartIcon />}
-            fullWidth
-          >
-            קטלוג מוצרים
-          </Button>
-        </Grid>
-      );
-    }
-
-
-    if (roles.includes('kadmin')) {
-      menuItems.push(
-        <Grid item key="accIndex">
-          <Button
-            onClick={() => navigate('/invoices')}
-            variant="contained"
-            startIcon={<PeopleIcon />}
-            fullWidth
-          >
-            חשבוניות 
-
-          </Button>
-        </Grid>
-      );
-    }
-
-
-    if (roles.includes('kadmin')) {
-      menuItems.push(
-        <Grid item key="accIndex">
-          <Button
-            onClick={() => navigate('/accIndex')}
-            variant="contained"
-            startIcon={<PeopleIcon />}
-            fullWidth
-          >
-            כרטסת 
-          </Button>
-        </Grid>
-      );
-    }
-
-
-    if (roles.includes('ksalesAdmin')) {
-      menuItems.push(
-        <Grid item key="salesReport">
-          <Button
-            onClick={() => navigate('/salesReport')}
-            variant="contained"
-            startIcon={<ShoppingCartIcon />}
-            fullWidth
-          >
-            דוח מכירות
-          </Button>
-        </Grid>
-      );
-    }
-
-
-
-    return menuItems;
+  const formatDate = (timestamp) => {
+    return new Date(timestamp * 1000).toLocaleDateString('he-IL', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        mt: 8,
-        p: 3,
-        borderRadius: 2,
-        boxShadow: 3,
-        bgcolor: 'background.paper',
-      }}
-    >
-
-      <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-        <DashboardIcon />
-      </Avatar>
-      <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-        תפריט ראשי
+    <Box sx={{ padding: theme.spacing(4), backgroundColor: theme.palette.background.default }}>
+      <Typography variant="h3" gutterBottom sx={{ textAlign: 'center', marginBottom: theme.spacing(5) }}>
+        בחירת תקציב
       </Typography>
-      {error && (
-        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-          {error}
-        </Alert>
+
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <TransitionGroup>
+          {budgets.map((budget) => {
+            const metaData = JSON.parse(budget.metaData);
+            return (
+              <CSSTransition key={budget.id} timeout={500} classNames="budget-item">
+                <Paper elevation={4} sx={{ padding: theme.spacing(4), marginBottom: theme.spacing(4), borderRadius: '12px' }}>
+                  <Grid container spacing={3} alignItems="flex-start">
+                    <Grid item xs={12} md={4}>
+                      <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
+                        מספר תקציב: {budget.id}
+                      </Typography>
+                      <Divider sx={{ marginY: theme.spacing(1) }} />
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        סוג תקציב: {formatBudgetType(budget.type)}
+                      </Typography>
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        מצב תקציב: {formatStatus(budget.status)}
+                      </Typography>
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        תאריך התחלה: {formatDate(budget.start)}
+                      </Typography>
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        תאריך סיום: {formatDate(budget.end)}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
+                        מצב תקציב
+                      </Typography>
+                      <Divider sx={{ marginY: theme.spacing(1) }} />
+                      <Typography variant="body1">
+                        {metaData.reasons.join(', ')}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
+                        ניצול תקציב
+                      </Typography>
+                      <Divider sx={{ marginY: theme.spacing(1) }} />
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(2) }}>
+                        סה"כ: {metaData.total}
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        disabled={budget.status === 0}
+                        sx={{ filter: budget.status === 0 ? 'blur(2px)' : 'none' }}
+                        onClick={() => alert(`בחרת את התקציב ${budget.id}`)}
+                      >
+                        בחר תקציב
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </CSSTransition>
+            );
+          })}
+        </TransitionGroup>
       )}
-      <Grid container spacing={2}>
-        {renderMenuItems()}
-      </Grid>
     </Box>
   );
 };
 
-export default Menu;
+export default BudgetPage;
