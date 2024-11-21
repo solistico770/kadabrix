@@ -46,6 +46,12 @@ const BudgetPage = () => {
     });
   };
 
+  const calculateRemaining = (budget) => {
+    const total = parseFloat(budget.metaData.total);
+    const value = parseFloat(budget.val);
+    return value - total;
+  };
+
   return (
     <Box sx={{ padding: theme.spacing(4), backgroundColor: theme.palette.background.default }}>
       <Typography variant="h3" gutterBottom sx={{ textAlign: 'center', marginBottom: theme.spacing(5) }}>
@@ -60,6 +66,7 @@ const BudgetPage = () => {
         <TransitionGroup>
           {budgets.map((budget) => {
             const metaData = JSON.parse(budget.metaData);
+            const remaining = metaData.remaining
             return (
               <CSSTransition key={budget.id} timeout={500} classNames="budget-item">
                 <Paper elevation={4} sx={{ padding: theme.spacing(4), marginBottom: theme.spacing(4), borderRadius: '12px' }}>
@@ -81,14 +88,23 @@ const BudgetPage = () => {
                       <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
                         תאריך סיום: {formatDate(budget.end)}
                       </Typography>
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        ערך תקציב: {budget.val}
+                      </Typography>
                     </Grid>
                     <Grid item xs={12} md={4}>
                       <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
                         מצב תקציב
                       </Typography>
                       <Divider sx={{ marginY: theme.spacing(1) }} />
-                      <Typography variant="body1">
-                        {metaData.reasons.join(', ')}
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        הזמנות במערכת: {metaData.orders}
+                      </Typography>
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        תעודות משלוח: {metaData.ship}
+                      </Typography>
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        חשבוניות: {metaData.inv}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -97,7 +113,13 @@ const BudgetPage = () => {
                       </Typography>
                       <Divider sx={{ marginY: theme.spacing(1) }} />
                       <Typography variant="body1" sx={{ marginBottom: theme.spacing(2) }}>
-                        סה"כ: {metaData.total}
+                        סה"כ ניצול תקציב: {metaData.total}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{ marginBottom: theme.spacing(2), color: remaining > 0 ? 'green' : 'red' }}
+                      >
+                        יתרה לניצול: {remaining}
                       </Typography>
                       <Button
                         variant="contained"
