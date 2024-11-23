@@ -263,7 +263,14 @@ try {
  
 } catch(err) {
 
-  return new Response(JSON.stringify({"status":"error", data:err.message}), 
+  return new Response(
+    
+    JSON.stringify({
+      status: "error",
+      data: err.message,
+      trace: err.stack,
+    })
+    , 
   
   { headers: corsHeaders })
   

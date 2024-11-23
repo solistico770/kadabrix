@@ -28,6 +28,7 @@ export const requestForToken = async () => {
     if (currentToken) {
       console.log("Current Token:", currentToken);
       // Save the token to your server or use it as needed
+      return currentToken;
     } else {
       console.log("No registration token available. Request permission to generate one.");
     }

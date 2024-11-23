@@ -13,6 +13,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import kdb from '../../kadabrix/kadabrix';
 import logo from '../../assets/logo.png';
+import { requestForToken, onMessageListener } from "../../kadabrix/firebase";
 
 const mockMenuItems = [
   { key: 'users', label: 'ניהול משתמשים', icon: <PeopleIcon fontSize="inherit" />, route: '/users', role: 'kadmin', color: '#f0f4f8' },
@@ -28,6 +29,40 @@ const mockMenuItems = [
 ];
 
 const Menu = () => {
+  
+  
+useEffect(() => {
+  // Request permission for notifications when the app loads
+  
+  const asyncReq = async ()=>{
+
+    let tokenID = await requestForToken()
+    let data = await kdb.run({
+      "module": "kadabrix_fcm",
+      "name": "register_token",
+      "data": {token:tokenID}
+    });
+
+
+
+  }
+  asyncReq();
+
+}, []);
+
+useEffect(() => {
+  // Listen for messages when the app is in the foreground
+  onMessageListener()
+    .then((payload) => {
+      console.log("Notification received: ", payload);
+      // Add custom handling for notification here if needed
+    })
+    .catch((err) => console.log("Failed to receive message: ", err));
+}, []);
+
+
+
+
   const [roles, setRoles] = useState([]);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
