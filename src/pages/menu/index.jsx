@@ -13,7 +13,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import kdb from '../../kadabrix/kadabrix';
 import logo from '../../assets/logo.png';
-import { requestForToken, onMessageListener } from "../../kadabrix/firebase";
+import { requestForToken } from "../../kadabrix/firebase";
 
 const mockMenuItems = [
   { key: 'users', label: 'ניהול משתמשים', icon: <PeopleIcon fontSize="inherit" />, route: '/users', role: 'kadmin', color: '#f0f4f8' },
@@ -48,16 +48,6 @@ useEffect(() => {
   }
   asyncReq();
 
-}, []);
-
-useEffect(() => {
-  // Listen for messages when the app is in the foreground
-  onMessageListener()
-    .then((payload) => {
-      console.log("Notification received: ", payload);
-      // Add custom handling for notification here if needed
-    })
-    .catch((err) => console.log("Failed to receive message: ", err));
 }, []);
 
 
