@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 import { CartProvider } from './kadabrix/cartState';
+import { UserProvider } from './kadabrix/userState.jsx';
+
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import rtlPlugin from 'stylis-plugin-rtl';
@@ -23,14 +25,16 @@ const cacheRtl = createCache({
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-  <CacheProvider value={cacheRtl}>
+    <CacheProvider value={cacheRtl}>
 
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <UserProvider>
+          <CartProvider>
+            <App />
+          </CartProvider>
+        </UserProvider>
+      </ThemeProvider>
     </CacheProvider>
   </React.StrictMode>,
 );

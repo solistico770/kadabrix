@@ -10,6 +10,16 @@ const BudgetPage = () => {
   const [loading, setLoading] = useState(true);
   const theme = useTheme();
 
+  const setBudget = async (budgetId)=>{
+
+
+    const response = await kdb.run({
+      module: 'kdb_budget',
+      name: 'setBudget',
+      data:budgetId
+    });
+
+  }
   useEffect(() => {
     const fetchBudgets = async () => {
       try {
@@ -65,7 +75,7 @@ const BudgetPage = () => {
       ) : (
         <TransitionGroup>
           {budgets.map((budget) => {
-            const metaData = JSON.parse(budget.metaData);
+            const metaData =budget.metaData;
             const remaining = metaData.remaining
             return (
               <CSSTransition key={budget.id} timeout={500} classNames="budget-item">
@@ -127,7 +137,7 @@ const BudgetPage = () => {
                         fullWidth
                         disabled={budget.status === 0}
                         sx={{ filter: budget.status === 0 ? 'blur(2px)' : 'none' }}
-                        onClick={() => alert(`בחרת את התקציב ${budget.id}`)}
+                        onClick={() => setBudget(budget.id)}
                       >
                         בחר תקציב
                       </Button>

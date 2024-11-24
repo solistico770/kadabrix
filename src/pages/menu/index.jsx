@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useContext} from 'react';
 import { Button, Grid, Container, Box, Typography, Avatar, Alert, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -13,7 +13,9 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import kdb from '../../kadabrix/kadabrix';
 import logo from '../../assets/logo.png';
-import { requestForToken } from "../../kadabrix/firebase";
+import { userContext } from '../../kadabrix/userState';
+
+
 
 const mockMenuItems = [
   { key: 'users', label: 'ניהול משתמשים', icon: <PeopleIcon fontSize="inherit" />, route: '/users', role: 'kadmin', color: '#f0f4f8' },
@@ -30,25 +32,12 @@ const mockMenuItems = [
 
 const Menu = () => {
   
+   
+  const { userDetails } = useContext(userContext);
   
-useEffect(() => {
-  // Request permission for notifications when the app loads
   
-  const asyncReq = async ()=>{
-
-    let tokenID = await requestForToken()
-    let data = await kdb.run({
-      "module": "kadabrix_fcm",
-      "name": "register_token",
-      "data": {token:tokenID}
-    });
 
 
-
-  }
-  asyncReq();
-
-}, []);
 
 
 
@@ -58,20 +47,9 @@ useEffect(() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        let data = await kdb.run({
-          "module": "kdb_users",
-          "name": "getRoles",
-          "data": {}
-        });
-        setRoles(data.map(item => item.role));
-      } catch (err) {
-        setError(err);
-      }
-    };
-    fetchRoles();
-  }, []);
+     setRoles(userDetails.roles);
+  
+  }, [userDetails]);
 
   const renderMenuItems = () => {
     return mockMenuItems.filter(item => roles.includes(item.role)).map((item) => (
@@ -108,6 +86,7 @@ useEffect(() => {
 
   return (
     <Container>
+      
       <Box
         sx={{
           display: 'flex',

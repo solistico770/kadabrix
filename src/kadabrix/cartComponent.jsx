@@ -6,6 +6,8 @@ import Avatar from '@mui/material/Avatar';
 import PropTypes from 'prop-types';
 import React , {  useState, useEffect,useContext } from 'react';
 import kdb from "./kadabrix";
+import { Card, CardContent,  Grid } from '@mui/material';
+
 import { CartContext } from './cartState';
 import {
   Container,
@@ -35,6 +37,7 @@ function SimpleDialog(props) {
   const { cart , setCart } = useContext(CartContext);
   
   
+
   
     const currencyFormat = (num) => {
       num=Number(num);
@@ -84,7 +87,7 @@ function SimpleDialog(props) {
 
 
   return (
-    <Dialog onClose={handleClose} open={open}>
+    <Dialog onClose={handleClose} open={open} maxWidth="lg" >
       <DialogTitle>סל הקניות </DialogTitle>
       
       <Container style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
@@ -101,6 +104,17 @@ function SimpleDialog(props) {
         <TableContainer component={Paper}>
               <Table>
                 
+              <TableHead>
+                  <TableRow>
+                    <TableCell>תמונה</TableCell>
+                    <TableCell>פריט</TableCell>
+                    <TableCell>תיאור</TableCell>
+                    <TableCell>מחיר</TableCell>
+                    <TableCell>כמות</TableCell>
+                    <TableCell>סהכ</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableHead>
                 <TableBody>
               
                 {cart.items.map((item) => (
@@ -116,6 +130,8 @@ function SimpleDialog(props) {
                       <TableCell>{item.partName}</TableCell>
                       <TableCell>{item.partDes}</TableCell>
                       <TableCell>{currencyFormat(item.price)}</TableCell>
+                      <TableCell>{currencyFormat(item.quant)}</TableCell>
+                      <TableCell>{currencyFormat(item.quant*item.price)}</TableCell>
                       <TableCell>
                         
                       <Button onClick={() => removeProduct(item.index) }>REMOVE</Button>
@@ -136,8 +152,8 @@ function SimpleDialog(props) {
                     <TableCell></TableCell>
                     <TableCell></TableCell>
                     <TableCell>סה"כ:</TableCell>
-                    <TableCell><b>{currencyFormat(cart.total)}</b></TableCell>
-                    <TableCell></TableCell>
+                    <TableCell><b>{currencyFormat(cart.total.total)}</b></TableCell>
+                    <TableCell><b>{cart.total.totalQ}</b></TableCell>
                   </TableRow>
   
   
@@ -145,7 +161,32 @@ function SimpleDialog(props) {
               </Table>
             </TableContainer>
             
-          
+
+         
+    <Card sx={{ maxWidth: 400, margin: 'auto', mt: 4, p: 2 }}>
+      <CardContent>
+        <Typography variant="h5" component="div" gutterBottom>
+          תקציב הזמנה
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              <strong>ערך תקציב:</strong> {cart.budget.val}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              <strong>יתרה בתקציב:</strong> {cart.budget.metaData.remaining}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              <strong>יתרה להזמנה:</strong> {cart.total.remainingBudget}
+            </Typography>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
         </div>
 
       ):(

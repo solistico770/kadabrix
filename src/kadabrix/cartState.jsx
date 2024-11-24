@@ -11,23 +11,14 @@ const [cart, setCart] = useState({items:[]});
 
   
 
-const processCart = async (cartData) => { 
-
-  cartData.total      = cartData.items.reduce((v,item)=>v+(item.price*item.quant),0);
-  cartData.totalQuant = cartData.items.reduce((v,item)=>v+item.quant,0);
-
-  setCart(cartData)
-
-}
-
 
 const fetchCart = async () => { 
-  let data = await kdb.run({
+  let cartData = await kdb.run({
     "module": "kdb_cart",
     "name": "getCart",
     "data": { }
   });
-  processCart(data)
+  setCart(cartData)
 }
 
 
@@ -42,7 +33,9 @@ const channel = kdb
 
 
 useEffect(()=>{
+
   fetchCart();
+  
 },[])
 
 
