@@ -4,57 +4,53 @@ import Layout from './kadabrix/layout';
 import './App.css'
 import React, { useEffect, useState } from "react";
 import { Snackbar, Alert } from '@mui/material'; // Import Snackbar for popup notification
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import {  onMessageListener } from "./kadabrix/firebase";
+
 
 function App() {
   const [notification, setNotification] = useState(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    // Listen for messages when the app is in the foreground
-    onMessageListener()
-      .then((payload) => {
-        console.log("Notification received: ", payload);
-        setNotification(payload); // Set notification data
-        setOpen(true); // Open snackbar
-      })
-      .catch((err) => console.log("Failed to receive message: ", err));
+    // Listen for messages continuously
+    onMessageListener((payload) => {
+      console.log("Notification received: ", payload);
+      setNotification(payload);
+      setOpen(true);
+    });
   }, []);
 
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+
+
+  const handleClose = () => {
     setOpen(false);
   };
 
   return (
     <div className="root">
       <Router>
-        {/* Layout Component: Fixed height */}
         <div className="layout">
           <Layout />
         </div>
-
-        {/* Routes Component: Takes up the rest of the height */}
         <div className="router">
           <Routes/>
         </div>
       </Router>
 
-      {/* Snackbar to show notifications */}
-      <Snackbar 
-        open={open} 
-        autoHideDuration={6000} 
-        onClose={handleClose}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
+      {/* Dialog for detailed notifications */}
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>
           {notification ? notification.notification.title : "New Notification"}
-        </Alert>
-      </Snackbar>
+        </DialogTitle>
+        <DialogContent>
+          {notification ? notification.notification.body : "You have a new message!"}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">Close</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
-
 export default App;

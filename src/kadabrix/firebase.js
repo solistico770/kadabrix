@@ -38,10 +38,13 @@ export const requestForToken = async () => {
 };
 
 // Listen for incoming messages
-export const onMessageListener = () =>
-  new Promise((resolve) => {
-    onMessage(messaging, (payload) => {
-      console.log("Message received: ", payload);
-      resolve(payload);
-    });
+
+export const onMessageListener = (callback) => {
+  onMessage(messaging, (payload) => {
+    console.log("Message received: ", payload);
+    if (callback) {
+      callback(payload); // Trigger the callback function to handle the incoming message
+    }
   });
+};
+
