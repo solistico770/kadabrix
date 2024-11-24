@@ -3,7 +3,7 @@ import kdb from "../../kadabrix/kadabrix";
 import AddButton from './addButton';
 import DetailsButton from './detailsButton';
 import CatalogCats from './catalogCats';
-import imageOnError from './imgErr.js';
+import imageOnError from '../../kadabrix/imgErr.js';
 import { supabaseUrl } from "../../kadabrix/kdbConfig";
 import "./catalog.css";
 import {
