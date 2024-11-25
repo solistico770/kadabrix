@@ -72,7 +72,7 @@ const cardHeight=viewSize([
 ],winw);
 
 const cardWidth=viewSize([
-  { from: 0, to: 480, size: 120 },
+  { from: 0, to: 480, size: 100 },
   { from: 481, to: 99999, size: 200 },
 ],winw);
 
