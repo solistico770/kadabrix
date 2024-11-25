@@ -109,8 +109,8 @@ const CatalogCats = (props) => {
           speed: 500,
           slidesToShow: 9, // Default number of slides to show
           slidesToScroll: 5, // Default number of slides to scroll
-
-          initialSlide:cats ,
+          rtl:true ,
+          initialSlide:cats.length ,
           responsive: [
             {
               breakpoint: 1200, // For large tablets and desktops
