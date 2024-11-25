@@ -29,6 +29,29 @@ const ProductList = () => {
   const { userDetails } = useContext(userContext);
   
   const { cart } = useContext(CartContext);
+  const [winw, setWinw] = useState(window.innerWidth);
+    useEffect(() => {
+      const handleResize = () => {
+        setWinw(window.innerWidth);
+      };  
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []); 
+
+    
+    const viewSize =  (ranges, size) => {
+  // Iterate through each range in the array
+  for (let range of ranges) {
+    // Check if the given size falls within the current range
+    if (size >= range.from && size <= range.to) {
+      return range.size;
+    }
+  }
+  // Optional: If no range is matched, return a default value (like 0 or null)
+  return null; // or you could return some default value
+}
 
 
   
@@ -41,6 +64,19 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const limit = 20;
+
+          
+const cardHeight=viewSize([
+  { from: 0, to: 480, size: 60 },
+  { from: 481, to: 99999, size: 118 },
+],winw);
+
+const cardWidth=viewSize([
+  { from: 0, to: 480, size: 120 },
+  { from: 481, to: 99999, size: 200 },
+],winw);
+
+
 
 
   useEffect(() => {
@@ -99,14 +135,14 @@ const ProductList = () => {
 
   return (
     <Container>
-      <div style={{ flex: '0 0 auto', padding: '8px' }}>
+      <div style={{ flex: '0 0 auto', padding: '6px' }}>
         <TextField
           label="חיפוש"
           variant="outlined"
           fullWidth
           value={searchTerm}
           onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-          style={{ marginBottom: '16px' }}
+          style={{ marginBottom: '8px' }}
         />
       </div>
       <div>
@@ -120,7 +156,7 @@ const ProductList = () => {
             {products.map((product, index) => (
               <CSSTransition key={product.part} timeout={500} classNames="fade">
                 <div style={{ 
-                    width: '200px', 
+                    width: cardWidth, 
                     border: '1px solid #ddd', 
                     borderRadius: '8px', 
                     position: 'relative', 

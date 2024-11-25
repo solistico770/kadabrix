@@ -162,15 +162,19 @@ const CatalogCats = (props) => {
         };
 
         
-const cardSize=viewSize([
+const cardHeight=viewSize([
     { from: 0, to: 480, size: 60 },
     { from: 481, to: 99999, size: 118 },
   ],winw);
 
-    return (
-        <div className="slider-container">
-{cardSize}
+  const cardWidth=viewSize([
+    { from: 0, to: 480, size: 140 },
+    { from: 481, to: 99999, size: 190 },
+  ],winw);
 
+
+  return (
+        <div className="slider-container">
         <Slider {...settings}>
         
             
@@ -180,8 +184,8 @@ const cardSize=viewSize([
                     key={index}
                     onClick={() => props.setCat(category.id)}
                     sx={{
-                        width: cardSize,
-                        height: cardSize*1.5,
+                        width: cardHeight,
+                        height: cardWidth,
                         cursor: 'pointer',
                         transition: 'transform 0.3s ease-in-out', // Smooth transition
                         '&:hover': {
@@ -191,8 +195,8 @@ const cardSize=viewSize([
                 >
                     <CardMedia
                         component="img"
-                        height="{cardSize}"
-                        image={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=280&height=280`}
+                        height="{cardHeight}"
+                        image={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=118&height=118`}
                         alt={category.name}
                     />
                     <CardContent style={{ padding: '4px' }}>
