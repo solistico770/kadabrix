@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { CartContext } from '../../kadabrix/cartState';
+
 import kdb from "../../kadabrix/kadabrix";
 import AddButton from './addButton';
 import DetailsButton from './detailsButton';
@@ -15,8 +18,21 @@ import {
 } from '@mui/material';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
+import { userContext } from '../../kadabrix/userState'; 
+
+
 
 const ProductList = () => {
+
+  const navigate = useNavigate();
+  
+  const { userDetails } = useContext(userContext);
+  
+  const { cart } = useContext(CartContext);
+
+
+  
+
   const [products, setProducts] = useState([]);
   const [catId, setCatId] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,6 +41,16 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const limit = 20;
+
+
+  useEffect(() => {
+    
+    if (!userDetails.roles||!cart.budget) return;
+
+    if (userDetails.roles.includes("kB2bBudget")&&!cart?.budget?.id)  {navigate("/selectBudget")}
+  }, [userDetails,cart]);
+
+  
 
   useEffect(() => {
     fetchProducts();

@@ -170,8 +170,8 @@ function SimpleDialog(props) {
                   <TableRow>
                     <TableCell colSpan={4}></TableCell>
                     <TableCell>סה"כ:</TableCell>
-                    <TableCell><b>{currencyFormat(cart.total.total)}</b></TableCell>
-                    <TableCell><b>{cart.total.totalQ}</b></TableCell>
+                    <TableCell><b>{currencyFormat(cart?.total?.total)}</b></TableCell>
+                    <TableCell><b>{cart?.total?.totalQ}</b></TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -185,17 +185,17 @@ function SimpleDialog(props) {
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <Typography variant="body1">
-                      <strong>ערך תקציב:</strong> {cart.budget.val}
+                      <strong>ערך תקציב:</strong> {cart?.budget?.val}
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
                     <Typography variant="body1">
-                      <strong>יתרה בתקציב:</strong> {cart.budget.metaData.remaining}
+                      <strong>יתרה בתקציב:</strong> {cart?.budget?.metaData?.remaining}
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
                     <Typography variant="body1">
-                      <strong>יתרה להזמנה:</strong> {cart.total.remainingBudget}
+                      <strong>יתרה להזמנה:</strong> {cart?.total?.remainingBudget}
                     </Typography>
                   </Grid>
                 </Grid>

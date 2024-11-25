@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import kdb from '../../kadabrix/kadabrix';
 import { Box, Button, CircularProgress, Typography, Paper, Grid, Divider } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import './index.css'; // For custom animations
+import { CartContext } from '../../kadabrix/cartState';
 
 const BudgetPage = () => {
+  const { cart } = useContext(CartContext);
   const [budgets, setBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
   const theme = useTheme();
 
-  const setBudget = async (budgetId)=>{
-
-
-    const response = await kdb.run({
+  const setBudget = async (budgetId) => {
+    await kdb.run({
       module: 'kdb_budget',
       name: 'setBudget',
-      data:budgetId
+      data: budgetId,
     });
+  };
 
-  }
   useEffect(() => {
     const fetchBudgets = async () => {
       try {
@@ -27,7 +30,6 @@ const BudgetPage = () => {
           module: 'kdb_budget',
           name: 'getUserBudgets',
         });
-        // Sort budgets to make valid ones appear first
         const sortedBudgets = response.sort((a, b) => b.status - a.status);
         setBudgets(sortedBudgets);
       } catch (error) {
@@ -40,27 +42,14 @@ const BudgetPage = () => {
     fetchBudgets();
   }, []);
 
-  const formatBudgetType = (type) => {
-    return type === 1 ? 'תקציב חד פעמי' : 'תקציב רב פעמי';
-  };
-
-  const formatStatus = (status) => {
-    return status === 0 ? 'לא פעיל' : 'פעיל';
-  };
-
-  const formatDate = (timestamp) => {
-    return new Date(timestamp * 1000).toLocaleDateString('he-IL', {
+  const formatBudgetType = (type) => (type === 1 ? 'תקציב חד פעמי' : 'תקציב רב פעמי');
+  const formatStatus = (status) => (status === 0 ? 'לא פעיל' : 'פעיל');
+  const formatDate = (timestamp) =>
+    new Date(timestamp * 1000).toLocaleDateString('he-IL', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
-  };
-
-  const calculateRemaining = (budget) => {
-    const total = parseFloat(budget.metaData.total);
-    const value = parseFloat(budget.val);
-    return value - total;
-  };
 
   return (
     <Box sx={{ padding: theme.spacing(4), backgroundColor: theme.palette.background.default }}>
@@ -75,8 +64,8 @@ const BudgetPage = () => {
       ) : (
         <TransitionGroup>
           {budgets.map((budget) => {
-            const metaData =budget.metaData;
-            const remaining = metaData.remaining
+            const metaData = budget.metaData;
+            const remaining = metaData.remaining;
             return (
               <CSSTransition key={budget.id} timeout={500} classNames="budget-item">
                 <Paper elevation={4} sx={{ padding: theme.spacing(4), marginBottom: theme.spacing(4), borderRadius: '12px' }}>
@@ -89,9 +78,7 @@ const BudgetPage = () => {
                       <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
                         סוג תקציב: {formatBudgetType(budget.type)}
                       </Typography>
-                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
-                        מצב תקציב: {formatStatus(budget.status)}
-                      </Typography>
+                      
                       <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
                         תאריך התחלה: {formatDate(budget.start)}
                       </Typography>
@@ -100,21 +87,6 @@ const BudgetPage = () => {
                       </Typography>
                       <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
                         ערך תקציב: {budget.val}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12} md={4}>
-                      <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
-                        מצב תקציב
-                      </Typography>
-                      <Divider sx={{ marginY: theme.spacing(1) }} />
-                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
-                        הזמנות במערכת: {metaData.orders}
-                      </Typography>
-                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
-                        תעודות משלוח: {metaData.ship}
-                      </Typography>
-                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
-                        חשבוניות: {metaData.inv}
                       </Typography>
                     </Grid>
                     <Grid item xs={12} md={4}>
@@ -131,13 +103,54 @@ const BudgetPage = () => {
                       >
                         יתרה לניצול: {remaining}
                       </Typography>
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        הזמנות במערכת: {metaData.orders}
+                      </Typography>
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        תעודות משלוח: {metaData.ship}
+                      </Typography>
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        חשבוניות: {metaData.inv}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                      <Typography variant="h6" sx={{ color: theme.palette.primary.main }}>
+                        מצב תקציב
+                      </Typography>
+                      
+                      <Divider sx={{ marginY: theme.spacing(1) }} />
+                      <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                        מצב תקציב: {formatStatus(budget.status)}
+                      </Typography>
+                      
+                      {metaData.reasons.length > 0 ? (
+
+                        
+                        metaData.reasons.map((reason, index) => (
+                          <Typography key={index} variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+                            - {reason}
+                          </Typography>
+                        ))
+                      ) : (
+                        <Typography variant="body1" sx={{ marginBottom: theme.spacing(1) }}>
+
+                          
+                        </Typography>
+                      )}
                       <Button
                         variant="contained"
-                        color="primary"
+                        color={cart?.budget?.id === budget.id ? 'success' : 'primary'}
                         fullWidth
-                        disabled={budget.status === 0}
-                        sx={{ filter: budget.status === 0 ? 'blur(2px)' : 'none' }}
-                        onClick={() => setBudget(budget.id)}
+                        disabled={!budget || budget.status === 0}
+                        sx={{ filter: !budget || budget.status === 0 ? 'blur(2px)' : 'none' }}
+                        onClick={() => {
+                          if (budget) {
+                            setBudget(budget.id);
+                            setTimeout(() => {
+                              navigate('/catalog');
+                            }, 3000);
+                          }
+                        }}
                       >
                         בחר תקציב
                       </Button>

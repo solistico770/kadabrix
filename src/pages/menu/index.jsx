@@ -32,27 +32,14 @@ const mockMenuItems = [
 
 const Menu = () => {
   
-   
-  const { userDetails } = useContext(userContext);
-  
-  
-
-
-
-
-
-
-  const [roles, setRoles] = useState([]);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-     setRoles(userDetails.roles);
-  
-  }, [userDetails]);
+  const { userDetails } = useContext(userContext);
+
 
   const renderMenuItems = () => {
-    return mockMenuItems.filter(item => roles.includes(item.role)).map((item) => (
+    return mockMenuItems.filter(item => userDetails.roles.includes(item.role)).map((item) => (
       <Grid key={item.key} item xs={12} sm={6} md={4} lg={3}>
         <Box
           onClick={() => navigate(item.route)}

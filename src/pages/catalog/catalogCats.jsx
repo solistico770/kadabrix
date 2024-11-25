@@ -3,6 +3,11 @@ import kdb from '../../kadabrix/kadabrix';
 import { Typography, Card, CardContent, CardMedia, IconButton, Menu, MenuItem } from '@mui/material';
 import { supabaseUrl } from "../../kadabrix/kdbConfig";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+
+import Slider from "react-slick";
 
 const SubCats = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -67,9 +72,77 @@ const CatalogCats = (props) => {
         fetchCats();
     }, []);
 
+    
+    
+        const settings = {
+          arrows: true,
+          infinite: false,
+          speed: 500,
+          slidesToShow: 9, // Default number of slides to show
+          slidesToScroll: 5, // Default number of slides to scroll
+
+          initialSlide:cats.length ,
+          responsive: [
+            {
+              breakpoint: 1200, // For large tablets and desktops
+              settings: {
+                slidesToShow: 8,
+                slidesToScroll: 5,
+                infinite: true,
+                dots: true,
+              },
+            },
+            {
+              breakpoint: 1024, // For tablets in landscape
+              settings: {
+                slidesToShow: 6,
+                slidesToScroll: 4,
+                infinite: true,
+                dots: true,
+              },
+            },
+            {
+              breakpoint: 768, // For tablets in portrait mode
+              settings: {
+                slidesToShow: 4,
+                slidesToScroll: 3,
+                infinite: true,
+                dots: true,
+              },
+            },
+            {
+              breakpoint: 600, // For larger mobile devices
+              settings: {
+                slidesToShow: 3,
+                slidesToScroll: 2,
+                initialSlide: 1,
+                infinite: true,
+                dots: true,
+              },
+            },
+            {
+              breakpoint: 480, // For smaller mobile devices
+              settings: {
+                slidesToShow: 2,
+                slidesToScroll: 2,
+                infinite: true,
+                dots: true,
+              },
+            },
+          ],
+        };
+
+        
+
     return (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+        <div className="slider-container">
+
+
+        <Slider {...settings}>
+        
+            
             {cats.filter((cat) => cat.father === 0).map((category, index) => (
+                <div>
                 <Card
                     key={index}
                     onClick={() => props.setCat(category.id)}
@@ -104,8 +177,15 @@ const CatalogCats = (props) => {
                         <SubCats setCat={props.setCat} children={childrenOf(category.id)} />
                     </CardContent>
                 </Card>
+                    </div>
+                
+
             ))}
+            
+        
+        </Slider>
         </div>
+        
     );
 };
 
