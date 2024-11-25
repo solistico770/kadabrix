@@ -10,6 +10,9 @@ import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 
 const SubCats = (props) => {
+
+  
+
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
@@ -52,6 +55,32 @@ const SubCats = (props) => {
 };
 
 const CatalogCats = (props) => {
+
+    const [winw, setWinw] = useState(window.innerWidth);
+    useEffect(() => {
+      const handleResize = () => {
+        setWinw(window.innerWidth);
+      };  
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []); 
+
+    
+    const viewSize =  (ranges, size) => {
+  // Iterate through each range in the array
+  for (let range of ranges) {
+    // Check if the given size falls within the current range
+    if (size >= range.from && size <= range.to) {
+      return range.size;
+    }
+  }
+  // Optional: If no range is matched, return a default value (like 0 or null)
+  return null; // or you could return some default value
+}
+
+
     const [cats, setCats] = useState([]);
     const childrenOf = (father) => {
         return cats.filter((cat) => cat.father === father);
@@ -81,7 +110,7 @@ const CatalogCats = (props) => {
           slidesToShow: 9, // Default number of slides to show
           slidesToScroll: 5, // Default number of slides to scroll
 
-          initialSlide:cats.length ,
+          initialSlide:cats ,
           responsive: [
             {
               breakpoint: 1200, // For large tablets and desktops
@@ -123,8 +152,8 @@ const CatalogCats = (props) => {
             {
               breakpoint: 480, // For smaller mobile devices
               settings: {
-                slidesToShow: 2,
-                slidesToScroll: 2,
+                slidesToShow: 6,
+                slidesToScroll: 4,
                 infinite: true,
                 dots: true,
               },
@@ -133,10 +162,14 @@ const CatalogCats = (props) => {
         };
 
         
+const cardSize=viewSize([
+    { from: 0, to: 480, size: 60 },
+    { from: 481, to: 99999, size: 118 },
+  ],winw);
 
     return (
         <div className="slider-container">
-
+{cardSize}
 
         <Slider {...settings}>
         
@@ -147,7 +180,7 @@ const CatalogCats = (props) => {
                     key={index}
                     onClick={() => props.setCat(category.id)}
                     sx={{
-                        width: '118px',
+                        width: cardSize,
                         cursor: 'pointer',
                         transition: 'transform 0.3s ease-in-out', // Smooth transition
                         '&:hover': {
@@ -157,7 +190,7 @@ const CatalogCats = (props) => {
                 >
                     <CardMedia
                         component="img"
-                        height="120"
+                        height="{cardSize}"
                         image={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=280&height=280`}
                         alt={category.name}
                     />
