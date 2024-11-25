@@ -17,7 +17,7 @@ const manifestForPlugIn = {
     display: 'standalone',
     scope: '/',
     start_url: '/',
-    orientation: 'any1',
+    orientation: 'any',
   },
   workbox: {
     runtimeCaching: [
