@@ -181,6 +181,7 @@ const cardSize=viewSize([
                     onClick={() => props.setCat(category.id)}
                     sx={{
                         width: cardSize,
+                        height: cardSize*1.5,
                         cursor: 'pointer',
                         transition: 'transform 0.3s ease-in-out', // Smooth transition
                         '&:hover': {
