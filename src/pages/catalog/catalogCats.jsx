@@ -104,14 +104,14 @@ const CatalogCats = (props) => {
     
     
         const settings = {
-          arrows: true,
-          infinite: false,
-          speed: 500,
+          arrows: false,
+          infinite: true,
+          speed: 100,
           slidesToShow: 9, // Default number of slides to show
           slidesToScroll: 5, // Default number of slides to scroll
-          rtl:true ,
-          initialSlide:cats.length ,
+          initialSlide:3 ,
           responsive: [
+
             {
               breakpoint: 1200, // For large tablets and desktops
               settings: {
