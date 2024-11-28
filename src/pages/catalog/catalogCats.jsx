@@ -106,10 +106,10 @@ const CatalogCats = (props) => {
     const settings = {
         autoplay: true,
         pauseOnHover: true,
-        autoplaySpeed: 2000,
+        autoplaySpeed: 4000,
         arrows: false,
         infinite: true,
-        speed: 100,
+        speed: 500,
         slidesToShow: 9, // Default number of slides to show
         slidesToScroll: 5, // Default number of slides to scroll
         initialSlide: 3,
