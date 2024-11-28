@@ -177,7 +177,9 @@ const CatalogCats = (props) => {
 
 
     return (
+        
         <div className="slider-container">
+        {cardHeight}
             <Slider {...settings}>
 
 
