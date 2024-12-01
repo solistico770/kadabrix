@@ -18,15 +18,21 @@ import { userContext } from '../../kadabrix/userState';
 
 
 const mockMenuItems = [
+  { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/selectBudget', role: 'kadmin', color: '#f0f0f0' },
+  { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/catalog', role: 'kb2b', color: '#edf3f5' },
+
+
   { key: 'users', label: 'ניהול משתמשים', icon: <PeopleIcon fontSize="inherit" />, route: '/users', role: 'kadmin', color: '#f0f4f8' },
   { key: 'editCatalogCats', label: 'ניהול קטגוריות', icon: <CategoryIcon fontSize="inherit" />, route: '/editCatalogCats', role: 'kadmin', color: '#e8f0f4' },
-  { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/selectBudget', role: 'kadmin', color: '#f0f0f0' },
   { key: 'editBudgets', label: 'ניהול תקציבים', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/editBudgets', role: 'kadmin', color: '#eaf3f5' },
   { key: 'codeEditor', label: 'עורך קוד', icon: <CodeIcon fontSize="inherit" />, route: '/codeEditor', role: 'kadmin', color: '#eef2f3' },
-  { key: 'cart', label: 'סל הקניות', icon: <ShoppingCartIcon fontSize="inherit" />, route: '/cart', role: 'kb2b', color: '#f5f7f8' },
-  { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/catalog', role: 'kb2b', color: '#edf3f5' },
-  { key: 'invoices', label: 'חשבוניות', icon: <ReceiptIcon fontSize="inherit" />, route: '/invoices', role: 'kadmin', color: '#f2f5f6' },
-  { key: 'accIndex', label: 'כרטסת', icon: <AccountBalanceIcon fontSize="inherit" />, route: '/accIndex', role: 'kadmin', color: '#e9f1f3' },
+  
+  
+  { key: 'invoices', label: 'מצב ההזמנות', icon: <ReceiptIcon fontSize="inherit" />, route: '/invoices', role: 'kb2b', color: '#f2f5f6' },
+  { key: 'invoices', label: 'חשבוניות', icon: <ReceiptIcon fontSize="inherit" />, route: '/invoices', role: 'kb2b', color: '#f2f5f6' },
+  { key: 'accIndex', label: 'כרטסת', icon: <AccountBalanceIcon fontSize="inherit" />, route: '/accIndex', role: 'kb2b', color: '#e9f1f3' },
+
+  
   { key: 'salesReport', label: 'דוח מכירות', icon: <BarChartIcon fontSize="inherit" />, route: '/salesReport', role: 'ksalesAdmin', color: '#f1f4f5' },
 ];
 
