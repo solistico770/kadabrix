@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
-import { Button, TextField, Grid, Box, Typography, Avatar, Alert } from '@mui/material';
+import {
+  Button,
+  TextField,
+  Grid,
+  Box,
+  Typography,
+  Avatar,
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useNavigate } from 'react-router-dom';
 import kdb from '../../kadabrix/kadabrix';
@@ -9,6 +21,7 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSignUp = async (event) => {
@@ -23,8 +36,13 @@ const SignUp = () => {
     if (error) {
       setError(error.message);
     } else {
-      navigate('/dashboard');
+      setSuccessDialogOpen(true);
     }
+  };
+
+  const handleDialogClose = () => {
+    setSuccessDialogOpen(false);
+    navigate('/login'); // Optionally navigate to login or another page
   };
 
   return (
@@ -63,6 +81,7 @@ const SignUp = () => {
           autoFocus
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          inputProps={{ dir: 'ltr' }}
         />
         <TextField
           margin="normal"
@@ -75,6 +94,7 @@ const SignUp = () => {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          inputProps={{ dir: 'ltr' }}
         />
         <TextField
           margin="normal"
@@ -87,6 +107,7 @@ const SignUp = () => {
           autoComplete="current-password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          inputProps={{ dir: 'ltr' }}
         />
         <Button
           type="submit"
@@ -104,6 +125,25 @@ const SignUp = () => {
           </Grid>
         </Grid>
       </Box>
+      <Dialog
+        open={successDialogOpen}
+        onClose={handleDialogClose}
+        aria-labelledby="success-dialog-title"
+      >
+        <DialogTitle id="success-dialog-title">ברוכים הבאים למערכת קדבריקס</DialogTitle>
+        <DialogContent>
+          <Typography>
+            נרשמת בהצלחה. עליך לאשר את המייל שנשלח אליך.
+            <br />
+            אנחנו כבר יודעים שנרשמת ונאשר אותך בהקדם.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} autoFocus>
+            סגור
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
