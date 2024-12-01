@@ -10,6 +10,7 @@ import { CartContext } from '../../kadabrix/cartState';
 const BudgetPage = () => {
   const { cart } = useContext(CartContext);
   const [budgets, setBudgets] = useState([]);
+  const [expectedId, setExpectedId] = useState();
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -21,7 +22,22 @@ const BudgetPage = () => {
       name: 'setBudget',
       data: budgetId,
     });
+
+      setExpectedId(budgetId);
+   
   };
+
+  
+  useEffect(() => {
+    if (expectedId && cart?.budget?.id  ) {
+
+      navigate("/catalog")
+
+
+    }
+  }, [expectedId,cart]);
+
+
 
   useEffect(() => {
     const fetchBudgets = async () => {
@@ -146,9 +162,6 @@ const BudgetPage = () => {
                         onClick={() => {
                           if (budget) {
                             setBudget(budget.id);
-                            setTimeout(() => {
-                              navigate('/catalog');
-                            }, 3000);
                           }
                         }}
                       >

@@ -7,7 +7,7 @@ export const CartContext = createContext();
 // Create a provider component
 export const CartProvider = ({ children }) => {
 
-const [cart, setCart] = useState({items:[]});
+const [cart, setCart] = useState({items:[],loaded:false});
 
   
 
@@ -18,7 +18,7 @@ const fetchCart = async () => {
     "name": "getCart",
     "data": { }
   });
-  setCart(cartData)
+  setCart({...cartData,loaded:true})
 }
 
 

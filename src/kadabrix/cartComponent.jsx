@@ -8,6 +8,7 @@ import kdb from "./kadabrix";
 import { Card, CardContent, Grid } from '@mui/material';
 import imageOnError from './imgErr.js';
 import { CartContext } from './cartState';
+import  CartQuantBtn  from './cartQuantBtn.jsx';
 import {
   Container,
   Button,
@@ -117,54 +118,12 @@ function SimpleDialog(props) {
                       <TableCell>{item.partDes}</TableCell>
                       <TableCell>{currencyFormat(item.price)}</TableCell>
                       <TableCell>
-                        {editQuant === item.index ? (
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <TextField
-                              value={tempQuant}
-                              type="number"
-                              size="small"
-                              onChange={(e) => setTempQuant(e.target.value)}
-                              style={{ maxWidth: '90px', marginRight: '8px' }}
-                            />
-                            <Button
-                              variant="contained"
-                              size="small"
-                              onClick={() => quantSetItem(item.index, parseInt(tempQuant, 10))}
-                              style={{ padding: '6px 12px', marginRight: '8px' }}
-                            >
-                              בצע
-                            </Button>
-                          </div>
-                        ) : (
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <IconButton
-                              onClick={() => quantSetItemAction(item.index, "-")}
-                              size="small"
-                            >
-                              <RemoveIcon />
-                            </IconButton>
-                            <Typography
-                              variant="body1"
-                              style={{ margin: '0 8px' }}
-                              onDoubleClick={() => { setEditQuant(item.index); setTempQuant(item.quant); }}
-                            >
-                              {item.quant}
-                            </Typography>
-                            <IconButton
-                              onClick={() => quantSetItemAction(item.index, "+")}
-                              size="small"
-                            >
-                              <AddIcon />
-                            </IconButton>
-                          </div>
-                        )}
+                       
+                       <CartQuantBtn item={item}/>
+                        
                       </TableCell>
                       <TableCell>{currencyFormat(item.quant * item.price)}</TableCell>
-                      <TableCell>
-                        <Button onClick={() => removeProduct(item.index)}>
-                          <DeleteIcon />
-                        </Button>
-                      </TableCell>
+                 
                     </TableRow>
                   ))}
                   <TableRow>

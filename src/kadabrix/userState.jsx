@@ -8,7 +8,7 @@ export const userContext = createContext();
 // Create a provider component
 export const UserProvider = ({ children }) => {
 
-const [userDetails, setUserDetails] = useState({roles:[],user:null});
+const [userDetails, setUserDetails] = useState({roles:[],user:null,loaded:false});
  
 
 let hasRun = false;
@@ -35,6 +35,7 @@ useEffect(() => {
               });
 
               setUserDetails({
+                  loaded:true,
                   user: session?.user || null,
                   roles: data.map(item => item.role),
               });

@@ -81,7 +81,7 @@ const cardWidth=viewSize([
 
   useEffect(() => {
     
-    if (!userDetails.roles||!cart.budget) return;
+    if (!userDetails.loaded||!cart.loaded) return;
 
     if (userDetails.roles.includes("kB2bBudget")&&!cart?.budget?.id)  {navigate("/selectBudget")}
   }, [userDetails,cart]);

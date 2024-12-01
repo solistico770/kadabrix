@@ -10,7 +10,9 @@ import "ace-builds/src-noconflict/ext-language_tools";
 import Modal from '@mui/material/Modal';
 
 
+
 const Users = () => {
+  const [isFocused, setIsFocused] = useState(false);
   const [error, setError] = useState(null);
   
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -205,6 +207,12 @@ const addRecord = async (record)=>{
       />
       <TextField
         label="Config"
+        multiline
+        maxRows={isFocused ? 10 : 1} // Expand to 4 rows on focus, collapse to 1 line otherwise
+        onFocus={() => setIsFocused(true)} // Expand when focused
+        onBlur={() => setIsFocused(false)} // Collapse when unfocused
+        inputProps={{ style: { direction: 'ltr' } }}
+
         value={editorItem.config}
         onChange={(e) => { setEditorItem({ ...editorItem, config: e.target.value }); }}
       />
