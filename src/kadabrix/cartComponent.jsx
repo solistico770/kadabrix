@@ -135,7 +135,7 @@ function SimpleDialog(props) {
                 </TableBody>
               </Table>
             </TableContainer>
-
+            {  (cart.budget)?(
             <Card sx={{ maxWidth: 400, mt: 4, p: 2, alignSelf: 'flex-end' }}>
               <CardContent>
                 <Typography variant="h5" component="div" gutterBottom>
@@ -160,7 +160,10 @@ function SimpleDialog(props) {
                 </Grid>
               </CardContent>
             </Card>
+          ):null}
+
           </div>
+
         ) : (
           <Typography variant="h4" component="div" align="center">
             אין מוצרים בסל
