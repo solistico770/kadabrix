@@ -18,7 +18,7 @@ import { userContext } from '../../kadabrix/userState';
 
 
 const mockMenuItems = [
-  { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/selectBudget', role: 'kadmin', color: '#f0f0f0' },
+  { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/selectBudget', role: 'kB2bBudget', color: '#f0f0f0' },
   { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/catalog', role: 'kb2b', color: '#edf3f5' },
 
 
@@ -32,7 +32,7 @@ const mockMenuItems = [
   { key: 'invoices', label: 'חשבוניות', icon: <ReceiptIcon fontSize="inherit" />, route: '/invoices', role: 'kb2b', color: '#f2f5f6' },
   { key: 'accIndex', label: 'כרטסת', icon: <AccountBalanceIcon fontSize="inherit" />, route: '/accIndex', role: 'kb2b', color: '#e9f1f3' },
 
-  
+
   { key: 'salesReport', label: 'דוח מכירות', icon: <BarChartIcon fontSize="inherit" />, route: '/salesReport', role: 'ksalesAdmin', color: '#f1f4f5' },
 ];
 
