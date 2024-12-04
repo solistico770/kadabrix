@@ -30,6 +30,8 @@ const AddBudget = ({ open, onClose, onAdd }) => {
     period: 'monthly',
   });
 
+  
+
   const isValidDate = (date) => !isNaN(new Date(date).getTime());
 
   const toUnix = (date) => Math.floor(new Date(date).getTime() / 1000);
@@ -107,7 +109,7 @@ const AddBudget = ({ open, onClose, onAdd }) => {
         name: 'addBudgets',
         data:budgets
     })
-
+    onAdd();
     onClose();
 
   };
@@ -119,6 +121,9 @@ const AddBudget = ({ open, onClose, onAdd }) => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
+             inputProps={{
+              dir: "ltr",
+            }}
               label="אימייל"
               value={newBudget.email}
               onChange={(e) => setNewBudget({ ...newBudget, email: e.target.value })}

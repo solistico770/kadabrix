@@ -344,7 +344,7 @@ const BudgetScreen = () => {
       <AddBudget
         open={addBudgetOpen}
         onClose={() => setAddBudgetOpen(false)}
-        onAdd={(newBudget) => setBudgets([...budgets, newBudget])}
+        onAdd={() => fetchBudgets()}
       />
 
       <DetailsPopup

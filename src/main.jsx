@@ -11,6 +11,9 @@ import rtlPlugin from 'stylis-plugin-rtl';
 import { prefixer } from 'stylis';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
+import runListeners from './events/index'
+
+runListeners();
 
 // Create an RTL theme
 const theme = createTheme({

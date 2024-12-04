@@ -1,31 +1,28 @@
 import "./index.css"
-
+import eventBus from "../../kadabrix/event"
 const App = () => {
+const  emit = async ()=>{
+
+  try {
+    await eventBus.emit("prePlaceOrder", "demsg");
+    console.log("Order placed successfully");
+  } catch (error) {
+    console.error(error.message);
+  }
+
+
+}
+
+
+
+
   return (
     <div className="app-container">
-      <br/>
-      <header className="search-header">
-        <div className="search">
-          <input type="text" placeholder="Search..." />
-        </div>
-      </header>
-      <aside className="categories-container">
-        <div className="categories">
-          <button>Cat 1</button>
-          <button>Cat 2</button>
-          <button>Cat 3</button>
-          <button>Cat 4</button>
-          <button>Cat 5</button>
-          {/* More category buttons */}
-        </div>
-      </aside>
-      <main className="products-container">
-        {[...Array(500)].map((_, idx) => (
-          <div key={idx} className="product">
-            Product {idx + 1}
-          </div>
-        ))}
-      </main>
+    
+
+    <button onClick={emit}>Cat 1</button>
+
+
     </div>
   );
 };
