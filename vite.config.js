@@ -20,6 +20,7 @@ const manifestForPlugIn = {
     orientation: 'any',
   },
   workbox: {
+    maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // Set limit to 5 MB
     runtimeCaching: [
       {
         urlPattern: ({ request }) => request.destination === 'script' || request.destination === 'style',
