@@ -4,7 +4,7 @@ import { CartContext } from '../../kadabrix/cartState';
 import { userContext } from '../../kadabrix/userState';
 import kdb from "../../kadabrix/kadabrix";
 import CatalogCats from './catalogCats';
-import Product from './Product.jsx';
+import Product from './product.jsx';
 import { supabaseUrl } from "../../kadabrix/kdbConfig";
 import {
   Container,
