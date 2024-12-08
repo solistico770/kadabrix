@@ -34,8 +34,7 @@
     "slick-carousel": "^1.8.1",
     "stylis": "^4.3.4",
     "stylis-plugin-rtl": "^2.1.1",
-    "swiper": "^11.1.15",
-    "tailwindcss": "^1.9.6",
+    "swiper": "^11.1.15"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
