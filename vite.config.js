@@ -42,8 +42,7 @@ const manifestForPlugIn = {
 
 export default defineConfig({
   build: {
-    minify: false, // Disable minification for debugging in production
-    sourcemap: true, // Optional: Enable source maps for better debugging
+
   },
   plugins: [
     react(),
