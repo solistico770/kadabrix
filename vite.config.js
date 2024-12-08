@@ -43,7 +43,6 @@ export default defineConfig({
   build: {
     minify: false, // Disable minification for debugging in production
     sourcemap: true, // Optional: Enable source maps for better debugging
-    outDir: 'dist', // Ensure the output directory is correct
   },
   plugins: [
     react(),
