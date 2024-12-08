@@ -1,27 +1,25 @@
-import "./index.css"
-import eventBus from "../../kadabrix/event"
+import { set } from "date-fns";
+import { useEffect,useState } from "react";
+import eventBus from "../../kadabrix/event";
+import { Button } from "@mui/material";
+
+
+
+
 const App = () => {
-const  emit = async ()=>{
-
-  try {
-    await eventBus.emit("prePlaceOrder", "demsg");
-    console.log("Order placed successfully");
-  } catch (error) {
-    console.error(error.message);
-  }
-
-
-}
-
-
+  
+  
 
 
   return (
-    <div className="app-container">
-    
+    <div>
+      <Button 
+        onClick={() => {
+          eventBus.emit("openDialog");
 
-    <button onClick={emit}>Cat 1</button>
-
+        }
+      }
+      > open </Button>
 
     </div>
   );

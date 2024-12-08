@@ -79,7 +79,6 @@ const Users = () => {
             <TableRow>
               <TableCell>אימייל</TableCell>
               <TableCell>משתמש ERP</TableCell>
-              <TableCell>תקציב</TableCell>
               <TableCell>הרשאות</TableCell>
               <TableCell>הרשאות</TableCell>
             </TableRow>
@@ -97,18 +96,6 @@ const Users = () => {
                    idName="email" 
                     idValue={user.email}  
                     editField="erpcust" />
-
-                </TableCell>
-                <TableCell>
-
-                <KdbInput 
-                  
-                   initialValue={user.budget} 
-                   table="kadabrix_user_config"
-                   idName="email" 
-                   idValue={user.email}  
-                   editField="budget" />
-
 
                 </TableCell>
                 <TableCell>

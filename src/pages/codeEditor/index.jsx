@@ -3,15 +3,33 @@ import { Button, TextField, Grid, Box, Typography, Alert, Table, TableBody, Tabl
 import { useNavigate } from 'react-router-dom';
 import kdb from '../../kadabrix/kadabrix';
 import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-java";
-import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/ext-language_tools";
-
+import ace from "ace-builds";
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/ext-searchbox";
 import Modal from '@mui/material/Modal';
+import JsonModal from './JsonModal';
 
 
 
 const Users = () => {
+
+  ace.config.loadModule("ace/ext/language_tools", function () {
+    var customCompleter = {
+        getCompletions: function (editor, session, pos, prefix, callback) {
+            const completions = [
+                { caption: "function", value: "function", meta: "keyword" },
+                { caption: "console.log", value: "console.log()", meta: "method" },
+            ];
+            callback(null, completions);
+        },
+    };
+    ace.require("ace/ext/language_tools").addCompleter(customCompleter);
+});
+
+
   const [isFocused, setIsFocused] = useState(false);
   const [error, setError] = useState(null);
   
@@ -140,6 +158,8 @@ const addRecord = async (record)=>{
 
   return (
     <div dir="ltr">
+<JsonModal jsonData={linesSearch} onImport={fetchApp} />
+
     <Box
       sx={{
         display: 'flex',
@@ -218,22 +238,33 @@ const addRecord = async (record)=>{
       />
     </Box>
     <Box>
-      <AceEditor
-        mode="java"
-        theme="github"
-        width="100%"
-        height={window.innerHeight+"px"} // Set a specific height for the editor
-        value={editorItem.data}
-        onChange={(newValue) => { setEditorItem({ ...editorItem, data: newValue }) }}
-        name="UNIQUE_ID_OF_DIV"
-        editorProps={{ $blockScrolling: true }}
-        setOptions={{
-          enableBasicAutocompletion: true,
-          enableLiveAutocompletion: true,
-          enableSnippets: true,
-          fontSize: '32px',
-        }}
-      />
+    <AceEditor
+  mode="javascript"
+  theme="monokai"
+  width="100%"
+  height={window.innerHeight + "px"}
+  value={editorItem.data}
+  onChange={(newValue) => setEditorItem({ ...editorItem, data: newValue })}
+  name="UNIQUE_ID_OF_DIV"
+  editorProps={{ $blockScrolling: true }}
+  setOptions={{
+    enableBasicAutocompletion: true,
+    enableLiveAutocompletion: true,
+    enableSnippets: true,
+    fontSize: '40px'
+
+  }}
+  commands={[
+    {
+      name: "search",
+      bindKey: { win: "Ctrl-F", mac: "Command-F" },
+      exec: (editor) => {
+        editor.execCommand("find");
+      },
+    },
+  ]}
+/>
+
     </Box>
   </Box>
 </Modal>

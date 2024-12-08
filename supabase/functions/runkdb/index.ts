@@ -67,10 +67,38 @@ const { data, error } = await supabaseServiceClient
  var kdbService = {};
  
  const kdb = getClient(req.headers.get('Authorization'));
- async function check_role(role){
+ 
+ let rolesCache = null;
+  async function get_roles(){
+  if (rolesCache) return rolesCache.data;
+  rolesCache =   await kdb.rpc("get_roles_by_email",{});
+  return rolesCache.data;
 
-  const res = await kdb.rpc("check_role",{p_desired_role:role})
-  if (res.data!=true) throw new Error(`not authorized`) 
+ } 
+
+ async function check_role(role){
+  const roles = await get_roles();
+  if (roles.includes(role)) return true;
+  else throw new Error(`not authorized`);
+
+
+ }
+
+
+ let permissionsCache = null;
+  async function get_permissions(){
+  if (permissionsCache) return permissionsCache.data;
+  permissionsCache =   await kdb.rpc("get_permissions_by_email",{});
+  return permissionsCache.data;
+
+ } 
+
+ async function check_permission(permission){
+  const permissions = await get_permissions();
+  if (permissions.includes(permission)) return true;
+  else throw new Error(`not authorized`);
+
+
  }
 
 

@@ -27,7 +27,6 @@ const Users = (props) => {
         "module": "kdb_users",
         "name": "setValue",
         "data": { 
-                 table: props.table,
                  idName: props.idName,
                  editField: props.editField,
                  idValue: props.idValue,

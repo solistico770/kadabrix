@@ -1,4 +1,4 @@
-import React, { useState, useEffect ,useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Button, Grid, Container, Box, Typography, Avatar, Alert, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -18,26 +18,28 @@ import { userContext } from '../../kadabrix/userState';
 
 
 const mockMenuItems = [
-  { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/selectBudget', role: 'kB2bBudget', color: '#f0f0f0' },
-  { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/catalog', role: 'kb2b', color: '#edf3f5' },
+  { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/selectBudget', permission: 'b2bBudgetUser', color: '#f0f0f0' },
+  { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/catalog', permission: 'b2bCatalog', color: '#edf3f5' },
 
 
-  { key: 'users', label: 'ניהול משתמשים', icon: <PeopleIcon fontSize="inherit" />, route: '/users', role: 'kadmin', color: '#f0f4f8' },
-  { key: 'editCatalogCats', label: 'ניהול קטגוריות', icon: <CategoryIcon fontSize="inherit" />, route: '/editCatalogCats', role: 'kadmin', color: '#e8f0f4' },
-  { key: 'editBudgets', label: 'ניהול תקציבים', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/editBudgets', role: 'kadmin', color: '#eaf3f5' },
-  { key: 'codeEditor', label: 'עורך קוד', icon: <CodeIcon fontSize="inherit" />, route: '/codeEditor', role: 'kadmin', color: '#eef2f3' },
-  
-  
-  { key: 'invoices', label: 'מצב ההזמנות', icon: <ReceiptIcon fontSize="inherit" />, route: '/invoices', role: 'kb2b', color: '#f2f5f6' },
-  { key: 'invoices', label: 'חשבוניות', icon: <ReceiptIcon fontSize="inherit" />, route: '/invoices', role: 'kb2b', color: '#f2f5f6' },
-  { key: 'accIndex', label: 'כרטסת', icon: <AccountBalanceIcon fontSize="inherit" />, route: '/accIndex', role: 'kb2b', color: '#e9f1f3' },
+
+  { key: 'invoices', label: 'מצב ההזמנות', icon: <ReceiptIcon fontSize="inherit" />, route: '/invoices', permission: 'userOrders', color: '#f2f5f6' },
+  { key: 'invoices', label: 'חשבוניות', icon: <ReceiptIcon fontSize="inherit" />, route: '/invoices', permission: 'userOrders', color: '#f2f5f6' },
+  { key: 'accIndex', label: 'כרטסת', icon: <AccountBalanceIcon fontSize="inherit" />, route: '/accIndex', permission: 'userIndex', color: '#e9f1f3' },
 
 
-  { key: 'salesReport', label: 'דוח מכירות', icon: <BarChartIcon fontSize="inherit" />, route: '/salesReport', role: 'ksalesAdmin', color: '#f1f4f5' },
+  { key: 'salesReport', label: 'דוח מכירות', icon: <BarChartIcon fontSize="inherit" />, route: '/salesReport', permission: 'salesReports', color: '#f1f4f5' },
+
+  { key: 'users', label: 'ניהול משתמשים', icon: <PeopleIcon fontSize="inherit" />, route: '/users', permission: 'usersManager', color: '#f0f4f8' },
+  { key: 'permissions', label: 'ניהול תפקידים', icon: <PeopleIcon fontSize="inherit" />, route: '/roles', permission: 'rolesManager', color: '#f0f4f8' },
+  { key: 'editCatalogCats', label: 'ניהול קטגוריות', icon: <CategoryIcon fontSize="inherit" />, route: '/editCatalogCats', permission: 'b2bManager', color: '#e8f0f4' },
+  { key: 'editBudgets', label: 'ניהול תקציבים', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/editBudgets', permission: 'b2bManager', color: '#eaf3f5' },
+  { key: 'codeEditor', label: 'עורך קוד', icon: <CodeIcon fontSize="inherit" />, route: '/codeEditor', permission: 'codeEditor', color: '#eef2f3' },
+
 ];
 
 const Menu = () => {
-  
+
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -45,7 +47,7 @@ const Menu = () => {
 
 
   const renderMenuItems = () => {
-    return mockMenuItems.filter(item => userDetails.roles.includes(item.role)).map((item) => (
+    return mockMenuItems.filter(item => userDetails.permissions.includes(item.permission)).map((item) => (
       <Grid key={item.key} item xs={12} sm={6} md={4} lg={3}>
         <Box
           onClick={() => navigate(item.route)}
@@ -69,7 +71,7 @@ const Menu = () => {
           <IconButton color="primary" size="large" sx={{ transform: 'scale(1.6)' }}>
             {item.icon}
           </IconButton>
-          <Typography variant="subtitle" align="center" sx={{  fontWeight: 'bold',mt: 1 }}>
+          <Typography variant="subtitle" align="center" sx={{ fontWeight: 'bold', mt: 1 }}>
             {item.label}
           </Typography>
         </Box>
@@ -79,7 +81,7 @@ const Menu = () => {
 
   return (
     <Container>
-      
+
       <Box
         sx={{
           display: 'flex',
@@ -92,12 +94,12 @@ const Menu = () => {
           bgcolor: 'background.paper',
         }}
       >
-        
-        <img 
-                src={logo} 
-                alt="Logo" 
-                style={{ width: 160, height: 'auto', marginRight: '16px', mixBlendMode: 'multiply' }} 
-              />
+
+        <img
+          src={logo}
+          alt="Logo"
+          style={{ width: 160, height: 'auto', marginRight: '16px', mixBlendMode: 'multiply' }}
+        />
 
         {error && (
           <Alert severity="error" sx={{ width: '100%', mb: 2 }}>

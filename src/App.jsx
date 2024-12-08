@@ -6,11 +6,22 @@ import React, { useEffect, useState } from "react";
 import { Snackbar, Alert } from '@mui/material'; // Import Snackbar for popup notification
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import {  onMessageListener } from "./kadabrix/firebase";
+import eventBus from "./kadabrix/event";
+
+let Injected;
 
 
 function App() {
   const [notification, setNotification] = useState(null);
   const [open, setOpen] = useState(false);
+  const [rerender, setRerender] = useState({});
+  
+  eventBus.on("injectComponent", (injectedComponent) => {
+    Injected = injectedComponent;
+    setRerender({});
+  });
+
+
 
   useEffect(() => {
     // Listen for messages continuously
@@ -29,6 +40,7 @@ function App() {
 
   return (
     <div className="root">
+      {Injected&&<Injected/>}
       <Router>
         <div className="layout">
           <Layout />

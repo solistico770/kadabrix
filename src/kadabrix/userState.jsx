@@ -8,7 +8,7 @@ export const userContext = createContext();
 // Create a provider component
 export const UserProvider = ({ children }) => {
 
-const [userDetails, setUserDetails] = useState({roles:[],user:null,loaded:false});
+const [userDetails, setUserDetails] = useState({roles:[],permissions:[],user:null,loaded:false});
  
 
 let hasRun = false;
@@ -30,14 +30,14 @@ useEffect(() => {
               // Fetch user roles and update state
               const data = await kdb.run({
                   module: "kdb_users",
-                  name: "getRoles",
+                  name: "getUserSpecs",
                   data: {},
               });
 
               setUserDetails({
                   loaded:true,
                   user: session?.user || null,
-                  roles: data.map(item => item.role),
+                  roles: data.roles,permissions:data.permissions
               });
 
               // Request and register token

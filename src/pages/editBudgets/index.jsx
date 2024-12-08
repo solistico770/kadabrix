@@ -1,6 +1,9 @@
 import CircularProgress from '@mui/material/CircularProgress';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { confirmAlert } from 'react-confirm-alert';
 
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { RadioGroup, FormControlLabel, Radio } from '@mui/material';
 
 import kdb from '../../kadabrix/kadabrix';
 import React, { useState, useEffect } from 'react';
@@ -31,6 +34,8 @@ import AddBudget from './addBudget'; // Camelcase naming for AddBudget
 import DetailsPopup from './detailsPopup'; // Separate DetailsPopup component
 
 const BudgetScreen = () => {
+
+
   const [budgets, setBudgets] = useState([]);
   const [filteredBudgets, setFilteredBudgets] = useState([]);
   const [search, setSearch] = useState({ id: '', email: '', status: 'both' });
@@ -49,7 +54,7 @@ const BudgetScreen = () => {
         name: 'getBudgets',
       });
       setBudgets(data);
-      setSearch({...search,time:new Date()})
+      setSearch({ ...search, time: new Date() })
     } catch (error) {
       console.error('Failed to fetch budgets:', error);
       setError('שגיאה בטעינת התקציבים');
@@ -62,9 +67,9 @@ const BudgetScreen = () => {
   }, []);
 
   useEffect(() => {
-   
+
     doSearch();
-    
+
   }, [search]);
 
   const doSearch = () => {
@@ -74,14 +79,14 @@ const BudgetScreen = () => {
         const matchesId = search.id === '' || budget.id.toString().includes(search.id);
         const matchesEmail = search.email === '' || budget.email.includes(search.email);
         const matchesStatus =
-        search.status === 'both' ||
+          search.status === 'both' ||
           (search.status === 'active' && budget.status === 1) ||
           (search.status === 'inactive' && budget.status === 0);
 
         return matchesId && matchesEmail && matchesStatus;
       })
     );
-    
+
 
   }
 
@@ -93,7 +98,7 @@ const BudgetScreen = () => {
 
 
 
-  
+
   const handleUpdateBudget = async (index, field, value) => {
     const updatedBudgets = [...budgets];
     updatedBudgets[index][field] = value;
@@ -138,21 +143,38 @@ const BudgetScreen = () => {
     setOpenPopup(true);
   };
 
-  const handleDeleteVisible = async () => {
-    const visibleIds = filteredBudgets.map((budget) => budget.id);
-    try {
-      await kdb.run({
-        module: 'kdb_budget',
-        name: 'deleteVisible',
-        data: visibleIds,
-      });
-      await fetchBudgets();
-    } catch (error) {
-      console.error('Failed to delete budgets:', error);
-      setError('שגיאה במחיקת התקציבים');
-      setSnackbarOpen(true);
-    }
+  const handleDeleteConfirmation = () => {
+    confirmAlert({
+      title: 'אישור מחיקה',
+      message: `אתה עומד למחוק ${filteredBudgets.length} תקציבים. פעולה זו אינה ניתנת לביטול.`,
+      buttons: [
+        {
+          label: 'אישור',
+          onClick: async () => {
+            const visibleIds = filteredBudgets.map((budget) => budget.id);
+            try {
+              await kdb.run({
+                module: 'kdb_budget',
+                name: 'deleteVisible',
+                data: visibleIds,
+              });
+              await fetchBudgets();
+            } catch (error) {
+              console.error('Failed to delete budgets:', error);
+              setError('שגיאה במחיקת התקציבים');
+              setSnackbarOpen(true);
+            }
+          },
+        },
+        {
+          label: 'ביטול',
+        },
+      ],
+    });
   };
+
+
+
 
   const handleCalculateVisible = async () => {
     const visibleIds = filteredBudgets.map((budget) => budget.id);
@@ -208,43 +230,43 @@ const BudgetScreen = () => {
         </Grid>
 
 
-<Grid container spacing={2} style={{ marginTop: '8px' }}>
-  <Grid item xs={3}>
-    <Button
-      variant="contained"
-      color="primary"
-      startIcon={<CalculateIcon />}
-      onClick={handleCalculateVisible}
-    >
-      חשב  מוצגים
-    </Button>
-    {calculatingBudgets && <CircularProgress />}
-  </Grid>
+        <Grid container spacing={2} style={{ marginTop: '8px' }}>
+          <Grid item xs={3}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<CalculateIcon />}
+              onClick={handleCalculateVisible}
+            >
+              חשב  מוצגים
+            </Button>
+            {calculatingBudgets && <CircularProgress />}
+          </Grid>
 
-  <Grid item xs={3}>
-  <Button
-    variant="contained"
-    color="error"
-    startIcon={<DeleteIcon />}
-    onClick={handleDeleteVisible}
-  >
-    מחק מוצגים
-  </Button>
-</Grid>
+          <Grid item xs={3}>
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={handleDeleteConfirmation}
+            >
+              מחק מוצגים
+            </Button>
+          </Grid>
 
-  <Grid item xs={3}>
-    <Button
-      variant="contained"
-      color="primary"
-      startIcon={<AddIcon />}
-      onClick={() => setAddBudgetOpen(true)}
-    >
-      הוספת  חדש
-    </Button>
-  </Grid>
-</Grid>
+          <Grid item xs={3}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={() => setAddBudgetOpen(true)}
+            >
+              הוספת  חדש
+            </Button>
+          </Grid>
+        </Grid>
 
-    
+
       </Grid>
 
       <TableContainer component={Paper}>
@@ -254,6 +276,9 @@ const BudgetScreen = () => {
               <TableCell><strong>ID</strong></TableCell>
               <TableCell><strong>אימייל</strong></TableCell>
               <TableCell><strong>תיאור</strong></TableCell>
+              <TableCell><strong>הערות</strong></TableCell>
+              <TableCell><strong>חשבון מיוחד</strong></TableCell>
+              <TableCell><strong>סוג תקציב</strong></TableCell>
               <TableCell><strong>סטטוס</strong></TableCell>
               <TableCell><strong>תאריך התחלה</strong></TableCell>
               <TableCell><strong>תאריך סיום</strong></TableCell>
@@ -283,8 +308,36 @@ const BudgetScreen = () => {
                   />
                 </TableCell>
 
-                
-                
+
+                <TableCell>
+                  <TextField
+                    dir="rtl"
+                    defaultValue={budget.remarks}
+                    onBlur={(e) => handleBlurUpdate(index, 'remarks', e.target.value)}
+                    fullWidth
+                  />
+                </TableCell>
+
+                <TableCell>
+                  <TextField
+                    type="number"
+                    defaultValue={budget.specialAccount}
+                    onBlur={(e) => handleBlurUpdate(index, 'specialAccount', parseInt(e.target.value))}
+                    fullWidth
+                  />
+                </TableCell>
+
+                <TableCell>
+                  <RadioGroup
+                    row
+                    value={budget.type}
+                    onChange={(e) => handleUpdateBudget(index, 'type', parseInt(e.target.value))}
+                  >
+                    <FormControlLabel value={1} control={<Radio />} label="חד פעמי" />
+                    <FormControlLabel value={2} control={<Radio />} label="רב פעמי" />
+                  </RadioGroup>
+                </TableCell>
+
                 <TableCell>
                   <Switch
                     checked={budget.status === 1}
@@ -293,7 +346,7 @@ const BudgetScreen = () => {
                 </TableCell>
                 <TableCell>
                   <TextField
-                  dir="ltr"
+                    dir="ltr"
                     type="date"
                     defaultValue={new Date(budget.start * 1000).toISOString().substr(0, 10)}
                     error={!isValidDate(new Date(budget.start * 1000).toISOString().substr(0, 10))}
@@ -303,7 +356,7 @@ const BudgetScreen = () => {
                 </TableCell>
                 <TableCell>
                   <TextField
-                  dir="ltr"
+                    dir="ltr"
                     type="date"
                     defaultValue={new Date(budget.end * 1000).toISOString().substr(0, 10)}
                     error={!isValidDate(new Date(budget.end * 1000).toISOString().substr(0, 10))}
@@ -313,17 +366,17 @@ const BudgetScreen = () => {
                 </TableCell>
                 <TableCell>{budget.metaData?.remaining || '-'}</TableCell>
                 <TableCell>
-                  
-                <TableCell>
-                  
-                <TextField
-                    dir="ltr"
-                    defaultValue={budget.val}
-                    onBlur={(e) => handleBlurUpdate(index, 'val', e.target.value)}
-                    fullWidth
-                  />
-                  
-                </TableCell>
+
+                  <TableCell>
+
+                    <TextField
+                      dir="ltr"
+                      defaultValue={budget.val}
+                      onBlur={(e) => handleBlurUpdate(index, 'val', e.target.value)}
+                      fullWidth
+                    />
+
+                  </TableCell>
 
 
                 </TableCell>

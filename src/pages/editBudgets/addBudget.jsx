@@ -1,6 +1,4 @@
-import kdb from '../../kadabrix/kadabrix';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogActions,
@@ -16,7 +14,9 @@ import {
   Select,
   MenuItem,
   Typography,
+  Autocomplete,
 } from '@mui/material';
+import kdb from '../../kadabrix/kadabrix';
 
 const AddBudget = ({ open, onClose, onAdd }) => {
   const [newBudget, setNewBudget] = useState({
@@ -28,9 +28,31 @@ const AddBudget = ({ open, onClose, onAdd }) => {
     desc: '',
     quantity: 1,
     period: 'monthly',
+    remarks: '',
+    specialAccount: 0,
   });
 
-  
+  const [emailOptions, setEmailOptions] = useState([]);
+  const [loadingEmails, setLoadingEmails] = useState(false);
+
+  useEffect(() => {
+    const fetchEmails = async () => {
+      setLoadingEmails(true);
+      try {
+        const response = await kdb.run({
+          module: 'kdb_budget',
+          name: 'getUsers',
+        });
+        setEmailOptions(response.map((user) => user.email));
+      } catch (error) {
+        console.error('Failed to fetch emails:', error);
+      } finally {
+        setLoadingEmails(false);
+      }
+    };
+
+    fetchEmails();
+  }, []);
 
   const isValidDate = (date) => !isNaN(new Date(date).getTime());
 
@@ -57,7 +79,6 @@ const AddBudget = ({ open, onClose, onAdd }) => {
     for (let i = 0; i < quantity; i++) {
       let currentEndUnix;
 
-      // Calculate end date in UNIX based on the period
       if (period === 'monthly') {
         const startDate = new Date(currentStartUnix * 1000);
         const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0, 23, 59, 59);
@@ -73,17 +94,17 @@ const AddBudget = ({ open, onClose, onAdd }) => {
       }
 
       budgets.push({
-        
         email: newBudget.email,
         type: newBudget.type,
         val: newBudget.val,
         status: newBudget.status,
         desc: newBudget.desc,
+        remarks: newBudget.remarks,
+        specialAccount: newBudget.specialAccount,
         start: currentStartUnix,
         end: currentEndUnix,
       });
 
-      // Update start date for the next budget
       if (period === 'monthly') {
         const nextStartDate = new Date(currentStartUnix * 1000);
         nextStartDate.setMonth(nextStartDate.getMonth() + 1);
@@ -104,14 +125,13 @@ const AddBudget = ({ open, onClose, onAdd }) => {
 
   const handleAdd = async () => {
     const budgets = calculateBudgets();
-    const data = await kdb.run({
-        module: 'kdb_budget',
-        name: 'addBudgets',
-        data:budgets
-    })
+    await kdb.run({
+      module: 'kdb_budget',
+      name: 'addBudgets',
+      data: budgets,
+    });
     onAdd();
     onClose();
-
   };
 
   return (
@@ -120,14 +140,14 @@ const AddBudget = ({ open, onClose, onAdd }) => {
       <DialogContent>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TextField
-             inputProps={{
-              dir: "ltr",
-            }}
-              label="אימייל"
+            <Autocomplete
+              options={emailOptions}
+              loading={loadingEmails}
               value={newBudget.email}
-              onChange={(e) => setNewBudget({ ...newBudget, email: e.target.value })}
-              fullWidth
+              onChange={(event, value) => setNewBudget({ ...newBudget, email: value })}
+              renderInput={(params) => (
+                <TextField {...params} label="אימייל" fullWidth />
+              )}
             />
           </Grid>
           <Grid item xs={12}>
@@ -161,14 +181,21 @@ const AddBudget = ({ open, onClose, onAdd }) => {
             <TextField
               label="כמות תקציבים"
               type="number"
-              inputProps={{
-                min: 0, // Minimum value
-                max: 10, // Maximum value
-              }}
-
+              inputProps={{ min: 1 }}
               value={newBudget.quantity}
               onChange={(e) =>
                 setNewBudget({ ...newBudget, quantity: parseInt(e.target.value, 10) || 1 })
+              }
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="חשבון מיוחד"
+              type="number"
+              value={newBudget.specialAccount}
+              onChange={(e) =>
+                setNewBudget({ ...newBudget, specialAccount: parseInt(e.target.value, 10) || 0 })
               }
               fullWidth
             />
@@ -194,6 +221,14 @@ const AddBudget = ({ open, onClose, onAdd }) => {
               <MenuItem value="quarterly">כל רבעון</MenuItem>
               <MenuItem value="annual">תקציב שנתי</MenuItem>
             </Select>
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="הערות"
+              value={newBudget.remarks}
+              onChange={(e) => setNewBudget({ ...newBudget, remarks: e.target.value })}
+              fullWidth
+            />
           </Grid>
           <Grid item xs={12}>
             <Switch

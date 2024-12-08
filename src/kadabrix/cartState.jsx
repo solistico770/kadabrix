@@ -39,6 +39,18 @@ useEffect(()=>{
 },[])
 
 
+useEffect(() => {
+  // Flag to ensure the effect runs only once for a session
+
+ const { data: { subscription } } = kdb.auth.onAuthStateChange((event, session) => {
+     if (session?.user?.email ) {
+      fetchCart();
+     }
+    
+})
+
+}, []); // Empty dependency array to run only on mount
+
   
 
 
