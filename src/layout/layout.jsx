@@ -38,6 +38,7 @@ const Layout = () => {
     <nav className="bg-[#d098f8]/20 h-24 flex items-center relative">
       <div className="w-11/12 mx-auto max-w-[1400px] flex justify-between">
         <img
+          onClick={() => navigate('/')} 
           src={logo}
           className="w-24 cursor-pointer duration-300 hover:scale-105"
           alt=""
