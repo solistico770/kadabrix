@@ -135,6 +135,7 @@ const cardWidth=viewSize([
 
   return (
     <Container>
+      <div className="sticky top-0 left-0 w-full py-10 sm:py-2  bg-white z-20"  >
       <div style={{ flex: '0 0 auto', padding: '6px' }}>
         <TextField
           label="חיפוש"
@@ -147,6 +148,7 @@ const cardWidth=viewSize([
       </div>
       <div>
         <CatalogCats setCat={setCatId} />
+      </div>
       </div>
       <div style={{ paddingTop: "20px" }}>
         {loading && page === 1 ? (

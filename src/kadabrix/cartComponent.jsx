@@ -4,10 +4,10 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import PropTypes from 'prop-types';
 import React, { useState, useContext } from 'react';
-import kdb from "./kadabrix";
+import kdb from "./kadabrix.js";
 import { Card, CardContent, Grid } from '@mui/material';
 import imageOnError from './imgErr.js';
-import { CartContext } from './cartState';
+import { CartContext } from './cartState.jsx';
 import  CartQuantBtn  from './cartQuantBtn.jsx';
 import {
   Container,

@@ -1,6 +1,6 @@
 import { BrowserRouter as Router } from 'react-router-dom';
 import Routes from './routes';
-import Layout from './kadabrix/layout';
+import Layout from './layout/layout';
 import './App.css'
 import React, { useEffect, useState } from "react";
 import { Snackbar, Alert } from '@mui/material'; // Import Snackbar for popup notification
