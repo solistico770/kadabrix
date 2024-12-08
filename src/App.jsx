@@ -42,12 +42,8 @@ function App() {
     <div className="root">
       {Injected&&<Injected/>}
       <Router>
-        <div className="layout">
           <Layout />
-        </div>
-        <div className="router">
           <Routes/>
-        </div>
       </Router>
 
       {/* Dialog for detailed notifications */}

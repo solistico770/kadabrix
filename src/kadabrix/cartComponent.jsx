@@ -1,5 +1,4 @@
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import DialogTitle from '@mui/material/DialogTitle';
+import { PiShoppingCart } from "react-icons/pi";import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import PropTypes from 'prop-types';
@@ -186,7 +185,7 @@ SimpleDialog.propTypes = {
 
 const Component = () => {
   const [open, setOpen] = useState(false);
-
+  const { cart } = useContext(CartContext);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -196,10 +195,16 @@ const Component = () => {
   };
 
   return (
-    <div>
+    <button
+            className="text-3xl sm:text-2xl outline-none text-black hover:text-primary duration-300 relative">
       <SimpleDialog open={open} onClose={handleClose} />
-      <ShoppingCartIcon onClick={handleClickOpen} style={{ cursor: 'pointer' }} />
-    </div>
+      <PiShoppingCart onClick={handleClickOpen} style={{ cursor: 'pointer' }}  />
+      {!cart.items.length > 0 ? null : 
+      <span className="absolute -top-2 bg-primary text-white px-1 rounded-full -right-2 text-xs sm:text-[10px]">
+              {cart.items.length}
+      </span>
+      } 
+  </button>
   );
 };
 
