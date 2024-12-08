@@ -6,8 +6,6 @@ import { supabaseUrl } from "../../kadabrix/kdbConfig";
 import { FaEye } from "react-icons/fa";
 
 
-
-
       const Product = ({ img , product }) => {
     const currencyFormat = (num) => {
         num = Number(num);
