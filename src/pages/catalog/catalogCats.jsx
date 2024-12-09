@@ -9,6 +9,53 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
 
+
+const Cat = ({ category,setCat,children }) => {
+
+
+    return (
+        <div 
+            onClick={() => setCat(category.id)}
+
+        className="swiper-slide flex justify-center items-center text-center w-[180px] sm:w-[120px]"
+        style={{ marginLeft: "20px" }}
+    >
+        <div
+            className="hover:bg-[rgb(208,152,248,0.2)] duration-300 w-full group border rounded-2xl border-primary flex flex-col items-center cursor-pointer pb-2"
+        >
+            <img
+                src={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=120&height=120`}
+                className="size-20 mix-blend-hue"
+                alt={category.name}
+
+            />
+            <div className="flex items-center gap-2">
+                <svg
+                    stroke="currentColor"
+                    fill="currentColor"
+                    strokeWidth="0"
+                    viewBox="0 0 24 24"
+                    height="1em"
+                    width="1em"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path d="M5.22 8.22a.749.749 0 0 0 0 1.06l6.25 6.25a.749.749 0 0 0 1.06 0l6.25-6.25a.749.749 0 1 0-1.06-1.06L12 13.939 6.28 8.22a.749.749 0 0 0-1.06 0Z"></path>
+                </svg>
+                <h4 className="sm:text-sm">
+                    {category.name}
+                </h4>
+            </div>
+        </div>
+        <div className="absolute -bottom-60 left-0 w-full bg-white border border-primary rounded-md shadow-lg group-hover:flex flex-col z-50">
+            <SubCats setCat={setCat} children={children}/>
+        </div>
+    </div>
+
+    )
+
+}
+
+
 const SubCats = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -52,25 +99,7 @@ const SubCats = (props) => {
 };
 
 const CatalogCats = (props) => {
-    const [winw, setWinw] = useState(window.innerWidth);
-    useEffect(() => {
-        const handleResize = () => {
-            setWinw(window.innerWidth);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
 
-    const viewSize = (ranges, size) => {
-        for (let range of ranges) {
-            if (size >= range.from && size <= range.to) {
-                return range.size;
-            }
-        }
-        return null;
-    };
 
     const [cats, setCats] = useState([]);
     const childrenOf = (father) => {
@@ -92,71 +121,32 @@ const CatalogCats = (props) => {
         fetchCats();
     }, []);
 
-    const cardHeight = viewSize([
-        { from: 0, to: 600, size: 60 },
-        { from: 600, to: 99999, size: 118 },
-    ], winw);
 
-    const cardWidth = viewSize([
-        { from: 0, to: 600, size: 140 },
-        { from: 600, to: 99999, size: 190 },
-    ], winw);
 
     return (
-            <Swiper
-                navigation={false}
-                modules={[Navigation, Pagination]}
-                spaceBetween={10}
-                slidesPerView={9}
-                pagination={{ clickable: true }}
-                breakpoints={{
-                    1200: { slidesPerView: 8 },
-                    1024: { slidesPerView: 6 },
-                    768: { slidesPerView: 4 },
-                    600: { slidesPerView: 3 },
-                    480: { slidesPerView: 6 },
-                    1: { slidesPerView: 6   },
-                }}
-            >
-                {cats.filter((cat) => cat.father === 0).map((category, index) => (
-                    <SwiperSlide key={index}>
-                        <Card
-                            onClick={() => props.setCat(category.id)}
-                            sx={{
-                                width: cardHeight,
-                                height: cardWidth,
-                                cursor: 'pointer',
-                                transition: 'transform 0.3s ease-in-out',
-                                '&:hover': {
-                                    transform: 'scale(1.05)',
-                                },
-                            }}
-                        >
-                            <CardMedia
-                                component="img"
-                                height={cardHeight}
-                                image={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=118&height=118`}
-                                alt={category.name}
-                            />
-                            <CardContent style={{ padding: '4px' }}>
-                                <Typography
-                                    variant="subtitle2"
-                                    component="div"
-                                    align="center"
-                                    sx={{ fontWeight: 'bold', mt: 1 }}
-                                >
-                                    {category.name}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" style={{ fontSize: '0.75rem' }}>
-                                    {category.description}
-                                </Typography>
-                                <SubCats setCat={props.setCat} children={childrenOf(category.id)} />
-                            </CardContent>
-                        </Card>
-                    </SwiperSlide>
-                ))}
-            </Swiper>
+        <Swiper
+            navigation={false}
+            modules={[Navigation, Pagination]}
+            spaceBetween={10}
+            slidesPerView={9}
+            pagination={{ clickable: true }}
+            breakpoints={{
+                1200: { slidesPerView: 7 },
+                1024: { slidesPerView: 6 },
+                768: { slidesPerView: 4 },
+                600: { slidesPerView: 3 },
+                480: { slidesPerView: 6 },
+                1: { slidesPerView: 6 },
+            }}
+        >
+            {cats.filter((cat) => cat.father === 0).map((category, index) => (
+                <SwiperSlide key={index}>
+                    <Cat category={category} setCat={props.setCat} children={childrenOf(category.id)} />
+                </SwiperSlide>
+            ))}
+        </Swiper>
     );
 };
 
 export default CatalogCats;
+

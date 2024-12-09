@@ -1,6 +1,8 @@
 // src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import eventBus from "../kadabrix/event";
+
 
 // Firebase configuration details (fill in with your provided keys)
 const firebaseConfig = {
@@ -39,12 +41,6 @@ export const requestForToken = async () => {
 
 // Listen for incoming messages
 
-export const onMessageListener = (callback) => {
-  onMessage(messaging, (payload) => {
-    console.log("Message received: ", payload);
-    if (callback) {
-      callback(payload); // Trigger the callback function to handle the incoming message
-    }
-  });
-};
-
+onMessage(messaging, (payload) => {
+  eventBus.emit("notification", payload);
+});

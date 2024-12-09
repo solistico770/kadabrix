@@ -3,61 +3,41 @@ import Routes from './routes';
 import Layout from './layout/layout';
 import './App.css'
 import React, { useEffect, useState } from "react";
-import { Snackbar, Alert } from '@mui/material'; // Import Snackbar for popup notification
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
-import {  onMessageListener } from "./kadabrix/firebase";
 import eventBus from "./kadabrix/event";
 
-let Injected;
-
+let Injected=[];
+let runOnce = false;
 
 function App() {
-  const [notification, setNotification] = useState(null);
-  const [open, setOpen] = useState(false);
   const [rerender, setRerender] = useState({});
-  
-  eventBus.on("injectComponent", (injectedComponent) => {
-    Injected = injectedComponent;
-    setRerender({});
-  });
-
-
-
   useEffect(() => {
-    // Listen for messages continuously
-    onMessageListener((payload) => {
-      console.log("Notification received: ", payload);
-      setNotification(payload);
-      setOpen(true);
-    });
+    if (!runOnce){
+      eventBus.on("injectComponent",  (Component) => {
+        Injected.push(Component);   
+        setRerender({});
+      });
+      runOnce = true;
+    } 
   }, []);
 
 
+  
+  
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+
+
+
+
+
 
   return (
     <div className="root">
-      {Injected&&<Injected/>}
+      {Injected.length}
+      {Injected.map((Component, index) => (<Component key={index} rerender={rerender}/>))}
       <Router>
           <Layout />
           <Routes/>
       </Router>
-
-      {/* Dialog for detailed notifications */}
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>
-          {notification ? notification.notification.title : "New Notification"}
-        </DialogTitle>
-        <DialogContent>
-          {notification ? notification.notification.body : "You have a new message!"}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">Close</Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 }
