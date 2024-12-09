@@ -32,7 +32,6 @@ function App() {
 
   return (
     <div className="root">
-      {Injected.length}
       {Injected.map((Component, index) => (<Component key={index} rerender={rerender}/>))}
       <Router>
           <Layout />

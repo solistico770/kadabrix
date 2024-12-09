@@ -84,30 +84,50 @@ const ProductList = () => {
     setPage(prev => prev + 1);
     fetchProducts();
   };
-
+let activeFilter
   return (
-    <div className="max-w-[1400px] mx-auto ">
+    <div className="max-w-[1400px] mx-auto">
       <div className="sticky top-0 left-0 w-full py-10 sm:py-2  bg-white z-20">
-      <div style={{ flex: '0 0 auto', padding: '6px' }}>
-        <TextField
-          label="חיפוש"
-          variant="outlined"
-          fullWidth
-          value={searchTerm}
+      
+      <div className="flex items-center gap-3 justify-center sm:flex-col pb-[15px]">
+        <input
+          type="text"
+          placeholder="חיפוש"
           onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-          style={{ marginBottom: '8px' }}
+          className="w-8/12 h-12 sm:w-11/12 border border-primary rounded-lg outline-none pr-4"
         />
+        
+        <div className="flex gap-2">
+          <button
+            className={`rounded-md text-lg sm:text-sm bg-[rgb(208,152,248,0.2)] border border-primary px-4 h-12 font-medium   duration-200 hover:text-white    hover:bg-primary group-hover:shadow-sm ${
+              activeFilter === "במלאי" ? "bg-primary text-white" : ""
+            }`}
+            
+          >
+            במלאי
+          </button>
+          <button
+            className={`rounded-md text-lg sm:text-sm bg-[rgb(208,152,248,0.2)] border border-primary px-4 h-12 font-medium   duration-200 hover:text-white    hover:bg-primary group-hover:shadow-sm ${
+              activeFilter === "שנרכשו בעבר" ? "bg-primary text-white" : ""
+            }`}
+            
+          >
+            נרכשו בעבר
+          </button>
+        </div>
       </div>
+
+    
       <div>
         <CatalogCats setCat={setCatId} />
       </div>
     </div>
 
-      <div style={{ paddingTop: "20px" }}>
+      <div>
         {loading && page === 1 ? (
           <CircularProgress />
         ) : (
-            <div className="max-w-[1400px] pb-10 mx-auto w-11/12 flex flex-wrap gap-8 justify-center ">
+            <div className="flex flex-wrap gap-6 justify-center ">
             {products.map((product) => (
               
                   <Product
