@@ -73,10 +73,10 @@ const AddButton = (props) => {
     <div className="relative flex flex-col items-center justify-center w-full max-w-md lg:max-w-lg">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-200/50">
-          <div className="w-8 h-8 border-4  animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-gray-300 rounded-full border-t-gray-800 animate-spin"></div>
         </div>
       )}
-      <div className="flex flex-col gap-4 p-4  transition-transform lg:scale-100 sm:scale-50 xs:scale-75">
+      <div className="flex flex-col gap-4 p-4 transition-transform lg:scale-100 sm:scale-50 xs:scale-75">
         {inCartItem?.partName === props.item?.partName ? (
           <div className="flex items-center justify-between w-full">
             {showOk ? (
@@ -84,10 +84,10 @@ const AddButton = (props) => {
                 onClick={() =>
                   changeQuant(props.item.partName, tempQuant)
                 }
-                className="p-2 sm:p-3 bg-green-500 hover:bg-green-600 rounded-md text-white"
+                className="p-2 sm:p-3 bg-green-500 hover:bg-green-600 rounded-md text-white flex items-center justify-center"
               >
                 <CheckIcon
-                  className="text-base sm:text-lg lg:text-xl"
+                  className="text-lg sm:text-xl lg:text-2xl"
                 />
               </button>
             ) : (
@@ -95,28 +95,28 @@ const AddButton = (props) => {
                 onClick={() =>
                   removeProduct(props.item.partName)
                 }
-                className="p-2 sm:p-3 bg-red-500 hover:bg-red-600 rounded-md text-white"
+                className="p-2 sm:p-3 bg-red-500 hover:bg-red-600 rounded-md text-white flex items-center justify-center"
               >
                 <DeleteIcon
-                  className="text-base sm:text-lg lg:text-xl"
+                  className="text-lg sm:text-xl lg:text-2xl"
                 />
               </button>
             )}
             <input
-              type="text"
+              type="number"
               value={tempQuant}
               onChange={handleQuantChange}
-              className="w-16 text-center border border-gray-300 rounded-md focus:ring focus:ring-blue-200"
+              className="w-16 h-12 text-center border border-gray-300 rounded-md focus:ring focus:ring-blue-200 text-lg"
               maxLength={3}
             />
           </div>
         ) : (
           <button
             onClick={() => addProduct(props.item)}
-            className="p-2 sm:p-3 bg-blue-500 hover:bg-blue-600 rounded-md text-white"
+            className="p-2 sm:p-3 bg-green-500 hover:bg-green-600 rounded-md text-white flex items-center justify-center"
           >
             <AddShoppingCartIcon
-              className="text-base sm:text-lg lg:text-xl"
+              className="text-lg sm:text-xl lg:text-2xl"
             />
           </button>
         )}

@@ -16,7 +16,7 @@ const Product = ({ img, product }) => {
   return (
 
 
-    <div className="hover:bg-[rgb(208,152,248,0.2)] items-stretch duration-300  group border  rounded-2xl border-primary w-[300px] md:w-[150px] sm:w-[75px] ">
+    <div className="flex flex-col hover:bg-[rgb(208,152,248,0.2)] items-stretch duration-300  group border  rounded-2xl border-primary w-[300px] md:w-[150px] sm:w-[75px] ">
       <div className="flex justify-center  h-[200px]   md:h-[150px] sm:h-[75px]" >
         <img
           src={img}
@@ -27,7 +27,7 @@ const Product = ({ img, product }) => {
         />
       </div>
       
-      <div className="flex flex-col relative text-center  justify-between  items-center ">
+      <div className="flex bg-[rgb(208,152,248,0.2)]  h-full flex-col relative text-center ">
         <div
           title="view product"
           className="group-hover:opacity-100 duration-300 opacity-0 sm:opacity-100 absolute -top-7 right-3 text-sm"
@@ -39,18 +39,18 @@ const Product = ({ img, product }) => {
             <FaEye />
           </button>
         </div>
-        <div className="flex flex-col gap-1 ">
+        <div className="">
           <h4>{product.partName}</h4>
           <h3 className=" text-base sm:text-xs">{product.partDes}</h3>
         </div>
 
-        <div className="flex flex-col gap-1 ">
+        <div className="">
 
           <h4 className="text-primary font-medium text-xl">₪{product.price}</h4>
         </div>
 
 
-        <div className="bottom-3">
+        <div className="mt-auto">
 
         <AddButton item={product} />
         

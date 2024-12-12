@@ -139,9 +139,7 @@ let activeFilter
             </div>
         )}
         {loading && page > 1 && <CircularProgress />}
-        {!loading && hasMore && (
-          <button onClick={handleLoadMore} style={{ marginTop: '20px' }}>Load More</button>
-        )}
+      
       </div>
       </div>
     
