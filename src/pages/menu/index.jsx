@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Button, Grid, Container, Box, Typography, Avatar, Alert, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
 import CategoryIcon from '@mui/icons-material/Category';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -11,7 +10,6 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import kdb from '../../kadabrix/kadabrix';
 import logo from '../../assets/logo.png';
 import { userContext } from '../../kadabrix/userState';
 
@@ -35,6 +33,7 @@ const mockMenuItems = [
   { key: 'editCatalogCats', label: 'ניהול קטגוריות', icon: <CategoryIcon fontSize="inherit" />, route: '/editCatalogCats', permission: 'b2bManager', color: '#e8f0f4' },
   { key: 'editBudgets', label: 'ניהול תקציבים', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/editBudgets', permission: 'b2bManager', color: '#eaf3f5' },
   { key: 'codeEditor', label: 'עורך קוד', icon: <CodeIcon fontSize="inherit" />, route: '/codeEditor', permission: 'codeEditor', color: '#eef2f3' },
+  { key: 'editHtmlTemplates', label: 'עורך HTML', icon: <CodeIcon fontSize="inherit" />, route: '/editHtmlTemplates', permission: 'editHtmlTemplates', color: '#eef2f3' },
 
 ];
 

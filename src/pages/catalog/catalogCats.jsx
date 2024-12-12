@@ -17,15 +17,15 @@ const Cat = ({ category,setCat,children }) => {
         <div 
             onClick={() => setCat(category.id)}
 
-        className="swiper-slide flex justify-center items-center text-center w-[180px] sm:w-[120px]"
-        style={{ marginLeft: "20px" }}
+        className="swiper-slide flex justify-center items-center text-center w-[160px] h-[200px]  md:w-[120px] md:h-[250px] sm:w-[100px] sm:h-[150px] "
+        
     >
         <div
-            className="hover:bg-[rgb(208,152,248,0.2)] duration-300 w-full group border rounded-2xl border-primary flex flex-col items-center cursor-pointer pb-2"
+            className="hover:bg-[rgb(208,152,248,0.2)] duration-300 w-full h-[calc(100%/1.7)]  mb-3 group border rounded-2xl border-primary flex flex-col items-center cursor-pointer "
         >
             <img
                 src={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=120&height=120`}
-                className="size-20 mix-blend-hue"
+                className="size-20 mix-blend-hue sm:size-10"
                 alt={category.name}
 
             />
@@ -131,12 +131,15 @@ const CatalogCats = (props) => {
             slidesPerView={9}
             pagination={{ clickable: true }}
             breakpoints={{
-                1200: { slidesPerView: 7 },
+                1800: { slidesPerView: 7 },
+                1535: { slidesPerView: 6 },
                 1024: { slidesPerView: 6 },
+                991: { slidesPerView: 4 },
                 768: { slidesPerView: 4 },
-                600: { slidesPerView: 3 },
-                480: { slidesPerView: 6 },
-                1: { slidesPerView: 6 },
+                540: { slidesPerView: 4 },
+                385: { slidesPerView: 4 },
+                325: { slidesPerView: 3 },
+                1: { slidesPerView: 2 }
             }}
         >
             {cats.filter((cat) => cat.father === 0).map((category, index) => (

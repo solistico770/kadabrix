@@ -87,9 +87,9 @@ const ProductList = () => {
 let activeFilter
   return (
     <div className="max-w-[1400px] mx-auto">
-      <div className="sticky top-0 left-0 w-full py-10 sm:py-2  bg-white z-20">
+      <div className="sticky top-0 left-0 w-full py-5 sm:py-2  bg-white z-20">
       
-      <div className="flex items-center gap-3 justify-center sm:flex-col pb-[15px]">
+      <div className="flex items-center gap-3 justify-center sm:flex-col pb-[5px]">
         <input
           type="text"
           placeholder="חיפוש"

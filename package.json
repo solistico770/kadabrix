@@ -10,13 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.5",
-    "@emotion/styled": "^11.13.5",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@mui/base": "^5.0.0-beta.58",
-    "@mui/icons-material": "^5.15.21",
-    "@mui/material": "^5.16.7",
+    "@mui/icons-material": "^5.16.9",
+    "@mui/material": "^5.16.9",
     "@mui/x-date-pickers": "^7.22.2",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-slot": "^1.1.0",
     "@supabase/supabase-js": "^2.44.2",
+    "@tinymce/tinymce-react": "^5.1.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "firebase": "^11.0.2",
     "jwt-decode": "^4.0.0",
@@ -35,9 +41,11 @@
     "slick-carousel": "^1.8.1",
     "stylis": "^4.3.4",
     "stylis-plugin-rtl": "^2.1.1",
-    "swiper": "^11.1.15"
+    "swiper": "^11.1.15",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@shadcn/ui": "^0.0.4",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",

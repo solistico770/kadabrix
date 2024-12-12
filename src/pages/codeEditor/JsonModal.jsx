@@ -35,11 +35,8 @@ const JsonModal = ({ jsonData, onImport }) => {
             "module": "codeEditor",
             "name": "addRecord",
             "data":{
-                type:item.type,
-                name:item.name,
-                module:item.module,
-                config:item.config,
-                data:item.data
+                isDuplicate:isDuplicate,
+                record:item
             }
           });
 
