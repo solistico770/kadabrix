@@ -106,7 +106,7 @@ const AddButton = (props) => {
               type="number"
               value={tempQuant}
               onChange={handleQuantChange}
-              className="w-16 h-12 text-center border border-gray-300 rounded-md focus:ring focus:ring-blue-200 text-lg"
+              className="w-16 h-10 text-center border border-gray-300 rounded-md mr-1 focus:ring focus:ring-blue-200 text-lg"
               maxLength={3}
             />
           </div>

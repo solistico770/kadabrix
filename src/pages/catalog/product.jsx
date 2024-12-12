@@ -27,7 +27,7 @@ const Product = ({ img, product }) => {
         />
       </div>
       
-      <div className="flex bg-[rgb(208,152,248,0.2)]  h-full flex-col relative text-center ">
+      <div className="flex h-full flex-col relative text-center ">
         <div
           title="view product"
           className="group-hover:opacity-100 duration-300 opacity-0 sm:opacity-100 absolute -top-7 right-3 text-sm"
@@ -44,14 +44,11 @@ const Product = ({ img, product }) => {
           <h3 className=" text-base sm:text-xs">{product.partDes}</h3>
         </div>
 
-        <div className="">
-
-          <h4 className="text-primary font-medium text-xl">₪{product.price}</h4>
-        </div>
-
 
         <div className="mt-auto">
 
+        <h4 className="text-primary font-medium text-xl mt-auto">₪{product.price}</h4>
+        
         <AddButton item={product} />
         
         </div>
