@@ -69,6 +69,7 @@ const Users = (props) => {
             <TableHead>
               <TableRow>
                 <TableCell>שם קונפיגורציה</TableCell>
+                <TableCell>תיאור </TableCell>
                 <TableCell>מערכת</TableCell>
                 <TableCell>לפי תפקיד</TableCell>
                 <TableCell>לפי משתמש</TableCell>
@@ -78,6 +79,7 @@ const Users = (props) => {
               {configs.map((conf, index) => (
                 <TableRow key={index}>
                   <TableCell>{conf.name}</TableCell>
+                  <TableCell>{conf.desc}</TableCell>
                   <TableCell>{conf.value}</TableCell>
                   <TableCell>{conf.rvalue}</TableCell>
                   <TableCell>
