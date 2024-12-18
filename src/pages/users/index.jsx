@@ -6,6 +6,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import kdb from '../../kadabrix/kadabrix';
 import KdbInput from './kdbInput';
 import RolesPopup from './rolesPopup';
+import ConfigPopup from './configPopup';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -78,8 +79,7 @@ const Users = () => {
           <TableHead>
             <TableRow>
               <TableCell>אימייל</TableCell>
-              <TableCell>משתמש ERP</TableCell>
-              <TableCell>הרשאות</TableCell>
+              <TableCell>קונפיגורציה</TableCell>
               <TableCell>הרשאות</TableCell>
             </TableRow>
           </TableHead>
@@ -89,18 +89,7 @@ const Users = () => {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
                   
-                  <KdbInput 
-                  
-                   initialValue={user.erpcust} 
-                   table="kadabrix_user_config"
-                   idName="email" 
-                    idValue={user.email}  
-                    editField="erpcust" />
-
-                </TableCell>
-                <TableCell>
-                {user.roles}
-
+                <ConfigPopup email={user.email}  />
 
                 </TableCell>
 

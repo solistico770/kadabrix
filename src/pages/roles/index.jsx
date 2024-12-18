@@ -5,13 +5,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import kdb from '../../kadabrix/kadabrix';
 import PermissionsPopup  from './permissionsPopup';
+import ConfigPopup from './configPopup';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
-  const [editing, setEditing] = useState(null);
-  const [newErpCust, setNewErpCust] = useState('');
-
+  
   const fetchUsers = async () => {
     try {
       const data = await kdb.run({
@@ -74,7 +73,10 @@ const Users = () => {
                 </TableCell>
 
                 <TableCell>
-                {user.permissions}
+                
+                <ConfigPopup role={user.role}  />
+
+
 
 
                 </TableCell>

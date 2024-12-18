@@ -48,7 +48,7 @@ const Users = (props) => {
 
   return (
     <div>
-    <Button onClick={handleOpen} variant="outlined" startIcon={<SecurityIcon />}>נהל הרשאות</Button>
+    <Button onClick={handleOpen} variant="outlined" startIcon={<SecurityIcon />}>הרשאות</Button>
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>הרשאות </DialogTitle>
 

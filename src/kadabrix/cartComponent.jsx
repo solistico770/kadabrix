@@ -60,6 +60,17 @@ function SimpleDialog(props) {
     });
   };
 
+
+  const placeOrder = async () => {
+    await kdb.run({
+      "module": "kdb_cart",
+      "name": "placeOrder"
+     
+    });
+    setEditQuant(null); // Close the editing input after successful update
+  };
+
+
   const quantSetItem = async (index, quant) => {
     await kdb.run({
       "module": "kdb_cart",
@@ -171,6 +182,7 @@ function SimpleDialog(props) {
       </Container>
 
       <DialogActions>
+        <Button onClick={placeOrder}>שלח הזמנה</Button>
         <Button onClick={clearCart}>נקה סל</Button>
         <Button onClick={handleClose}>סגור חלון</Button>
       </DialogActions>

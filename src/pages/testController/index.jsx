@@ -45,7 +45,7 @@ const JsonViewer = () => {
       const data = await kdb.run({
         module,
         name: controller,
-        data: jsonData
+        data: JSON.parse(jsonData),
       });
       setRetData(data);
     } catch (err) {
