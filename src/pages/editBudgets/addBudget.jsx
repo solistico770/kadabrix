@@ -83,7 +83,15 @@ const AddBudget = ({ open, onClose, onAdd }) => {
         const startDate = new Date(currentStartUnix * 1000);
         const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0, 23, 59, 59);
         currentEndUnix = Math.floor(endDate.getTime() / 1000);
-      } else if (period === 'quarterly') {
+      } 
+      else if (period === 'bimonthly') {
+
+        const startDate = new Date(currentStartUnix * 1000);
+        const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 2, 0, 23, 59, 59);
+        currentEndUnix = Math.floor(endDate.getTime() / 1000);
+        
+      }
+      else if (period === 'quarterly') {
         const startDate = new Date(currentStartUnix * 1000);
         const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 3, 0, 23, 59, 59);
         currentEndUnix = Math.floor(endDate.getTime() / 1000);
@@ -109,7 +117,13 @@ const AddBudget = ({ open, onClose, onAdd }) => {
         const nextStartDate = new Date(currentStartUnix * 1000);
         nextStartDate.setMonth(nextStartDate.getMonth() + 1);
         currentStartUnix = Math.floor(nextStartDate.getTime() / 1000);
+      } else if (period === 'bimonthly') {
+        const nextStartDate = new Date(currentStartUnix * 1000);
+        nextStartDate.setMonth(nextStartDate.getMonth() + 2);
+        currentStartUnix = Math.floor(nextStartDate.getTime() / 1000);
+
       } else if (period === 'quarterly') {
+
         const nextStartDate = new Date(currentStartUnix * 1000);
         nextStartDate.setMonth(nextStartDate.getMonth() + 3);
         currentStartUnix = Math.floor(nextStartDate.getTime() / 1000);
@@ -218,6 +232,7 @@ const AddBudget = ({ open, onClose, onAdd }) => {
               fullWidth
             >
               <MenuItem value="monthly">כל חודש</MenuItem>
+              <MenuItem value="bimonthly">דו חודשי</MenuItem>
               <MenuItem value="quarterly">כל רבעון</MenuItem>
               <MenuItem value="annual">תקציב שנתי</MenuItem>
             </Select>
