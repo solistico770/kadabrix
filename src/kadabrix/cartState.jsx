@@ -1,5 +1,11 @@
 import React, { createContext, useState , useEffect } from 'react';
 import kdb from "../kadabrix/kadabrix"
+import eventBus from "./event";
+
+
+
+
+
 
 // Create the context
 export const CartContext = createContext();
@@ -19,6 +25,8 @@ const fetchCart = async () => {
     "data": { }
   });
   setCart({...cartData,loaded:true})
+  eventBus.emit("updateCart", {...cartData,loaded:true});
+  
 }
 
 

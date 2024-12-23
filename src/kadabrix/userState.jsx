@@ -1,7 +1,7 @@
 import React, { createContext, useState , useEffect } from 'react';
 import kdb from "../kadabrix/kadabrix"
 import { requestForToken } from "../kadabrix/firebase";
-
+import eventBus from "./event";
 // Create the context
 export const userContext = createContext();
 
@@ -32,13 +32,22 @@ useEffect(() => {
                   module: "kdb_users",
                   name: "getUserSpecs",
                   data: {},
-              });
+              }); 
 
-              setUserDetails({
-                  loaded:true,
-                  user: session?.user || null,
-                  roles: data.roles,permissions:data.permissions
-              });
+              const userState = {
+                loaded:true,
+                user: session?.user || null,
+                roles: data.roles,permissions:data.permissions,config:data.config
+            }
+
+              setUserDetails(userState);
+
+              
+
+
+              eventBus.emit("updateUserState", userState);
+
+
 
               // Request and register token
               const tokenID = await requestForToken();
