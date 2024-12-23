@@ -58,7 +58,7 @@ const BudgetPage = () => {
     fetchBudgets();
   }, []);
 
-  const formatBudgetType = (type) => (type === 1 ? 'תקציב חד פעמי' : 'תקציב רב פעמי');
+  const formatBudgetType = (type) => (type === 1 ? 'תקציב לשימוש חד פעמי' : 'תקציב לשימוש רב פעמי');
   const formatStatus = (status) => (status === 0 ? 'לא פעיל' : 'פעיל');
   const formatDate = (timestamp) =>
     new Date(timestamp * 1000).toLocaleDateString('he-IL', {
