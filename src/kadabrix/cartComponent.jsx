@@ -1,3 +1,5 @@
+import eventBus from "./event";
+
 import { PiShoppingCart } from "react-icons/pi";import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -22,9 +24,7 @@ import {
   IconButton,
   TextField
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+
 
 function SimpleDialog(props) {
   const { onClose, open } = props;
@@ -201,6 +201,12 @@ const Component = () => {
   const handleClickOpen = () => {
     setOpen(true);
   };
+
+  eventBus.on('openCart', () => {
+    
+    setOpen(true);
+
+  });
 
   const handleClose = () => {
     setOpen(false);

@@ -35,14 +35,6 @@ const { data, error } = await supabaseServiceClient
  const {config,configProtected} = await getConfig(kdb.userName ? kdb.userName : '');
  kdb.config = config;
  kdb.configProtected = configProtected;
-
-
-
- 
-
-
- 
-
  
 
 

@@ -4,6 +4,7 @@ import { CartContext } from '../../kadabrix/cartState';
 import { userContext } from '../../kadabrix/userState';
 import kdb from "../../kadabrix/kadabrix";
 import CatalogCats from './catalogCats';
+import CatalogWords from './CatalogWords';
 import Product from './product.jsx';
 import { supabaseUrl } from "../../kadabrix/kdbConfig";
 import {
@@ -93,6 +94,7 @@ let activeFilter
         <input
           type="text"
           placeholder="חיפוש"
+          value={searchTerm}
           onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
           className="w-8/12 h-12 sm:w-11/12 border border-primary rounded-lg outline-none pr-4"
         />
@@ -117,7 +119,11 @@ let activeFilter
         </div>
       </div>
 
-    
+     <div className="">
+          <CatalogWords searchState={searchTerm} setSearchState={setSearchTerm} />
+
+     </div>
+
       <div>
         <CatalogCats setCat={setCatId} />
       </div>

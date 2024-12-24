@@ -19,6 +19,7 @@ const mockMenuItems = [
   { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/selectBudget', permission: 'b2bBudgetUser', color: '#f0f0f0' },
   { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/catalog', permission: 'b2bCatalog', color: '#edf3f5' },
 
+  { key: 'deferredCarts', label: 'סלי משתמשים', icon: <ShoppingCartIcon fontSize="inherit" />, route: '/deferredCarts', permission: 'canDefferCart', color: '#edf3f5' },
 
 
   { key: 'invoices', label: 'מצב ההזמנות', icon: <ReceiptIcon fontSize="inherit" />, route: '/invoices', permission: 'userOrders', color: '#f2f5f6' },

@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import kdb from '../../kadabrix/kadabrix';
+import eventBus from '../../kadabrix/event';
+
+
+
+
 
 const CartList = () => {
   const [carts, setCarts] = useState([]);
@@ -15,6 +20,15 @@ const CartList = () => {
     }, 3000); // Toast disappears after 3 seconds
   };
 
+  useEffect(() => {
+    
+    const intervalId = setInterval(fetchCarts, 10000);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []); 
+
+
   // Fetch carts data
   const fetchCarts = async () => {
     try {
@@ -25,7 +39,7 @@ const CartList = () => {
       });
       setCarts(data);
       setFilteredCarts(data);
-      showToast('נטען בהצלחה', 'success'); // Success toast
+      
     } catch (err) {
       showToast('Failed to load cart data. Please try again.', 'error'); // Error toast
       console.error('Error fetching carts:', err);
@@ -57,8 +71,13 @@ const CartList = () => {
         data: { id, type }
       });
       showToast(`סל נטען בהצלחה`, 'success');
+      fetchCarts();
+      eventBus.emit('openCart');
+
     } catch (err) {
-      showToast('Failed to load the selected cart. Please try again.', 'error');
+      
+      fetchCarts();
+      showToast(err, 'error');
       console.error('Error loading cart:', err);
     }
   };
