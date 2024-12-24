@@ -27,7 +27,8 @@ const Page = ({ searchState, setSearchState }) => {
                 .join(' ');
             setSearchState(newSearchState);
         } else {
-            setSearchState((prev) => prev ? `${prev} ${word}` : word);
+            setSearchState((prev) => prev ? `${prev} ${word} ` : word+' '
+        );
         }
     };
 
