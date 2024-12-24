@@ -27,8 +27,18 @@ const Page = ({ searchState, setSearchState }) => {
                 .join(' ');
             setSearchState(newSearchState);
         } else {
-            setSearchState((prev) => prev ? `${prev} ${word} ` : word+' '
-        );
+            // Check if we're in the middle of typing a word
+            const lastSpaceIndex = searchState?.lastIndexOf(' ') ?? -1;
+            const currentTyping = searchState?.slice(lastSpaceIndex + 1);
+
+            if (currentTyping && word.startsWith(currentTyping)) {
+                // Replace the partial word with the full word
+                const beforePartial = searchState.slice(0, lastSpaceIndex + 1);
+                setSearchState(beforePartial + word + ' ');
+            } else {
+                // Normal case - add the word
+                setSearchState((prev) => prev ? `${prev}${word} ` : `${word} `);
+            }
         }
     };
 
