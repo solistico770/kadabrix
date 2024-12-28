@@ -10,6 +10,8 @@ const Layout = () => {
   const navigate = useNavigate();
 
 
+  // BOOFIX
+
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await kdb.auth.getSession();
