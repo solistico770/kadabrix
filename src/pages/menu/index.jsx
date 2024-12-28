@@ -34,6 +34,7 @@ const mockMenuItems = [
   { key: 'editCatalogCats', label: 'ניהול קטגוריות', icon: <CategoryIcon fontSize="inherit" />, route: '/editCatalogCats', permission: 'b2bManager', color: '#e8f0f4' },
   { key: 'editBudgets', label: 'ניהול תקציבים', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/editBudgets', permission: 'b2bManager', color: '#eaf3f5' },
   { key: 'codeEditor', label: 'עורך קוד', icon: <CodeIcon fontSize="inherit" />, route: '/codeEditor', permission: 'codeEditor', color: '#eef2f3' },
+  { key: 'etlEditor', label: 'עורך ETL', icon: <CodeIcon fontSize="inherit" />, route: '/etlEditor', permission: 'etlEditor', color: '#eef2f3' },
   { key: 'editHtmlTemplates', label: 'עורך HTML', icon: <CodeIcon fontSize="inherit" />, route: '/editHtmlTemplates', permission: 'editHtmlTemplates', color: '#eef2f3' },
 
 ];

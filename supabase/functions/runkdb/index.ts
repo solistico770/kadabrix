@@ -2,6 +2,9 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 import moment from "https://deno.land/x/momentjs@2.29.1-deno/mod.ts";
 
+const dbPool = new postgres.Pool(getPooler(), 3, true)
+
+
 
 const supabaseServiceClient = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
@@ -11,7 +14,33 @@ const supabaseServiceClient = createClient(
 
  
 
+function getPooler(){
+  const supabaseDbUrl = Deno.env.get('SUPABASE_DB_URL')!
 
+
+  const regex = /^postgres:\/\/([^:]+):([^@]+)@([^\.]+)\.([^\.]+)\.([^:\/]+):(\d+)\/([^?]+)/;
+
+// Match the URL using the regex
+const match = supabaseDbUrl.match(regex);
+
+if (!match) {
+  throw new Error("Invalid SUPABASE_DB_URL format.");
+}
+
+// Extract components
+const username = match[1]; // ""
+const password = match[2]; // ""
+const dbHostPrefix = match[3]; // "db"
+const deployment = match[4]; // ""
+const domain = match[5]; // "supabase.co"
+const port = match[6]; // "5432"
+const database = match[7]; // "postgres"
+
+// Rebuild the pooler URL
+const poolerUrl = `postgresql://${username}.${deployment}:${password}@aws-0-eu-west-1.pooler.supabase.com:6543/${database}`;
+
+return poolerUrl;
+}
 
 
 async function getController(module,name,req) {
