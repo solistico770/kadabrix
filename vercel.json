@@ -1,5 +1,9 @@
 {
   "rewrites": [
+    {
+      "source": "/supabase.json",
+      "destination": "/supabase.json"
+    },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
