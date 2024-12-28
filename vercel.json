@@ -8,5 +8,5 @@
       "source": "/(?!config\\.json$)(.*)",
       "destination": "/"
     }
-  ]
+  ] 
 }
