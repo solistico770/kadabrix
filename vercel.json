@@ -1,5 +1,12 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/config.json",
+      "destination": "/config.json"
+    },
+    {
+      "source": "/(?!config\\.json$)(.*)",
+      "destination": "/"
+    }
   ]
 }
