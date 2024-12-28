@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { createRoutesPlugin } from './scripts/vite-plugin-routes';
 import { VitePWA } from 'vite-plugin-pwa';
 import { createfilesTreePlugin } from './scripts/vite-plugin-filesTree';
+import  {createSupabaseConfig}  from './scripts/vite-plugin-supabase-html';
 
 const manifestForPlugIn = {
   registerType: 'autoUpdate',
@@ -46,11 +47,13 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    createSupabaseConfig(), 
     VitePWA(manifestForPlugIn),
     createfilesTreePlugin(),
     createRoutesPlugin({
       pagesDir: 'src/pages',
       output: 'src/routes.jsx',
     }),
+    
   ],
 });
