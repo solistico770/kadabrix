@@ -5,8 +5,8 @@
       "destination": "/config.json"
     },
     {
-      "source": "/(?!config\\.json$)(.*)",
+      "source": "/(?!config.json$)(.*)",
       "destination": "/"
     }
-  ] 
+  ]
 }
