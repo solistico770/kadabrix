@@ -6,8 +6,9 @@ import { defineConfig, loadEnv } from 'vite';
 export  function createSupabaseConfig() {
   return {
     name: 'vite-plugin-supabase-config',
-    async buildStart() {
-      
+    async generateBundle() {
+      console.log(`Supabase config emitted as config.js`);
+
       await genFile();
 
       
