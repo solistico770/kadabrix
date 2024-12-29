@@ -20,7 +20,8 @@ async function genFile() {
 
   console.log("Generating file");
 console.log(viteEnv.VITE_supabaseUrl);
-fileContent = `{
+
+const fileContent = `{
   "supabaseUrl": "${viteEnv.VITE_supabaseUrl}",
   "supabaseKey": "${viteEnv.VITE_supabaseKey}"
 }`
