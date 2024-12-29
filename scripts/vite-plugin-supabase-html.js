@@ -23,7 +23,7 @@ export function createSupabaseConfig() {
         {
           supabaseUrl: "${viteEnv.VITE_supabaseUrl}",
           supabaseKey: "${viteEnv.VITE_supabaseKey}"
-        };
+        }
       `;
 
       // Write the file to the dist directory
