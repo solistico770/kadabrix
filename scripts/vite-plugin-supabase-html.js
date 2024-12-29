@@ -26,7 +26,7 @@ let file = `{
   "supabaseKey": "${viteEnv.VITE_supabaseKey}"
 }`
 
-fs.writeFileSync(path.resolve(__dirname, '../public/config.json'), file);
+fs.writeFileSync(path.resolve(__dirname, '../public/config.js'), file);
 
 
 }
