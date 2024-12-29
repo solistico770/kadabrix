@@ -20,13 +20,24 @@ async function genFile() {
 
   console.log("Generating file");
 console.log(viteEnv.VITE_supabaseUrl);
-
-let file = `{
+fileContent = `{
   "supabaseUrl": "${viteEnv.VITE_supabaseUrl}",
   "supabaseKey": "${viteEnv.VITE_supabaseKey}"
 }`
 
-fs.writeFileSync(path.resolve(__dirname, '../dist/config.js'), file);
+
+      // Emit config.js as an asset
+      this.emitFile({
+        type: 'asset',
+        fileName: 'config.js',
+        source: fileContent,
+      });
+
+      console.log(`Supabase config emitted as config.js`);
+
+
 
 
 }
+
+
