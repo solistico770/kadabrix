@@ -1,45 +1,36 @@
+import { loadEnv } from 'vite';
 import fs from 'fs';
 import path from 'path';
-import { createClient } from '@supabase/supabase-js'
-import { defineConfig, loadEnv } from 'vite';
 
-export  function createSupabaseConfig() {
+export function createSupabaseConfig() {
   return {
     name: 'vite-plugin-supabase-config',
-    async generateBundle() {
-      console.log(`Supabase config emitted as config.js`);
 
-      await genFile();
+    configResolved(config) {
+      // Store the mode and root directory
+     
+    },
 
+    writeBundle() {
       
-    }
+      let viteEnv  = {...process.env, ...loadEnv( "" , process.cwd())};
+      console.log("Generating config.js with Supabase credentials");
+      console.log(`Supabase URL: ${viteEnv.VITE_supabaseUrl}`);
+      console.log(`Supabase Key: ${viteEnv.VITE_supabaseKey}`);
+
+      // Prepare the content for config.js
+      const fileContent = `
+        window.supabaseConfig = {
+          supabaseUrl: "${viteEnv.VITE_supabaseUrl}",
+          supabaseKey: "${viteEnv.VITE_supabaseKey}"
+        };
+      `;
+
+      // Write the file to the dist directory
+      const outputPath = '../dist/config.js'
+      fs.writeFileSync(outputPath, fileContent, 'utf-8');
+
+      console.log(`Supabase config written to ${outputPath}`);
+    },
   };
 }
-
-async function genFile() {
-  let viteEnv  = {...process.env, ...loadEnv( "" , process.cwd())};
-
-  console.log("Generating file");
-console.log(viteEnv.VITE_supabaseUrl);
-
-const fileContent = `{
-  "supabaseUrl": "${viteEnv.VITE_supabaseUrl}",
-  "supabaseKey": "${viteEnv.VITE_supabaseKey}"
-}`
-
-
-      // Emit config.js as an asset
-      this.emitFile({
-        type: 'asset',
-        fileName: 'config.js',
-        source: fileContent,
-      });
-
-      console.log(`Supabase config emitted as config.js`);
-
-
-
-
-}
-
-
