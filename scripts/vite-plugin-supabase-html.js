@@ -27,7 +27,7 @@ export function createSupabaseConfig() {
       `;
 
       // Write the file to the dist directory
-      const outputPath = '../dist/config.js'
+      const outputPath = 'dist/config.js'
       fs.writeFileSync(outputPath, fileContent, 'utf-8');
 
       console.log(`Supabase config written to ${outputPath}`);
