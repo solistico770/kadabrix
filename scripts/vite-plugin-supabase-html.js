@@ -20,7 +20,7 @@ export function createSupabaseConfig() {
 
       // Prepare the content for config.js
       const fileContent = `
-        window.supabaseConfig = {
+        {
           supabaseUrl: "${viteEnv.VITE_supabaseUrl}",
           supabaseKey: "${viteEnv.VITE_supabaseKey}"
         };
