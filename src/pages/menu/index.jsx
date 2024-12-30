@@ -19,7 +19,6 @@ const mockMenuItems = [
   { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/selectBudget', permission: 'b2bBudgetUser', color: '#f0f0f0' },
   { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/catalog', permission: 'b2bCatalog', color: '#edf3f5' },
 
-  { key: 'deferredCarts', label: 'סלי משתמשים', icon: <ShoppingCartIcon fontSize="inherit" />, route: '/deferredCarts', permission: 'canDefferCart', color: '#edf3f5' },
 
 
   { key: 'invoices', label: 'מצב ההזמנות', icon: <ReceiptIcon fontSize="inherit" />, route: '/invoices', permission: 'userOrders', color: '#f2f5f6' },
@@ -29,15 +28,8 @@ const mockMenuItems = [
 
   { key: 'salesReport', label: 'דוח מכירות', icon: <BarChartIcon fontSize="inherit" />, route: '/salesReport', permission: 'salesReports', color: '#f1f4f5' },
 
-  { key: 'users', label: 'ניהול משתמשים', icon: <PeopleIcon fontSize="inherit" />, route: '/users', permission: 'usersManager', color: '#f0f4f8' },
-  { key: 'permissions', label: 'ניהול תפקידים', icon: <PeopleIcon fontSize="inherit" />, route: '/roles', permission: 'rolesManager', color: '#f0f4f8' },
-  { key: 'editCatalogCats', label: 'ניהול קטגוריות', icon: <CategoryIcon fontSize="inherit" />, route: '/editCatalogCats', permission: 'b2bManager', color: '#e8f0f4' },
-  { key: 'editBudgets', label: 'ניהול תקציבים', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/editBudgets', permission: 'b2bManager', color: '#eaf3f5' },
-  { key: 'codeEditor', label: 'עורך קוד', icon: <CodeIcon fontSize="inherit" />, route: '/codeEditor', permission: 'codeEditor', color: '#eef2f3' },
-  { key: 'etlEditor', label: 'עורך ETL', icon: <CodeIcon fontSize="inherit" />, route: '/etlEditor', permission: 'etlEditor', color: '#eef2f3' },
-  { key: 'editHtmlTemplates', label: 'עורך HTML', icon: <CodeIcon fontSize="inherit" />, route: '/editHtmlTemplates', permission: 'editHtmlTemplates', color: '#eef2f3' },
-
-];
+  { key: 'menuAdmin', label: 'ניהול', icon: <PeopleIcon fontSize="inherit" />, route: '/menuAdmin', permission: 'usersManager', color: '#f0f4f8' }
+]
 
 const Menu = () => {
 
