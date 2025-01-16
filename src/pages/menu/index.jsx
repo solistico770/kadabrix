@@ -18,6 +18,7 @@ import { userContext } from '../../kadabrix/userState';
 const mockMenuItems = [
   { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/selectBudget', permission: 'b2bBudgetUser', color: '#f0f0f0' },
   { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/catalog', permission: 'b2bCatalog', color: '#edf3f5' },
+  { key: 'deferredCarts', label: 'ניהול הזמנות', icon: <InventoryIcon fontSize="inherit" />, route: '/deferredCarts', permission: 'deferredCarts', color: '#edf3f5' },
 
 
 
