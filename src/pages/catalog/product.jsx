@@ -1,71 +1,105 @@
 
-import AddButton from "./addButton";
-import DetailsButton from "./detailsButton";
+import AddButton from "./addButton.jsx";
+import DetailsButton from "./detailsButton.jsx";
 import imageOnError from '../../kadabrix/imgErr.js';
-import { supabaseUrl } from "../../kadabrix/kdbConfig";
 import { FaEye } from "react-icons/fa";
+import { supabaseUrl } from "../../kadabrix/kdbConfig";
+import "./product.css";
 
-
-const Product = ({ img, product }) => {
+const Product = ({ products }) => {
   const currencyFormat = (num) => {
     num = Number(num);
     return '₪' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
-
-
-  return (
-
-
-    <div className="flex flex-col hover:bg-[rgb(208,152,248,0.2)] items-stretch duration-300  group border  rounded-2xl border-primary w-[300px] md:w-[150px] sm:w-[75px] ">
-      <div className="flex justify-center  h-[200px]   md:h-[150px] sm:h-[75px]" >
-        <img
-          src={img}
-          className="mix-blend-multiply h-full w-10/12 object-contain"
-          alt=""
-          onError={imageOnError}
-
-        />
-      </div>
+  
+      return (
+        // Main grid container
+        <div className="productbox grid 
+                xxl:text-xl
+                2xl:text-xl
+                xl:text-xl 
+                lg:text-lg 
+                slg:text-base 
+                md:text-base 
+                sm:text-sm 
+                xsm:text-sm  
+                xxsm:text-lg
+                
+                xxl:grid-cols-5
+                2xl:grid-cols-5
+                xl:grid-cols-4
+                lg:grid-cols-4
+                slg:grid-cols-3
+                md:grid-cols-3
+                sm:grid-cols-2 
+                xsm:grid-cols-2 
+                xxsm:grid-cols-1
+                gap-6
+                p-6">
+          {products.map((product) => (
+            // Product card container
+            <div className="bg-white rounded-xl shadow-xl hover:shadow-xl transition-all duration-300 
+                            border border-gray-100 hover:border-primary/30 h-full flex flex-col
+                            max-w-[300px] 
+                            xxl:text-xl
+                            2xl:text-xl
+                            xl:text-xl 
+                            lg:text-lg 
+                            slg:text-base 
+                            md:text-base 
+                            sm:text-sm xsm:text-sm  xxsm:text-lg
+                            ">
+              
+              {/* Image section - Fixed aspect ratio */}
+              <div className="relative pt-[100%] w-full overflow-hidden rounded-t-xl">
+                <img
+                  src={`${supabaseUrl}/storage/v1/render/image/public/images/${product.part}.jpg?width=200&height=200`}
+                  alt={product.partName}
+                  onError={imageOnError}
+                  className="absolute inset-0 w-full h-full object-contain p-4 bg-white"
+                />
+              </div>
       
-      <div className="flex h-full flex-col relative text-center ">
-        <div
-          title="view product"
-          className="group-hover:opacity-100 duration-300 opacity-0 sm:opacity-100 absolute -top-7 right-3 text-sm"
-        >
-          <button
-            className="rounded-full  size-10 grid place-items-center font-medium text-lg mt-3 duration-200 text-white  bg-primary group-hover:shadow-sm border-2"
+              {/* Content section */}
+              <div className="flex flex-col flex-grow p-4">
+                {/* Product name - single line with ellipsis */}
+                <h4 className="font-semibold text-gray-800 line-clamp-1 mb-2">
+                  {product.partName}
+                </h4>
+                
+                {/* Description - two lines with ellipsis */}
+                <h3 className=" text-gray-600 mb-4">
+                {product.partDes}
+                </h3>
+      
+                {/* Price and actions section - pushed to bottom */}
+                <div className="mt-auto space-y-3">
+                  {/* Price and quantity row */}
+                  <div className="flex justify-between items-center">
+                    <span className="text-primary font-bold text-lg">₪{product.price}</span>
+                    <span className="text-gray-500 font-medium">#{product.tQuant}</span>
+                  </div>
+      
 
-          >
-            <FaEye />
-          </button>
+                  <div className="">
+                      <AddButton item={product} className="bg-primary hover:bg-primary/90 
+                        text-white rounded-lg py-2 px-4 transition-colors" />
+                    </div>
+
+                    <button className="">
+                      <FaEye size={20} />
+                    </button>
+
+             
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="">
-          <h4>{product.partName}</h4>
-          <h3 className=" text-base sm:text-xs">{product.partDes}</h3>
-        </div>
+      );
 
+    
+  }
 
-        <div className="mt-auto">
-
-        <h4 className="text-primary font-medium text-xl mt-auto">₪{product.price}</h4>
-        
-        <AddButton item={product} />
-        
-        </div>
-        
-
-        
-
-      </div>
-
-    </div>
-
-
-
-  )
-
-
-
-};
 
 export default Product;

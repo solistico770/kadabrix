@@ -15,7 +15,8 @@ const supabaseServiceClient = createClient(
  
 
 function getPooler(){
-  const supabaseDbUrl = Deno.env.get('SUPABASE_DB_URL')!
+  const supabaseDbUrl = Deno.env.get('SUPABASE_DB_URL');
+  const sbRegion = Deno.env.get('SB_REGION');
 
 
   const regex = /^postgres:\/\/([^:]+):([^@]+)@([^\.]+)\.([^\.]+)\.([^:\/]+):(\d+)\/([^?]+)/;
@@ -26,6 +27,8 @@ const match = supabaseDbUrl.match(regex);
 if (!match) {
   throw new Error("Invalid SUPABASE_DB_URL format.");
 }
+
+
 
 // Extract components
 const username = match[1]; // ""
@@ -102,64 +105,42 @@ const { data, error } = await supabaseServiceClient
 
  
 
- async function runSqlJ(query_text,jsonElement,noSelect = false){
-  
-
-  if (noSelect) {
-    
-    
-    const res = await supabaseServiceClient.rpc("execute_user_queryjns",{query_text:query_text,params : jsonElement})
-    if (res.error) throw  new Error(JSON.stringify(res.error));
-    
-
-
-  } else {
-
-    const res = await supabaseServiceClient.rpc("execute_user_queryj",{query_text:query_text,params : jsonElement})
-    if (res.error) throw  new Error(JSON.stringify(res.error));
-
-    if ( res.data ) {
-  
-        const fres = res.data.map((line)=>line.result)
-        return fres
-  
-    } else {
-  
-      return res.data;
-  
-    }
-
-
-
-  }
-
-  
- }
-
  
 async function getConfig(userName){
  
-  const result = await runSqlJ(`
 
+  const connection = await dbPool.connect()
+  let configResult;
+
+  try {
+    const result = await connection.queryObject(`
+        
+        
+        
 SELECT kadabrix_config.*,
 kadabrix_config_role.value as rvalue ,
 kadabrix_config_user.value as uvalue 
 FROM 
   kadabrix_config
-  left join kadabrix_user_roles on kadabrix_user_roles.email =  $1::text   
+  left join kadabrix_user_roles on kadabrix_user_roles.email =  $userName::text   
   left join kadabrix_config_role on kadabrix_config.name = kadabrix_config_role.name 
       and kadabrix_config_role.role = kadabrix_user_roles.role
   left join kadabrix_config_user on kadabrix_config.name = kadabrix_config_user.name 
-  and kadabrix_config_user.user  = $2::text
+  and kadabrix_config_user.user  = $userName::text
   
+      `,{
+        userName:kdb.userName
 
+      })
+      configResult =  result.rows;
+  } finally {
+      connection.release()
+  }
 
-
-   `,[userName,userName])
-
+  
 let config={}
 let configProtected={}
-result.forEach(dataItem => {
+configResult.forEach(dataItem => {
   if (dataItem.protected) {
     configProtected[dataItem.name] = dataItem.value !== null 
           ? dataItem.value 
@@ -170,7 +151,7 @@ result.forEach(dataItem => {
   });
 
 
-result.forEach(dataItem => {
+  configResult.forEach(dataItem => {
   if (!dataItem.protected) {
       config[dataItem.name] = dataItem.value !== null 
           ? dataItem.value 
@@ -185,76 +166,6 @@ return {config,configProtected};
 
 }
 
-
- async function runSql(query_text,noSelect = false){
-  
-
-  if (noSelect) {
-    
-    
-    const res = await kdb.rpc("execute_user_queryns",{query_text:query_text})
-    if (res.error) throw  new Error(JSON.stringify(res.error));
-    
-
-
-  } else {
-
-    const res = await kdb.rpc("execute_user_query",{query_text:query_text})
-    if (res.error) throw  new Error(JSON.stringify(res.error));
-
-    if ( res.data ) {
-  
-        const fres = res.data.map((line)=>line.result)
-        return fres
-  
-    } else {
-  
-      return res.data;
-  
-    }
-
-
-
-  }
-
-  
- }
-
-
-
- async function runSqlAdmin(query_text,noSelect = false){
-  
-
-  if (noSelect) {
-    
-    
-    const res = await supabaseServiceClient.rpc("execute_user_queryns",{query_text:query_text})
-    if (res.error) throw  new Error(JSON.stringify(res.error));
-    
-
-
-  } else {
-
-    const res = await supabaseServiceClient.rpc("execute_user_query",{query_text:query_text})
-    if (res.error) throw  new Error(JSON.stringify(res.error));
-
-    if ( res.data ) {
-  
-        const fres = res.data.map((line)=>line.result)
-        return fres
-  
-    } else {
-  
-      return res.data;
-  
-    }
-
-
-
-  }
-
-  
- }
 
 
  
