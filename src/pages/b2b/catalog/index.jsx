@@ -74,6 +74,8 @@ const ProductList = () => {
     if (loadPreventor) {
       return;
     }
+
+    loadPreventor = true;
     setPage(page+1);
 
     if (timoutHandler) {
@@ -81,8 +83,10 @@ const ProductList = () => {
     }
     
     timoutHandler = setTimeout(() => {
+      
+      loadPreventor = false;
   
-    }, 5000);
+    }, 2000);
 
   };
 
