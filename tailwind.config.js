@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.js
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -17,6 +17,15 @@ export default {
       colors: {
         primary: "#a359eb",
         btnHover: "#ededed",
+      },
+      animation: {
+        fadeIn: "fadeIn 0.5s ease-out", // Add fadeIn animation with duration
+      },
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0" },  // Start fully transparent
+          "100%": { opacity: "1" }, // End fully opaque
+        },
       },
     },
   },
