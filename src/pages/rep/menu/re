@@ -1,0 +1,19 @@
+
+import React from 'react';
+import PeopleIcon from '@mui/icons-material/People';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+
+const mockMenuItems = [
+  { key: 'users', label: 'ניהול משתמשים', icon: <PeopleIcon />, route: '/users', role: 'kadmin' },
+  { key: 'editCatalogCats', label: 'ניהול קטגוריות', icon: <PeopleIcon />, route: '/editCatalogCats', role: 'kadmin' },
+  { key: 'budgetSelect', label: 'בחירת תקציב', icon: <PeopleIcon />, route: '/editCatalogCats', role: 'kadmin' },
+  { key: 'editBudgets', label: 'ניהול תקציבים', icon: <PeopleIcon />, route: '/editBudgets', role: 'kadmin' },
+  { key: 'codeEditor', label: 'codeEditor', icon: <PeopleIcon />, route: '/codeEditor', role: 'kadmin' },
+  { key: 'cart', label: 'סל הקניות', icon: <ShoppingCartIcon />, route: '/cart', role: 'kagent' },
+  { key: 'catalog', label: 'קטלוג מוצרים', icon: <ShoppingCartIcon />, route: '/catalog', role: 'kagent' },
+  { key: 'invoices', label: 'חשבוניות', icon: <PeopleIcon />, route: '/invoices', role: 'kadmin' },
+  { key: 'accIndex', label: 'כרטסת', icon: <PeopleIcon />, route: '/accIndex', role: 'kadmin' },
+  { key: 'salesReport', label: 'דוח מכירות', icon: <ShoppingCartIcon />, route: '/salesReport', role: 'ksalesAdmin' },
+];
+
+export default mockMenuItems;

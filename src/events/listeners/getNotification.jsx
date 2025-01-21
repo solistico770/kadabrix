@@ -1,4 +1,4 @@
-import eventBus from "../../kadabrix/event";
+import eventBus from "../../../kadabrix/event";
 import React, { useState } from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 

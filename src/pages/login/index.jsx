@@ -14,7 +14,7 @@ const Login = () => {
     const checkSession = async () => {
       const { data: { session } } = await kdb.auth.getSession();
       if (session?.user) {
-        navigate('/menu');
+        navigate('/admin/menu');
       }
     };
     
@@ -39,7 +39,7 @@ const Login = () => {
     console.log('Decoded JWT:', decodedToken);
   }
   
-      navigate('/menu');
+  navigate('/admin/menu');
     }
   };
 

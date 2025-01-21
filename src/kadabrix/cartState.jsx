@@ -1,22 +1,22 @@
-import React, { createContext, useState , useEffect } from 'react';
 import kdb from "../kadabrix/kadabrix"
-import eventBus from "./event";
+import { create } from 'zustand';
+import eventBus from "../kadabrix/event";
+
+export const useCartStore = create((set) => ({
+  cart: { items: [], loaded: false },
+  setValue: (newValue) => {
+    set({ cart: newValue })
+  }
+}));
 
 
 
-
-
-
-// Create the context
-export const CartContext = createContext();
-
-// Create a provider component
-export const CartProvider = ({ children }) => {
-
-const [cart, setCart] = useState({items:[],loaded:false});
-
+eventBus.on("onAuthStateChange", async (session) => {
   
-
+  if (session?.user?.email ) {
+    await fetchCart(); 
+  }
+});
 
 const fetchCart = async () => { 
   let cartData = await kdb.run({
@@ -24,47 +24,27 @@ const fetchCart = async () => {
     "name": "getCart",
     "data": { }
   });
-  setCart({...cartData,loaded:true})
-  eventBus.emit("updateCart", {...cartData,loaded:true});
   
+  useCartStore.getState().setValue({...cartData,loaded:true});
+  
+
 }
 
-
+let debounceTimer;
 
 const channel = kdb
-.channel('schema-db-changes')
-.on('postgres_changes', { event: '*', schema: 'public', table: 'kadabrix_carts' }, payload => {
-  console.log('Change received!', payload);
-  fetchCart();
-})
-.subscribe();
+  .channel('schema-db-changes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'kadabrix_carts' }, payload => {
+    console.log('Change received!', payload);
 
+    // Clear the previous timeout if a new event comes in within 100ms
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
 
-useEffect(()=>{
-
-  fetchCart();
-  
-},[])
-
-
-useEffect(() => {
-  // Flag to ensure the effect runs only once for a session
-
- const { data: { subscription } } = kdb.auth.onAuthStateChange((event, session) => {
-     if (session?.user?.email ) {
+    // Set a new timeout for the fetchCart() call after 100ms
+    debounceTimer = setTimeout(() => {
       fetchCart();
-     }
-    
-})
-
-}, []); // Empty dependency array to run only on mount
-
-  
-
-
-  return (
-    <CartContext.Provider value={{ cart, setCart }}>
-      {children}
-    </CartContext.Provider>
-  );
-};
+    }, 300);
+  })
+  .subscribe();

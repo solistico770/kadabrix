@@ -8,7 +8,7 @@ import React, { useState, useContext } from 'react';
 import kdb from "./kadabrix.js";
 import { Card, CardContent, Grid } from '@mui/material';
 import imageOnError from './imgErr.js';
-import { CartContext } from './cartState.jsx';
+import { useCartStore } from './cartState.jsx';
 import  CartQuantBtn  from './cartQuantBtn.jsx';
 import {
   Container,
@@ -33,7 +33,8 @@ function SimpleDialog(props) {
     onClose();
   };
 
-  const { cart } = useContext(CartContext);
+  const cart = useCartStore((state) => state.cart);
+  
   const [editQuant, setEditQuant] = useState(null);
   const [tempQuant, setTempQuant] = useState(0);
 
@@ -96,6 +97,7 @@ function SimpleDialog(props) {
   return (
     <Dialog onClose={handleClose} open={open} maxWidth="lg">
       <DialogTitle>סל הקניות</DialogTitle>
+
 
       <Container style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
         {cart.items.length > 0 ? (
@@ -197,7 +199,7 @@ SimpleDialog.propTypes = {
 
 const Component = () => {
   const [open, setOpen] = useState(false);
-  const { cart } = useContext(CartContext);
+  const cart = useCartStore((state) => state.cart);
   const handleClickOpen = () => {
     setOpen(true);
   };

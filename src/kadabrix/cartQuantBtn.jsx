@@ -1,13 +1,14 @@
 import { ButtonGroup, CircularProgress, IconButton, TextField } from '@mui/material';
 import { useState, useEffect, useContext } from 'react';
-import { CartContext } from './cartState';
+import { useCartStore } from './cartState';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import CheckIcon from '@mui/icons-material/Check';
 import kdb from "./kadabrix";
 
 const AddButton = (props) => {
-    const { cart, setCart } = useContext(CartContext);
+    const cart = useCartStore((state) => state.cart);
+    
     const [isLoading, setIsLoading] = useState(false);
     const [tempQuant, setTempQuant] = useState('');
     const [showOk, setShowOk] = useState(false);

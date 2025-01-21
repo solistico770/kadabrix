@@ -1,4 +1,4 @@
-import eventBus from "../../kadabrix/event";
+import eventBus from "../../../kadabrix/event";
 import React from 'react';
 import { confirmAlert } from 'react-confirm-alert'; // Install this package or create a custom confirm dialog.
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import CSS for react-confirm-alert.

@@ -1,22 +1,18 @@
 import fs from 'fs';
 import path from 'path';
-import { createClient } from '@supabase/supabase-js'
 import { defineConfig, loadEnv } from 'vite';
 
-export  function createRoutesPlugin({ pagesDir, output }) {
+export function createRoutesPlugin({ pagesDir, output }) {
   return {
     name: 'vite-plugin-routes',
     async buildStart() {
-      
       await generateRoutes(pagesDir, output);
-
-      
     }
   };
 }
 
 async function generateRoutes(pagesDir, outputFile) {
-  const generateRoutesContent = (dir) => {
+  const generateRoutesContent = (dir, basePath = '') => {
     const folders = fs.readdirSync(dir);
 
     return folders.reduce((routes, folder) => {
@@ -26,75 +22,27 @@ async function generateRoutes(pagesDir, outputFile) {
       if (stat.isDirectory()) {
         const indexPath = path.join(folderPath, 'index.jsx');
         if (fs.existsSync(indexPath)) {
+          // Construct route path based on directory structure
+          const routePath = path.join(basePath, folder).replace(/\\/g, '/');
           routes.push({
-            path: `/${folder}`,
-            component: `./pages/${folder}/index.jsx`,
-            importName: folder.charAt(0).toUpperCase() + folder.slice(1) + 'Index',
+            path: `/${routePath}`,
+            component: `./pages/${path.relative(pagesDir, indexPath).replace(/\\/g, '/')}`,
+            importName: routePath
+              .split('/')
+              .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+              .join('') + 'Index',
           });
         }
+
+        // Recurse into subdirectories
+        routes.push(...generateRoutesContent(folderPath, path.join(basePath, folder)));
       }
 
       return routes;
     }, []);
   };
 
-
-  
-  async function generateRoutesContentDynamic() {
-    let path='./app/';
-    let viteEnv  = {...process.env, ...loadEnv( "" , process.cwd())};
-
-
-
-    try {
-
-      const response = await fetch(viteEnv.VITE_supabaseUrl+"/functions/v1/runkdb", {
-        headers: {
-          "authorization": "Bearer "+viteEnv.VITE_supabaseKey
-        },
-        body: JSON.stringify({
-          module: "frontendGate",
-          name: "getRoutes",
-          data: {}
-        }),
-        method: "POST"
-      });
-
-      // Check if the response is okay (status code 2xx)
-      if (response.ok) {
-      const {data:kdbAppData} = await response.json();
-
-    let routes=[]
-    for (let i=0;i<kdbAppData.length;i++){
-      let record = kdbAppData[i];
-      
-      routes.push({
-        path: `${record.data}`,
-        component: `./app/${record.module}/Main.jsx`,
-        importName: "C"+record.data + 'Index',
-      });
-  
-  
-    }
-    return routes;
-  
-      } else {
-        console.error("Error:", response.status, response.statusText);  // Handle non-2xx responses
-      }
-    } catch (error) {
-      console.error("Fetch error:", error);  // Handle network errors
-    }
-
-    
-  }
-  
-  
-    
-  let droutes = await generateRoutesContentDynamic()
-  const routes = [...droutes , ...generateRoutesContent(pagesDir)]
-  
-
-
+  const routes = generateRoutesContent(pagesDir);
 
   const outputContent = `
   import React from 'react';
@@ -104,15 +52,13 @@ async function generateRoutes(pagesDir, outputFile) {
 
   const AppRoutes = () => (
     <Routes>
-      <Route path="/" element={<LoginIndex />} />
-      ${routes.map(route => `<Route path="${route.path}" element={<${route.importName} />} />`).join('\n')}
+      ${routes.map(route => `<Route path="${route.path}" element={<${route.importName} />} />`).join('\n      ')}
     </Routes>
   );
 
   export default AppRoutes;
   `;
 
-
   fs.writeFileSync(outputFile, outputContent, 'utf8');
-  console.log('Routes generated successfully...',outputFile);
+  console.log('Routes generated successfully...', outputFile);
 }
