@@ -1,4 +1,4 @@
-import eventBus from "../../../kadabrix/event";
+import eventBus from "../../kadabrix/event";
 const main = () => {
    
     eventBus.on("cartPriceSetItem", (payload) => {
