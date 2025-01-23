@@ -3,6 +3,9 @@ import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 import moment from "https://deno.land/x/momentjs@2.29.1-deno/mod.ts";
 
 
+
+
+
 const getTransactionPoolerAddress = () => {
   const TPtable = {
     "heuayknlgusdwimnjbgs": "aws-0-eu-west-1",
