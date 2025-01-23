@@ -2,48 +2,49 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 import moment from "https://deno.land/x/momentjs@2.29.1-deno/mod.ts";
 
-const dbPool = new postgres.Pool(getPooler(), 3, true)
 
+const getTransactionPoolerAddress = () => {
+  const TPtable = {
+    "heuayknlgusdwimnjbgs": "aws-0-eu-west-1",
+    "fbpmgiezamyfmlglkqcb": "aws-0-eu-central-1",
+    "ndlnbrybztgnhlqkwxra": "aws-0-us-west-1",
+  };
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  if (!supabaseUrl) throw new Error("SUPABASE_URL is not set.");
+
+  const projectRef = supabaseUrl.match(/https:\/\/(.+?)\.supabase\.co/)?.[1];
+  if (!projectRef) throw new Error("Invalid SUPABASE_URL format.");
+
+  const poolerAddress = TPtable[projectRef];
+  if (!poolerAddress) throw new Error(`No TP found for ref: ${projectRef}`);
+
+  return poolerAddress;
+};
+
+const getPooler = () => {
+  const supabaseDbUrl = Deno.env.get("SUPABASE_DB_URL");
+  if (!supabaseDbUrl) throw new Error("SUPABASE_DB_URL is not set.");
+
+  const regex =
+    /^postgres:\/\/([^:]+):([^@]+)@([^\.]+)\.([^\.]+)\.([^:\/]+):(\d+)\/([^?]+)/;
+  const match = supabaseDbUrl.match(regex);
+  if (!match) throw new Error("Invalid SUPABASE_DB_URL format.");
+
+  const [, username, password, , deployment, , , database] = match;
+  const tpAddress = getTransactionPoolerAddress();
+
+  return `postgresql://${username}.${deployment}:${password}@${tpAddress}.pooler.supabase.com:6543/${database}`;
+};
+
+
+const dbPool = new postgres.Pool(getPooler(), 3, true)
 
 
 const supabaseServiceClient = createClient(
   Deno.env.get('SUPABASE_URL') ?? '',
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
 )
-
-
- 
-
-function getPooler(){
-  const supabaseDbUrl = Deno.env.get('SUPABASE_DB_URL');
-  const sbRegion = Deno.env.get('SB_REGION');
-
-
-  const regex = /^postgres:\/\/([^:]+):([^@]+)@([^\.]+)\.([^\.]+)\.([^:\/]+):(\d+)\/([^?]+)/;
-
-// Match the URL using the regex
-const match = supabaseDbUrl.match(regex);
-
-if (!match) {
-  throw new Error("Invalid SUPABASE_DB_URL format.");
-}
-
-
-
-// Extract components
-const username = match[1]; // ""
-const password = match[2]; // ""
-const dbHostPrefix = match[3]; // "db"
-const deployment = match[4]; // ""
-const domain = match[5]; // "supabase.co"
-const port = match[6]; // "5432"
-const database = match[7]; // "postgres"
-
-// Rebuild the pooler URL
-const poolerUrl = `postgresql://${username}.${deployment}:${password}@aws-0-eu-west-1.pooler.supabase.com:6543/${database}`;
-
-return poolerUrl;
-}
 
 
 async function getController(module,name,req) {
