@@ -1,6 +1,10 @@
 import eventBus from "../../kadabrix/event";
 import kdb from "../../kadabrix/kadabrix";
 import injectComponent from "../../kadabrix/injectComponent";
+import {useUserStore} from "../../kadabrix/userState";
+import {useCartStore } from "../../kadabrix/cartState";
+
+
 import React, { useState } from "react";
 import {
   TextField,
@@ -11,21 +15,22 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-let cartData;
-let userState;
+
 let isOpen = false;
 
-eventBus.on("updateCart", (payload) => {
-  cartData = payload;
-  checkCart();
-});
+eventBus.on("cartAddItem", (payload) => {
 
-eventBus.on("updateUserState", (payload) => {
-  userState = payload;
+  
   checkCart();
+
 });
 
 const checkCart = () => {
+  
+  const userState = useUserStore.getState().userDetails
+  const cartData = useCartStore.getState().cart
+
+
   if (
     !isOpen &&
     userState.config.custom_aluf_require_details === "true" &&
