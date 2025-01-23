@@ -48,17 +48,43 @@ const supabaseServiceClient = createClient(
 
 
 async function getController(module,name,req) {
-    
-const { data, error } = await supabaseServiceClient
-.from('kadabrix_app')
-.select('*')
-.eq('name', name)
-.eq('type', 'CONTROLLER')
-.eq('module', module)
+  const { data: customData, error: customError } = await supabaseServiceClient
+  .from('kadabrix_app_custom')
+  .select('*')
+  .eq('name', name)
+  .eq('type', 'CONTROLLER')
+  .eq('module', module);
 
- if (data.length==0) {throw new Error(`no such controller : ${module}->${name}`) }
+if (customError) {
+  throw new Error(`Error querying kadabrix_app_custom: ${customError.message}`);
+}
 
- const appRecord = data[0];
+let appRecord;
+
+if (customData && customData.length > 0) {
+  // Use the record from kadabrix_app_custom if it exists
+  appRecord = customData[0];
+} else {
+  // Fall back to kadabrix_app if no record is found in kadabrix_app_custom
+  const { data, error } = await supabaseServiceClient
+    .from('kadabrix_app')
+    .select('*')
+    .eq('name', name)
+    .eq('type', 'CONTROLLER')
+    .eq('module', module);
+
+  if (error) {
+    throw new Error(`Error querying kadabrix_app: ${error.message}`);
+  }
+
+  if (data.length === 0) {
+    throw new Error(`No such controller: ${module}->${name}`);
+  }
+
+  appRecord = data[0];
+}
+
+
  const serviceConf = JSON.parse(appRecord.config);
  var kdbService = {};
  
@@ -203,17 +229,41 @@ return {config,configProtected};
 
 
 async function getService(module,name,kdbService,kdb,supabaseServiceClient){
-    
-  const { data, error } = await supabaseServiceClient
-  .from('kadabrix_app')
+  const { data: customData, error: customError } = await supabaseServiceClient
+  .from('kadabrix_app_custom')
   .select('*')
   .eq('name', name)
   .eq('type', 'SERVICE')
-  .eq('module', module)
-  
-   if (data.length==0) { throw new Error(`no such service : ${module}->${name}`) }
-  
-   const appRecord = data[0];
+  .eq('module', module);
+
+if (customError) {
+  throw new Error(`Error querying kadabrix_app_custom: ${customError.message}`);
+}
+
+let appRecord;
+
+if (customData && customData.length > 0) {
+  // Use the record from kadabrix_app_custom if it exists
+  appRecord = customData[0];
+} else {
+  // Fall back to kadabrix_app if no record is found in kadabrix_app_custom
+  const { data, error } = await supabaseServiceClient
+    .from('kadabrix_app')
+    .select('*')
+    .eq('name', name)
+    .eq('type', 'SERVICE')
+    .eq('module', module);
+
+  if (error) {
+    throw new Error(`Error querying kadabrix_app: ${error.message}`);
+  }
+
+  if (data.length === 0) {
+    throw new Error(`No such service: ${module}->${name}`);
+  }
+
+  appRecord = data[0];
+}
 
 
  const serviceConf = JSON.parse(appRecord.config);

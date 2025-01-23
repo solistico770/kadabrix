@@ -15,6 +15,7 @@ import JsonModal from './JsonModal';
 
 
 const Users = () => {
+ const navigate  = useNavigate();
 
   ace.config.loadModule("ace/ext/language_tools", function () {
     var customCompleter = {
@@ -136,6 +137,10 @@ const doDelete = async ()=>{
       id:editorItem.id
     }
   });
+
+  fetchApp();
+
+  
 }
 
 
@@ -144,9 +149,14 @@ const addRecord = async (record)=>{
     "module": "codeEditor",
     "name": "addRecord",
     "data":{
-        type:searchType,
-        name:searchName,
-        module:searchModule,
+       "isDuplicate": true,
+       
+      "record" : {
+        type: searchType,
+        name: searchName,
+        module: searchModule
+      }
+      
     }
   });
   fetchApp();
@@ -158,7 +168,17 @@ const addRecord = async (record)=>{
 
   return (
     <div dir="ltr">
+      
 <JsonModal jsonData={linesSearch} onImport={fetchApp} />
+<Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate('/admin/codeEditorCustom')} // Navigate to /admin/codeEditorCustom
+          sx={{ mb: 2 }}
+        >
+CUSTOM        
+</Button>
+
 
     <Box
       sx={{
@@ -272,6 +292,7 @@ const addRecord = async (record)=>{
 
 
       <TableContainer component={Paper}>
+        
         <Table>
           <TableHead>
           
