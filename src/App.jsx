@@ -9,6 +9,8 @@ let Injected=[];
 let runOnce = false;
 
 function App() {
+
+
   const [rerender, setRerender] = useState({});
   useEffect(() => {
     if (!runOnce){

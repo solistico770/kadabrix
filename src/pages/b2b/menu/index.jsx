@@ -20,6 +20,7 @@ import logo from '../../../assets/logo.png';
 const mockMenuItems = [
   { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/b2b/selectBudget', permission: 'b2bBudgetUser', color: '#f0f0f0' },
   { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/b2b/catalog', permission: 'b2bCatalog', color: '#edf3f5' },
+  { key: 'catalog', label: 'ניהול הזמנות', icon: <InventoryIcon fontSize="inherit" />, route: '/b2b/deferredCarts', permission: 'deferredCarts', color: '#edf3f5' },
 
 
   { key: 'editCatalogCats', label: 'ניהול קטגוריות', icon: <CategoryIcon fontSize="inherit" />, route: '/b2b/editCatalogCats', permission: 'b2bManager', color: '#e8f0f4' },

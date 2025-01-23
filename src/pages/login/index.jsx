@@ -31,7 +31,6 @@ const Login = () => {
         const decodedToken = jwtDecode(token);
         console.log('Decoded JWT:', decodedToken);
       }
-      navigate('/admin/menu');
     }
   };
 
