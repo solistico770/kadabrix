@@ -15,19 +15,11 @@ async function emit(event, args) {
   // Sort listeners by priority (highest priority first)
   eventListeners.sort((a, b) => b.priority - a.priority);
 
-  // Array to hold all promises of async listeners
-  const promises = eventListeners.map(listener => {
-    try {
-      // Call the listener and ensure async handling
-      return listener.callback(args);
-    } catch (error) {
-      console.error(`Error in listener for event "${event}":`, error);
-      return Promise.resolve(); // Return resolved promise to continue execution
-    }
-  });
-
-  // Wait for all listeners to complete asynchronously
-  await Promise.all(promises);
+  // Use a for loop to iterate through listeners
+  for (const listener of eventListeners) {
+    // Call the listener and await its completion
+    await listener.callback(args);
+  }
 }
 
 /**

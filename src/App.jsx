@@ -5,7 +5,7 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 import eventBus from './kadabrix/event';
 import Navigate from './kadabrix/Navigate';
-
+import Toast from './kadabrix/toaster';
 let Injected = [];
 let runOnce = false;
 
@@ -33,6 +33,7 @@ function App() {
       ))}
       {hasLayout && <Layout />}
       <Navigate />
+      <Toast />
       <Routes />
     </div>
   );

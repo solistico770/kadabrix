@@ -8,3 +8,16 @@ html, body {
     overscroll-behavior-y: contain;
   }
   
+
+  /* Custom RTL styles */
+.rtl-toaster {
+    direction: rtl;
+    text-align: right;
+  }
+  
+  .rtl-toaster .sonner-toast-title {
+    direction: rtl;
+    text-align: right
+
+    }
+    
