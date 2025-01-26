@@ -4,16 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import kdb from '../kadabrix/kadabrix';
 import CartComponent from "../kadabrix/cartComponent";
 import logo from '../assets/logoTop.png';
-import eventBus from '../kadabrix/event';
 
 
 const Layout = () => {
-
-
-  eventBus.on("navigate", (payload) => {
-    navigate(payload);
-  });
-
+  
   
 
   const [user, setUser] = useState(null);

@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import CheckIcon from '@mui/icons-material/Check';
 import kdb from "../../../kadabrix/kadabrix";
-import {addItem,removeItem} from "../../../kadabrix/cartCommands";
+import {addItem,removeItem,updateQuantity} from "../../../kadabrix/cartCommands";
 
 
 const AddButton = (props) => {
@@ -48,11 +48,8 @@ const AddButton = (props) => {
   const changeQuant = async (partName, newQuant) => {
     setIsLoading(true);
     const index = inCartItem.index;
-    await kdb.run({
-      module: "kdb_cart",
-      name: "quantSetItem",
-      data: { index, quant: newQuant },
-    });
+    await updateQuantity(index, "set", newQuant);
+    
     setShowOk(false);
     setIsLoading(false);
   };

@@ -36,34 +36,30 @@ async function emit(event, args) {
  * @param {string} event - The event name.
  * @param {function} callback - The listener callback function.
  * @param {number} [priority=0] - The listener priority (higher values are executed first).
+ * @returns {function} A function that, when called, removes the event listener.
  */
 function on(event, callback, priority = 0) {
   // Ensure priority is a valid number
   priority = Number(priority);
 
-  // Add the listener to the events array
-  eventsArr.push({
+  // Create the event listener object
+  const eventListener = {
     eventName: event,
     priority,
     callback
-  });
-}
+  };
 
-/**
- * Unsubscribe from an event by removing a listener.
- * @param {string} event - The event name.
- * @param {function} callback - The listener callback function to remove.
- */
-function off(event, callback) {
-  // Remove the specified listener for the event
-  eventsArr = eventsArr.filter(eventObj => {
-    return !(eventObj.eventName === event && eventObj.callback === callback);
-  });
+  // Add the listener to the events array
+  eventsArr.push(eventListener);
+
+  // Return a cleanup function that removes the listener
+  return () => {
+    eventsArr = eventsArr.filter(listener => listener !== eventListener);
+  };
 }
 
 // Export the event bus as default
 export default {
   emit,
-  on,
-  off
+  on
 };

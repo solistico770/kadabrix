@@ -1,15 +1,19 @@
 import eventBus from "./event";
-
-import { PiShoppingCart } from "react-icons/pi";import DialogTitle from '@mui/material/DialogTitle';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
+import { PiShoppingCart } from "react-icons/pi";
 import PropTypes from 'prop-types';
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext ,useEffect} from 'react';
 import kdb from "./kadabrix.js";
 import { Card, CardContent, Grid } from '@mui/material';
 import imageOnError from './imgErr.js';
 import { useCartStore } from './cartState.jsx';
 import  CartQuantBtn  from './cartQuantBtn.jsx';
+import {resetCart} from "./cartCommands";
+import { supabaseUrl } from "./kdbConfig";
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { PiPencilSimple } from "react-icons/pi";
+
+import {updatePrice} from "./cartCommands";
+
 import {
   Container,
   Button,
@@ -38,29 +42,13 @@ function SimpleDialog(props) {
   const [editQuant, setEditQuant] = useState(null);
   const [tempQuant, setTempQuant] = useState(0);
 
-  const currencyFormat = (num) => {
-    num = Number(num);
-    return '₪' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-  };
-
+ 
   const clearCart = async () => {
-    await kdb.run({
-      "module": "kdb_cart",
-      "name": "reset",
-    });
+    await resetCart();
+    
   };
 
-  const quantSetItemAction = async (index, action) => {
-    await kdb.run({
-      "module": "kdb_cart",
-      "name": "quantSetItem",
-      "data": {
-        index: index,
-        action: action
-      }
-    });
-  };
-
+  
 
   const placeOrder = async () => {
     await kdb.run({
@@ -72,27 +60,11 @@ function SimpleDialog(props) {
   };
 
 
-  const quantSetItem = async (index, quant) => {
-    await kdb.run({
-      "module": "kdb_cart",
-      "name": "quantSetItem",
-      "data": {
-        index: index,
-        quant: quant
-      }
-    });
-    setEditQuant(null); // Close the editing input after successful update
+  const currencyFormat = (num) => {
+    num = Number(num);
+    return '₪' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
   };
-
-  const removeProduct = async (index) => {
-    await kdb.run({
-      "module": "kdb_cart",
-      "name": "removeItem",
-      "data": {
-        index: index
-      }
-    });
-  };
+  
 
   return (
     <Dialog onClose={handleClose} open={open} maxWidth="lg">
@@ -117,26 +89,7 @@ function SimpleDialog(props) {
                 </TableHead>
                 <TableBody>
                   {cart.items.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <img
-                          src={`https://heuayknlgusdwimnjbgs.supabase.co/storage/v1/render/image/public/images/${item.part}.jpg?width=50&height=50`}
-                          alt={item.partName}
-                          style={{ width: '50px', height: 'auto' }}
-                          onError={imageOnError}
-                        />
-                      </TableCell>
-                      <TableCell>{item.partName}</TableCell>
-                      <TableCell>{item.partDes}</TableCell>
-                      <TableCell>{currencyFormat(item.price)}</TableCell>
-                      <TableCell>
-                       
-                       <CartQuantBtn item={item}/>
-                        
-                      </TableCell>
-                      <TableCell>{currencyFormat(item.quant * item.price)}</TableCell>
-                 
-                    </TableRow>
+                   <CartLine item={item} index={index} key={index} />
                   ))}
                   <TableRow>
                     <TableCell colSpan={4}></TableCell>
@@ -229,3 +182,136 @@ const Component = () => {
 };
 
 export default Component;
+
+const CartLine = ({ item, index }) => {  
+  const [priceEditOpen, setPriceEditOpen] = useState(false);
+  
+  const currencyFormat = (num) => {
+    num = Number(num);
+    return '₪' + num.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+  };
+
+  const handlePriceUpdate = async (newPrice) => {
+    await updatePrice(item.index, newPrice);
+  };
+
+  return (
+    <TableRow>
+      <TableCell>
+        <img
+          src={`${supabaseUrl}/storage/v1/render/image/public/images/${item.part}.jpg?width=200&height=200`}
+          alt={item.partName}
+          style={{ width: '50px', height: 'auto' }}
+          onError={imageOnError}
+        />
+      </TableCell>
+      <TableCell>{item.partName}</TableCell>
+      <TableCell>{item.partDes}</TableCell>
+      <TableCell>
+        {currencyFormat(item.price)}
+        <IconButton 
+          size="small" 
+          onClick={() => setPriceEditOpen(true)}
+        >
+          <PiPencilSimple />
+        </IconButton>
+      </TableCell>
+      <TableCell>
+        <CartQuantBtn item={item}/>
+      </TableCell>
+      <TableCell>{currencyFormat(item.quant * item.price)}</TableCell>
+      <PriceEditDialog 
+        open={priceEditOpen}
+        onClose={() => setPriceEditOpen(false)}
+        originalPrice={item.price}
+        onSave={handlePriceUpdate}
+      />
+    </TableRow>
+  );
+}
+
+
+const PriceEditDialog = ({ open, onClose, originalPrice, onSave }) => {
+  const [newPrice, setNewPrice] = useState(originalPrice);
+  const [discount, setDiscount] = useState(0);
+
+  useEffect(() => {
+    // Reset values when dialog opens
+    if (open) {
+      setNewPrice(originalPrice);
+      setDiscount(0);
+    }
+  }, [open, originalPrice]);
+
+  const handlePriceChange = (value) => {
+    const price = parseFloat(value) || 0;
+    setNewPrice(price);
+    if (price === 0) {
+      setDiscount(100);
+    } else {
+      const calculatedDiscount = ((originalPrice - price) / originalPrice) * 100;
+      setDiscount(Math.round(calculatedDiscount * 100) / 100);
+    }
+  };
+
+  const handleDiscountChange = (value) => {
+    const discountValue = parseFloat(value) || 0;
+    setDiscount(discountValue);
+    const calculatedPrice = originalPrice * (1 - discountValue / 100);
+    setNewPrice(Math.round(calculatedPrice * 100) / 100);
+  };
+
+  const handleSave = () => {
+    onSave(newPrice);
+    onClose();
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>עדכון מחיר</DialogTitle>
+      <DialogContent className="space-y-4">
+        <div className="mt-4">
+          <TextField
+            label="מחיר מקורי"
+            value={originalPrice}
+            disabled
+            fullWidth
+            className="mb-4"
+          />
+        </div>
+        <div>
+          <TextField
+            label="מחיר חדש"
+            type="number"
+            value={newPrice}
+            onChange={(e) => handlePriceChange(e.target.value)}
+            fullWidth
+            className="mb-4"
+          />
+        </div>
+        <div>
+          <TextField
+            label="הנחה (%)"
+            type="number"
+            value={discount}
+            onChange={(e) => handleDiscountChange(e.target.value)}
+            fullWidth
+            InputProps={{
+              inputProps: { 
+                min: 0,
+                max: 100
+              }
+            }}
+          />
+        </div>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>ביטול</Button>
+        <Button onClick={handleSave} variant="contained">שמור</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+
+

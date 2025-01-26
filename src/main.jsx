@@ -14,7 +14,7 @@ import  './kadabrix/loginEvent';
 import  './kadabrix/cartState';
 import  './kadabrix/userState';
 import  './kadabrix/pushEvent';
-import  './kadabrix/test';
+
 
 
 
