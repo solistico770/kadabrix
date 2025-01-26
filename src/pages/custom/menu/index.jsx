@@ -18,20 +18,9 @@ import logo from '../../../assets/logo.png';
 
 
 const mockMenuItems = [
-  { key: 'budgetSelect', label: 'בחירת תקציב', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/b2b/selectBudget', permission: 'b2bBudgetUser', color: '#f0f0f0' },
-  { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/b2b/catalog', permission: 'b2bCatalog', color: '#edf3f5' },
-  { key: 'catalog', label: 'ניהול הזמנות', icon: <InventoryIcon fontSize="inherit" />, route: '/b2b/deferredCarts', permission: 'deferredCarts', color: '#edf3f5' },
-
-
-  { key: 'editCatalogCats', label: 'ניהול קטגוריות', icon: <CategoryIcon fontSize="inherit" />, route: '/b2b/editCatalogCats', permission: 'b2bManager', color: '#e8f0f4' },
-  { key: 'editBudgets', label: 'ניהול תקציבים', icon: <AttachMoneyIcon fontSize="inherit" />, route: '/b2b/editBudgets', permission: 'b2bManager', color: '#eaf3f5' },
-
-  { key: 'invoices', label: 'מצב ההזמנות', icon: <ReceiptIcon fontSize="inherit" />, route: '/b2b/invoices', permission: 'userOrders', color: '#f2f5f6' },
-  { key: 'invoices', label: 'חשבוניות', icon: <ReceiptIcon fontSize="inherit" />, route: '/b2b/invoices', permission: 'userOrders', color: '#f2f5f6' },
-  { key: 'accIndex', label: 'כרטסת', icon: <AccountBalanceIcon fontSize="inherit" />, route: '/b2b/accIndex', permission: 'userIndex', color: '#e9f1f3' },
-
-
-  { key: 'salesReport', label: 'דוח מכירות', icon: <BarChartIcon fontSize="inherit" />, route: '/b2b/salesReport', permission: 'salesReports', color: '#f1f4f5' },
+  { key: 'catalog', label: 'קטלוג מוצרים', icon: <InventoryIcon fontSize="inherit" />, route: '/custom/catalog', permission: 'b2bCatalog', color: '#edf3f5' },
+  { key: 'catalog', label: 'ניהול הזמנות', icon: <InventoryIcon fontSize="inherit" />, route: '/custom/deferredCarts', permission: 'deferredCarts', color: '#edf3f5' },
+  { key: 'salesReport', label: 'דוח מכירות', icon: <BarChartIcon fontSize="inherit" />, route: '/custom/salesReport', permission: 'salesReports', color: '#f1f4f5' },
 
 ]
 

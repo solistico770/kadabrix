@@ -43,7 +43,7 @@ export async  function addItem({ part, partName, partDes, quant, price }) {
   export async  function updateQuantity(index, action, quant = null) {
     
       await eventBus.emit("cartQuantSetItem", { index, action, quant });
-      return await kdb.run({
+       await kdb.run({
         module: 'kdb_cart',
         name: 'quantSetItem',
         data: {
@@ -58,7 +58,7 @@ export async  function addItem({ part, partName, partDes, quant, price }) {
   // Update item price
   export async  function updatePrice(index, price) {
     await eventBus.emit("priceSetItem", { index, price });
-      return await kdb.run({
+       await kdb.run({
         module: 'kdb_cart',
         name: 'priceSetItem',
         data: {
