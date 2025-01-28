@@ -131,65 +131,65 @@ if (customData && customData.length > 0) {
 
  
 
- 
-async function getConfig(userName){
- 
-
-  const connection = await dbPool.connect()
+ async function getConfig(userName) {
+  const connection = await dbPool.connect();
   let configResult;
 
   try {
-    const result = await connection.queryObject(`
-        
-        
-        
-SELECT kadabrix_config.*,
-kadabrix_config_role.value as rvalue ,
-kadabrix_config_user.value as uvalue 
-FROM 
-  kadabrix_config
-  left join kadabrix_user_roles on kadabrix_user_roles.email =  $userName::text   
-  left join kadabrix_config_role on kadabrix_config.name = kadabrix_config_role.name 
-      and kadabrix_config_role.role = kadabrix_user_roles.role
-  left join kadabrix_config_user on kadabrix_config.name = kadabrix_config_user.name 
-  and kadabrix_config_user.user  = $userName::text
-  
-      `,{
-        userName:kdb.userName
-
-      })
-      configResult =  result.rows;
+    const result = await connection.queryObject(
+      `
+      SELECT 
+        COALESCE(kadabrix_config_custom.name, kadabrix_config.name) AS name,
+        kadabrix_config.value AS config_value,
+        kadabrix_config.protected,
+        kadabrix_config_custom.value AS custom_value,
+        kadabrix_config_role.value AS role_value,
+        kadabrix_config_user.value AS user_value
+      FROM 
+        kadabrix_config_custom
+      FULL OUTER JOIN kadabrix_config 
+        ON kadabrix_config_custom.name = kadabrix_config.name
+      LEFT JOIN kadabrix_user_roles 
+        ON kadabrix_user_roles.email = $userName::text
+      LEFT JOIN kadabrix_config_role 
+        ON COALESCE(kadabrix_config_custom.name, kadabrix_config.name) = kadabrix_config_role.name
+        AND kadabrix_config_role.role = kadabrix_user_roles.role
+      LEFT JOIN kadabrix_config_user 
+        ON COALESCE(kadabrix_config_custom.name, kadabrix_config.name) = kadabrix_config_user.name
+        AND kadabrix_config_user.user = $userName::text
+      `,
+      {
+        userName,
+      }
+    );
+    configResult = result.rows;
   } finally {
-      connection.release()
+    connection.release();
   }
 
-  
-let config={}
-let configProtected={}
-configResult.forEach(dataItem => {
-  if (dataItem.protected) {
-    configProtected[dataItem.name] = dataItem.value !== null 
-          ? dataItem.value 
-          : (dataItem.rvalue !== null 
-              ? dataItem.rvalue 
-              : dataItem.uvalue);
-        }
+  let config = {};
+  let configProtected = {};
+
+  configResult.forEach((dataItem) => {
+    // Determine the final value based on priority: user > role > custom > config
+    const finalValue =
+      dataItem.user_value !== null
+        ? dataItem.user_value
+        : dataItem.role_value !== null
+        ? dataItem.role_value
+        : dataItem.custom_value !== null
+        ? dataItem.custom_value
+        : dataItem.config_value;
+
+    // Separate into protected and non-protected configurations
+    if (dataItem.protected) {
+      configProtected[dataItem.name] = finalValue;
+    } else {
+      config[dataItem.name] = finalValue;
+    }
   });
 
-
-  configResult.forEach(dataItem => {
-  if (!dataItem.protected) {
-      config[dataItem.name] = dataItem.value !== null 
-          ? dataItem.value 
-          : (dataItem.rvalue !== null 
-              ? dataItem.rvalue 
-              : dataItem.uvalue);
-        }
-  });
-  
-return {config,configProtected};
-
-
+  return { config, configProtected };
 }
 
 

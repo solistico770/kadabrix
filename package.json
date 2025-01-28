@@ -16,6 +16,7 @@
     "@mui/icons-material": "^5.16.13",
     "@mui/material": "^5.16.13",
     "@mui/x-date-pickers": "^7.22.2",
+    "@radix-ui/react-alert-dialog": "^1.1.5",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.0",

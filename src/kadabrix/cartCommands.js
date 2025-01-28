@@ -19,7 +19,7 @@ export async function addItem({ part, partName, partDes, quant, price }) {
         await eventBus.emit("cartPostAddItem", { part, partName, partDes, quant, price });
         eventBus.emit("toast", { title: "מוצר נוסף", text: `מוצר ${partDes} נוסף לסל` });
     } catch (error) {
-        eventBus.emit("toast", { title: "שגיאה", text: error });
+        eventBus.emit("toast", { type:'error',title: "שגיאה", text: error });
     }
 }
 
@@ -37,7 +37,7 @@ export async function removeItem(index) {
         await eventBus.emit("cartPostRemoveItem", { index });
         eventBus.emit("toast", { title: "מוצר הוסר", text: `המוצר ${cartItem.partDes} הוסר מהסל` });
     } catch (error) {
-        eventBus.emit("toast", { title: "שגיאה", text: error });
+        eventBus.emit("toast", {type:'error', title: "שגיאה", text: error });
     }
 }
 
@@ -59,7 +59,7 @@ export async function updateQuantity(index, action, quant = null) {
         await eventBus.emit("cartPostQuantSetItem", { index, action, quant });
         eventBus.emit("toast", { title: "כמות עודכנה", text: `כמות המוצר ${cartItem.partDes} עודכנה` });
     } catch (error) {
-        eventBus.emit("toast", { title: "שגיאה", text: error });
+        eventBus.emit("toast", { type:'error',title: "שגיאה", text: error });
     }
 }
 
@@ -80,7 +80,7 @@ export async function updatePrice(index, price) {
         await eventBus.emit("pricePostSetItem", { index, price });
         eventBus.emit("toast", { title: "מחיר עודכן", text: `מחיר המוצר ${cartItem.partDes} עודכן ל-${price}` });
     } catch (error) {
-        eventBus.emit("toast", { title: "שגיאה", text: error });
+        eventBus.emit("toast", { type:'error', title: "שגיאה", text: error });
     }
 }
 
@@ -95,6 +95,6 @@ export async function resetCart() {
         await eventBus.emit("cartPostReset");
         eventBus.emit("toast", { title: "עגלת הקניות אופסה", text: "כל המוצרים הוסרו מהסל" });
     } catch (error) {
-        eventBus.emit("toast", { title: "שגיאה", text: error });
+        eventBus.emit("toast", { type:'error', title: "שגיאה", text: error });
     }
 }
