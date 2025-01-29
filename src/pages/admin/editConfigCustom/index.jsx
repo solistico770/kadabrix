@@ -127,8 +127,6 @@ const ModuleHeader = ({ module, isExpanded, configs, onToggle }) => {
   );
 };
 
-
-// Config Card Component
 const ConfigCard = ({ 
   config,
   onDelete, 
@@ -136,92 +134,103 @@ const ConfigCard = ({
   editedConfig, 
   onConfigChange, 
   isSaving
-}) => (
-  <div className={`
-    rounded-lg border overflow-hidden hover:shadow-md transition-shadow duration-200
-    ${config.customValue ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}
-  `}>
-    <div className="p-4">
-      <div className="flex justify-between items-start mb-3">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">
-            {config.name}
-            {config.customValue && (
-              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                Custom Override
-              </span>
-            )}
-          </h3>
-          <p className="text-sm text-gray-500">{config.type}</p>
-        </div>
-        {config.customValue && !config.customProtected && (
-          <button
-            onClick={() => onDelete(config.name)}
-            className="text-gray-400 hover:text-red-500 transition-colors duration-200"
-          >
-            <Trash2 className="h-5 w-5" />
-          </button>
-        )}
-        {!config.customValue && (
-          <button
-            onClick={() => onConfigChange(config.name, { 
-              value: config.defaultValue,
-              protected: config.defaultProtected
-            })}
-            className="text-gray-400 hover:text-blue-500 transition-colors duration-200"
-          >
-            <Edit className="h-5 w-5" />
-          </button>
-        )}
-      </div>
-      
-      <p className="text-sm text-gray-600 mb-4 line-clamp-2">{config.desc}</p>
-      
-      <div className="space-y-3">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Default Value</label>
-          <div className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-md text-gray-600 text-sm">
-            {config.defaultValue || '(empty)'}
-          </div>
-        </div>
+}) => {
+  // בחירת הערך בהתאם ללוגיקה החדשה
+  const selectedValue = editedConfig?.value ?? config.customValue ?? config.defaultValue ?? '';
+  const selectedProtected = editedConfig?.protected ?? config.customProtected ?? config.defaultProtected ?? false;
 
-        {(config.customValue || editedConfig) && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {config.customValue ? 'Custom Value' : 'New Custom Value'}
-            </label>
-            <textarea
-              value={(editedConfig?.value ?? config.customValue) || ''}
-              onChange={(e) => onConfigChange(config.name, { value: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              rows="3"
-              dir="ltr"
-            />
-          </div>
-        )}
+  return (
+    <div className={`
+      rounded-lg border overflow-hidden hover:shadow-md transition-shadow duration-200
+      ${config.customValue ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}
+    `}>
+      <div className="p-4">
         
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              checked={editedConfig?.protected ?? config.customProtected ?? false}
-              onChange={(e) => onConfigChange(config.name, { protected: e.target.checked })}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label className="ml-2 block text-sm text-gray-900">Protected</label>
+        <div className="flex justify-between items-start mb-3">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {config.name}
+              {config.customValue && (
+                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                  Custom Override
+                </span>
+              )}
+            </h3>
+            <p className="text-sm text-gray-500">{config.type}</p>
           </div>
-          
-          {editedConfig && (
-            <SaveButton
-              onClick={() => onSave(config.name)}
-              isLoading={isSaving}
-            />
+          {config.customValue && (
+            <button
+              onClick={() => onDelete(config.name)}
+              className="text-gray-400 hover:text-red-500 transition-colors duration-200"
+            >
+              <Trash2 className="h-5 w-5" />
+            </button>
           )}
+          {!config.customValue && (
+            <button
+              onClick={() => onConfigChange(config.name, { 
+                value: config.defaultValue,
+                protected: config.defaultProtected
+              })}
+              className="text-gray-400 hover:text-blue-500 transition-colors duration-200"
+            >
+              <Edit className="h-5 w-5" />
+            </button>
+          )}
+        </div>
+        
+        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{config.desc}</p>
+        
+        <div className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Default Value</label>
+            <div className="w-full px-3 py-2 bg-gray-100 border border-gray-200 rounded-md text-gray-600 text-sm">
+              {config.defaultValue || '(empty)'}
+            </div>
+          </div>
+
+          {(config.customValue || editedConfig) && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {config.customValue ? 'Custom Value' : 'New Custom Value'}
+              </label>
+              <textarea
+                value={selectedValue}
+                onChange={(e) => onConfigChange(config.name, { value: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                rows="3"
+                dir="ltr"
+              />
+            </div>
+          )}
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={selectedProtected}
+                onChange={(e) => onConfigChange(config.name, { protected: e.target.checked })}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label className="ml-2 block text-sm text-gray-900">Protected</label>
+            </div>
+            
+            {editedConfig && (
+              <SaveButton
+                onClick={() => onSave(config.name)}
+                isLoading={isSaving}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
+
+
+
+
 
 // Module Content Component
 const ModuleContent = ({ 
