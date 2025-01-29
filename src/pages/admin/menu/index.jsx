@@ -9,13 +9,15 @@ import { useUserStore } from '../../../kadabrix/userState';
 const mockMenuItems = [
   { key: 'config', label: 'תפריט B2B', icon: <PeopleIcon fontSize="inherit" />, route: '/b2b/menu', permission: '', color: '#f0f4f8' },
   { key: 'config', label: 'תפריט REP', icon: <PeopleIcon fontSize="inherit" />, route: '/rep/menu', permission: '', color: '#f0f4f8' },
-  { key: 'config', label: 'קןנפיג', icon: <PeopleIcon fontSize="inherit" />, route: '/admin/editConfig', permission: 'configEditor', color: '#f0f4f8' },
+  { key: 'config', label: 'קונפיגורציה', icon: <PeopleIcon fontSize="inherit" />, route: '/admin/editConfig', permission: 'configEditor', color: '#f0f4f8' },
+  { key: 'configCustom', label: 'קוסטום קונפיגורציה', icon: <PeopleIcon fontSize="inherit" />, route: '/admin/editConfigCustom', permission: 'configEditor', color: '#f0f4f8' },
   { key: 'permissions', label: 'ניהול תפקידים', icon: <PeopleIcon fontSize="inherit" />, route: '/admin/roles', permission: 'rolesManager', color: '#f0f4f8' },
   { key: 'users', label: 'ניהול משתמשים', icon: <PeopleIcon fontSize="inherit" />, route: '/admin/users', permission: 'usersManager', color: '#f0f4f8' },
   { key: 'codeEditor', label: 'עורך קוד', icon: <CodeIcon fontSize="inherit" />, route: '/admin/codeEditor', permission: 'codeEditor', color: '#eef2f3' },
   { key: 'etlEditor', label: 'עורך ETL', icon: <CodeIcon fontSize="inherit" />, route: '/admin/etlEditor', permission: 'etlEditor', color: '#eef2f3' },
   { key: 'editHtmlTemplates', label: 'עורך HTML', icon: <CodeIcon fontSize="inherit" />, route: '/admin/editHtmlTemplates', permission: 'editHtmlTemplates', color: '#eef2f3' },
 ];
+
 
 const Menu = () => {
   const [error, setError] = useState(null);
