@@ -4,11 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import kdb from '../kadabrix/kadabrix';
 import CartComponent from "../kadabrix/cartComponent";
 import logo from '../assets/logoTop.png';
+import eventBus from "../../kadabrix/event";
+import {useUserStore} from "../../kadabrix/userState";
+
+
+
+
 
 
 const Layout = () => {
   
-  
+  const userState = useUserStore.getState().userDetails
+
 
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -39,12 +46,21 @@ const Layout = () => {
     navigate('/login');
   };
 
+  const handleGotoMain = ()=>{
+
+
+    eventBus.emit("navigate", userState.config.defaultScreen);
+
+
+
+  }
+
   return (
 
     <nav className="bg-[#d098f8]/20 h-24 flex items-center relative">
       <div className="w-11/12 mx-auto max-w-[1400px] flex justify-between">
         <img
-          onClick={() => navigate('/login')} 
+          onClick={() => handleGotoMain() } 
           src={logo}
           className="w-24 cursor-pointer duration-300 hover:scale-105"
           alt=""
