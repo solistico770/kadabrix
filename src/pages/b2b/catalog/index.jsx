@@ -18,7 +18,7 @@ let loadPreventor = false;
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
-  const [catId, setCatId] = useState(1);
+  const [catId, setCatId] = useState();
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [page, setPage] = useState(1);
@@ -35,7 +35,7 @@ const ProductList = () => {
   const limit = 100;
 
   const setCat = (cat)=>{
-    setCatId(cat)
+    setCatId(cat  )
 
 
   }
