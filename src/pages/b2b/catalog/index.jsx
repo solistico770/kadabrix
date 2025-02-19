@@ -3,6 +3,8 @@ import { CircularProgress } from '@mui/material';
 import kdb from "../../../kadabrix/kadabrix.js";
 import Products from './product.jsx';
 import Search from './search.jsx';
+import CatalogCats from './catalogCats.jsx'
+
 import InfiniteScroll from 'react-infinite-scroller';
 
 let timoutHandler = null;
@@ -32,6 +34,11 @@ const ProductList = () => {
 
   const limit = 100;
 
+  const setCat = (cat)=>{
+    setCatId(cat)
+
+
+  }
   
   useEffect(() => {
       window.scrollTo({
@@ -97,6 +104,7 @@ const ProductList = () => {
      
   
       <div className="max-w-[1400px] mx-auto">
+        <CatalogCats setCat={setCat} />
         <Search
           initialLoad={false}
           searchTerm={searchTerm}

@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import kdb from '../kadabrix/kadabrix';
 import CartComponent from "../kadabrix/cartComponent";
 import logo from '../assets/logoTop.png';
-import eventBus from "../../kadabrix/event";
-import {useUserStore} from "../../kadabrix/userState";
+import eventBus from "../kadabrix/event";
+import {useUserStore} from "../kadabrix/userState";
 
 
 
