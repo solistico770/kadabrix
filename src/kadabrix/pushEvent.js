@@ -1,7 +1,6 @@
 import kdb from "./kadabrix"
 import { requestForToken } from "./firebase";
 import eventBus from "./event";
-import { useCartStore } from "./cartState";
 
 eventBus.on("onAuthStateChange", async (session) => {
 

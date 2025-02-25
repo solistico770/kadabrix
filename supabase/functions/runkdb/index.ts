@@ -3,22 +3,9 @@ import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 
 
 const getTransactionPoolerAddress = () => {
-  const TPtable = {
-    "heuayknlgusdwimnjbgs": "aws-0-eu-west-1",
-    "fbpmgiezamyfmlglkqcb": "aws-0-eu-central-1",
-    "ndlnbrybztgnhlqkwxra": "aws-0-us-west-1",
-  };
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  if (!supabaseUrl) throw new Error("SUPABASE_URL is not set.");
+  return Deno.env.get("DB_POOLER");
 
-  const projectRef = supabaseUrl.match(/https:\/\/(.+?)\.supabase\.co/)?.[1];
-  if (!projectRef) throw new Error("Invalid SUPABASE_URL format.");
-
-  const poolerAddress = TPtable[projectRef];
-  if (!poolerAddress) throw new Error(`No TP found for ref: ${projectRef}`);
-
-  return poolerAddress;
 };
 
 const getPooler = () => {

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import kdb from '../../kadabrix/kadabrix';
-import { jwtDecode } from 'jwt-decode';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -22,15 +21,32 @@ const Login = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    const { user, error } = await kdb.auth.signInWithPassword({ email, password });
+    const { data, error } = await kdb.auth.signInWithPassword({ email, password });
     if (error) {
       setError(error.message);
     } else {
-      if (user) {
-        const token = user.access_token;
-        const decodedToken = jwtDecode(token);
-        console.log('Decoded JWT:', decodedToken);
+      if (data?.session) {
+        console.log('User authenticated:', data.session.user);
+        // Send Supabase credentials to Service Worker
+        sendCredentialsToServiceWorker(data.session.access_token);
+        navigate('/admin/menu');
       }
+    }
+  };
+
+  const sendCredentialsToServiceWorker = async (accessToken) => {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
+
+      console.log('Sending credentials to Service Worker');
+
+      navigator.serviceWorker.controller.postMessage({
+        type: 'SUPABASE_CREDENTIALS',
+        payload: { supabaseUrl, supabaseKey, accessToken },
+      });
+    } else {
+      console.warn('No active Service Worker to receive credentials');
     }
   };
 
@@ -90,21 +106,6 @@ const Login = () => {
           >
             כניסה למערכת
           </button>
-
-          <div className="flex justify-between text-sm mt-6">
-            <a
-              href="/forgot"
-              className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
-            >
-              שכחת סיסמה?
-            </a>
-            <a
-              href="/signup"
-              className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
-            >
-              אין חשבון? הרשם עכשיו
-            </a>
-          </div>
         </form>
       </div>
     </div>
