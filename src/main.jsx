@@ -28,24 +28,6 @@ import  './kadabrix/pushEvent';
 
 
   
-if ('serviceWorker' in navigator && 'PeriodicSyncManager' in window) {
-  navigator.serviceWorker.ready.then((registration) => {
-      registration.periodicSync.getTags().then((tags) => {
-          if (!tags.includes('location-sync')) {
-              registration.periodicSync.register('location-sync', {
-                  minInterval: 60 * 1000, // 1 minute interval
-              }).then(() => {
-                  console.log('Periodic location sync registered');
-              }).catch((error) => {
-                  console.error('Failed to register periodic sync:', error);
-              });
-          }
-      });
-  });
-} else {
-  console.warn('Periodic Background Sync is not supported');
-}
-
 
 
 
