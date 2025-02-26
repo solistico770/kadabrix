@@ -6,9 +6,11 @@ const SearchAndFilterFirstLine = ({ searchTerm, setSearchTerm, filters, setFilte
 
 
   const resetSearch = () => {
-    setFilters({});
+    setSearchTerm('');
     setPage(1);
   };
+
+
 
   return (
     <>

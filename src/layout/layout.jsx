@@ -8,14 +8,10 @@ import eventBus from "../kadabrix/event";
 import {useUserStore} from "../kadabrix/userState";
 
 
-
-
-
-
 const Layout = () => {
-  
-  const userState = useUserStore.getState().userDetails
 
+
+  const userState = useUserStore(state => state.userDetails);
 
   const [user, setUser] = useState(null);
   const navigate = useNavigate();

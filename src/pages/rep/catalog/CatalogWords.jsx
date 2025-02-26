@@ -8,7 +8,7 @@ const Page = ({ searchState, setSearchState }) => {
     useEffect(() => {
         const fetchWords = async () => {
             const data = await kdb.run({
-                "module": "catalog",
+                "module": "repCatalog",
                 "name": "getWords",
                 "data": {
                     searchTerm: searchState

@@ -1,93 +1,121 @@
 import React, { useState, useEffect } from 'react';
-import { Button , CircularProgress, FormControlLabel, List, ListItem, ListItemText, ListItemSecondaryAction } from '@mui/material';
 import kdb from '../../../kadabrix/kadabrix';
-import DialogTitle from '@mui/material/DialogTitle';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import SecurityIcon from '@mui/icons-material/Security';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Tabs,
+  Tab,
+  Box,
+  Typography,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Paper,
+} from '@mui/material';
 
+const ProductDetailsPopup = ({ part, open, onClose }) => {
+  const [activeTab, setActiveTab] = useState(0);
+  const [stockDetails, setStockDetails] = useState([]);
+  const [priceDetails, setPriceDetails] = useState([]);
 
-const Users = (props) => {
-  const handleClose =()=> {setOpen(false)}
-  const handleOpen  =()=> {setOpen(true)}
-  const [partData,setPartData] = useState([])
-  const [open, setOpen] = useState(false);
-  const [ isLoading , setIsLoading ] = useState(false);
-
-
+  // Fetch stock details when the tab is active
   useEffect(() => {
-    if (open==true)  loadData();
-
-  }, [open]);
-  
-  const loadData = async () => {
-    setIsLoading(true)
-
-      
-    kdb.run({
-      "module": "catalog",
-      "name": "getInventory",
-      "data": {part:props.part,cache:true}
-    }).then(function(res){
-      setPartData(res);  
-    })
-    
-    
-
-    try {
-      let res = await kdb.run({
-        "module": "catalog",
-        "name": "getInventory",
-        "data": {part:props.part}
-      });
-      setPartData(res);
-      setIsLoading(false)
-    } catch (error) {
-      setIsLoading(false)
-      console.error("Failed to load roles:", error);
+    if (open && activeTab === 0) {
+      const fetchStockDetails = async () => {
+        const data = await kdb.run({
+          module: "repCatalog",
+          name: "getInventory",
+          data: { part },
+        });
+        setStockDetails(data.stockDetails);
+      };
+      fetchStockDetails();
     }
+  }, [open, activeTab, part]);
 
-    
-  };
+  // Fetch price details when the tab is active
+  useEffect(() => {
+    if (open && activeTab === 1) {
+      const fetchPriceDetails = async () => {
+        const data = await kdb.run({
+          module: "repCatalog",
+          name: "getPriceList",
+          data: { part },
+        });
+        setPriceDetails(data.priceDetails);
+      };
+      fetchPriceDetails();
+    }
+  }, [open, activeTab, part]);
 
   return (
-    <div>
-    <Button onClick={handleOpen} variant="outlined" startIcon={<SecurityIcon />}>פרטים</Button>
-    <Dialog onClose={handleClose} open={open}>
-      <DialogTitle>פרטי מלאי {props.partName} {props.partDes}  </DialogTitle>
-      {isLoading?
-            <CircularProgress
-            size={68}
-            sx={{
-              position: 'absolute',
-              top: -6,
-              left: -6,
-              zIndex: 1,
-            }}
-          />
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>Product Details: Part {part}</DialogTitle>
+      <DialogContent>
+        <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
+          <Tab label="מלאי (Stock)" />
+          <Tab label="מחירים (Prices)" />
+        </Tabs>
 
-        :''}
+        <Box sx={{ mt: 2 }}>
+          {activeTab === 0 && (
+            <div>
+              <Typography variant="h6" gutterBottom>
+                מלאי (Stock)
+              </Typography>
+              <Paper elevation={3} sx={{ overflowX: 'auto' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Warehouse</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }} align="right">Balance</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {stockDetails.map((row, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{row.warhs}</TableCell>
+                        <TableCell align="right">{row.balance}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
+          )}
 
-{partData.map((part, index) => (
-
-    <List>
-        <ListItem>
-          <ListItemText
-            primary={part.name}
-            secondary={part.bal}
-          />
-          <ListItemSecondaryAction>
-          </ListItemSecondaryAction>
-        </ListItem>
-    </List>
-
-))}
-
-    <DialogActions></DialogActions>
+          {activeTab === 1 && (
+            <div>
+              <Typography variant="h6" gutterBottom>
+                מחירים (Prices)
+              </Typography>
+              <Paper elevation={3} sx={{ overflowX: 'auto' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 'bold' }}>Price List</TableCell>
+                      <TableCell sx={{ fontWeight: 'bold' }} align="right">Price</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {priceDetails.map((row, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{row.pldes}</TableCell>
+                        <TableCell align="right">{row.price}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
+          )}
+        </Box>
+      </DialogContent>
     </Dialog>
-    </div>
-
   );
 };
 
-export default Users;
+export default ProductDetailsPopup;

@@ -1,14 +1,15 @@
 import { useState, useEffect, useContext } from 'react';
-import { CartContext } from '../../../kadabrix/cartState';
+import { useCartStore } from '../../../kadabrix/cartState';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import CheckIcon from '@mui/icons-material/Check';
 import kdb from "../../../kadabrix/kadabrix";
-import {addItem} from "../../../kadabrix/cartCommands";
+import {addItem,removeItem,updateQuantity} from "../../../kadabrix/cartCommands";
 
 
 const AddButton = (props) => {
-  const { cart, setCart } = useContext(CartContext);
+  const cart = useCartStore((state) => state.cart);
+  
   const [isLoading, setIsLoading] = useState(false);
   const [tempQuant, setTempQuant] = useState('');
   const [showOk, setShowOk] = useState(false);
@@ -27,11 +28,7 @@ const AddButton = (props) => {
   const removeProduct = async (partName) => {
     setIsLoading(true);
     const index = inCartItem.index;
-    await kdb.run({
-      module: "kdb_cart",
-      name: "removeItem",
-      data: { index },
-    });
+    await removeItem(index);
     setIsLoading(false);
   };
 
@@ -51,11 +48,8 @@ const AddButton = (props) => {
   const changeQuant = async (partName, newQuant) => {
     setIsLoading(true);
     const index = inCartItem.index;
-    await kdb.run({
-      module: "kdb_cart",
-      name: "quantSetItem",
-      data: { index, quant: newQuant },
-    });
+    await updateQuantity(index, "set", newQuant);
+    
     setShowOk(false);
     setIsLoading(false);
   };

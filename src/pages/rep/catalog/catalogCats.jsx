@@ -56,7 +56,7 @@ const Cat = ({ category,setCat,children }) => {
 }
 
 
-const SubCats = (props) => {
+const SubCats = (category,setCat,children) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
@@ -71,26 +71,26 @@ const SubCats = (props) => {
     const handleClickCat = (catId, e) => {
         handleClose();
         e.stopPropagation();
-        props.setCat(catId);
+        setCat(catId);
     };
 
     return (
         <div>
             <IconButton onClick={handleClick} size="small">
-                {Array.isArray(props.children) && props.children.length > 0 && (
+                {Array.isArray(children) && children.length > 0 && (
                     <ExpandMoreIcon fontSize="small" />
                 )}
             </IconButton>
             <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-                {props.children && Array.isArray(props.children) ? (
-                    props.children.map((child, index) => (
+                {children && Array.isArray(children) ? (
+                    children.map((child, index) => (
                         <MenuItem key={index} onClick={(e) => handleClickCat(child.id, e)}>
                             {child.name}
                         </MenuItem>
                     ))
                 ) : (
                     <MenuItem onClick={handleClose}>
-                        {props.children ? props.children.name : 'No subcategories available'}
+                        {children ? children.name : 'No subcategories available'}
                     </MenuItem>
                 )}
             </Menu>
@@ -98,7 +98,7 @@ const SubCats = (props) => {
     );
 };
 
-const CatalogCats = (props) => {
+const CatalogCats = ({setCat}) => {
 
 
     const [cats, setCats] = useState([]);
@@ -110,7 +110,7 @@ const CatalogCats = (props) => {
         const fetchCats = async () => {
             try {
                 let data = await kdb.run({
-                    module: "catalog",
+                    module: "repCatalog",
                     name: "getCats",
                 });
                 setCats(data);
@@ -144,7 +144,7 @@ const CatalogCats = (props) => {
         >
             {cats.filter((cat) => cat.father === 0).map((category, index) => (
                 <SwiperSlide key={index}>
-                    <Cat category={category} setCat={props.setCat} children={childrenOf(category.id)} />
+                    <Cat category={category} setCat={setCat} children={childrenOf(category.id)} />
                 </SwiperSlide>
             ))}
         </Swiper>
