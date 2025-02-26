@@ -6,11 +6,12 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { createfilesTreePlugin } from './scripts/vite-plugin-filesTree';
 import { createSupabaseConfig } from './scripts/vite-plugin-supabase-html';
 
+//filename: 'sworker/geo.js', // Corrected the service worker path
 const manifestForPlugIn = {
   registerType: 'autoUpdate',
   strategies: 'injectManifest',
   srcDir: 'src',
-  filename: 'sworker/geo.js', // Corrected the service worker path
+  
   manifest: {
     name: 'kadabrix',
     short_name: 'kadabrix',
