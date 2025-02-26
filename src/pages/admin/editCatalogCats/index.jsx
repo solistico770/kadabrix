@@ -1,304 +1,787 @@
 import React, { useState, useEffect } from 'react';
-import { Button, TextField, Grid, Box, Typography, Alert, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { 
+  Button, 
+  TextField, 
+  Box, 
+  Typography, 
+  Alert, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper, 
+  IconButton,
+  Tooltip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Switch,
+  FormControlLabel,
+  CircularProgress,
+  Chip,
+  Collapse,
+  Snackbar
+} from '@mui/material';
+
+// Icons
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import UploadIcon from '@mui/icons-material/Upload';
+import ImageIcon from '@mui/icons-material/Image';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import SearchIcon from '@mui/icons-material/Search';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import CloseIcon from '@mui/icons-material/Close';
+
 import kdb from '../../../kadabrix/kadabrix';
-import KdbInput from './kdbInput';
-import {supabaseUrl} from "../../../kadabrix/kdbConfig"
+import { supabaseUrl } from "../../../kadabrix/kdbConfig";
 
-const Users = () => {
-  const [users, setUsers] = useState([]);
+// ======= Inline Editable Field Component =======
+const EditableField = ({ initialValue, idValue, editField, refresh, type = "text", options }) => {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(initialValue);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      await kdb.run({
+        "module": "editCatalogCats",
+        "name": "setValue",
+        "data": { 
+          editField: editField,
+          idValue: idValue,
+          newValue: value
+        }
+      });
+      
+      refresh();
+      setEditing(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setValue(initialValue);
+    setEditing(false);
+  };
+
+  // Handle special types
+  const renderEditField = () => {
+    switch (type) {
+      case "boolean":
+        return (
+          <FormControlLabel
+            control={
+              <Switch
+                checked={value === true || value === 1 || value === "1"}
+                onChange={(e) => setValue(e.target.checked)}
+                color="primary"
+              />
+            }
+            label={value ? "פעיל" : "לא פעיל"}
+          />
+        );
+      case "select":
+        return (
+          <TextField
+            select
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            SelectProps={{
+              native: true,
+            }}
+            variant="outlined"
+            fullWidth
+            size="small"
+          >
+            {options && options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </TextField>
+        );
+      case "number":
+        return (
+          <TextField
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            type="number"
+            variant="outlined"
+            fullWidth
+            size="small"
+            InputProps={{ inputProps: { min: 0 } }}
+          />
+        );
+      default:
+        return (
+          <TextField
+            value={value || ""}
+            onChange={(e) => setValue(e.target.value)}
+            variant="outlined"
+            fullWidth
+            size="small"
+            multiline={type === "textarea"}
+            rows={type === "textarea" ? 3 : 1}
+            autoFocus
+          />
+        );
+    }
+  };
+
+  const renderDisplay = () => {
+    if (type === "boolean") {
+      const isActive = value === true || value === 1 || value === "1";
+      return (
+        <Chip
+          icon={isActive ? <VisibilityIcon /> : <VisibilityOffIcon />}
+          label={isActive ? "פעיל" : "לא פעיל"}
+          color={isActive ? "success" : "default"}
+          size="small"
+          className="cursor-pointer"
+        />
+      );
+    }
+    
+    if (value === null || value === undefined || value === "") {
+      return <Typography color="text.secondary" className="italic">ריק</Typography>;
+    }
+    
+    return <Typography>{value}</Typography>;
+  };
+
+  return (
+    <Box className="min-w-20">
+      {editing ? (
+        <Box className="flex gap-2 items-center">
+          {renderEditField()}
+          <Box className="flex">
+            <Tooltip title="שמור">
+              <IconButton 
+                color="primary" 
+                onClick={handleSave} 
+                size="small"
+                disabled={loading}
+              >
+                {loading ? <CircularProgress size={20} /> : <SaveIcon />}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="בטל">
+              <IconButton 
+                color="default" 
+                onClick={handleCancel} 
+                size="small"
+              >
+                <CloseIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Box>
+      ) : (
+        <Box 
+          onClick={() => setEditing(true)} 
+          className="cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors"
+        >
+          {renderDisplay()}
+        </Box>
+      )}
+    </Box>
+  );
+};
+
+// ======= Image Uploader Component =======
+const ImageUploader = ({ id, refresh }) => {
+  const [loading, setLoading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(
+    `${supabaseUrl}/storage/v1/object/public/cats/${id}.jpg?cacheBuster=${Math.random()}`
+  );
+  const [error, setError] = useState(false);
+
+  const handleImageError = () => {
+    setError(true);
+  };
+
+  const handleUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    try {
+      setLoading(true);
+      const reader = new FileReader();
+      
+      reader.onload = async (e) => {
+        try {
+          await kdb.run({
+            "module": "editCatalogCats",
+            "name": "upload",
+            "data": { 
+              id: id, 
+              base64: e.target.result 
+            }
+          });
+          
+          // Update the preview with a cache buster
+          setPreviewUrl(`${supabaseUrl}/storage/v1/object/public/cats/${id}.jpg?cacheBuster=${Math.random()}`);
+          setError(false);
+          refresh();
+        } catch (err) {
+          console.error('Error uploading file:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Error handling file:', err);
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Box className="flex flex-col items-center gap-2">
+      <Box className="relative w-24 h-24 border rounded overflow-hidden flex items-center justify-center bg-gray-50">
+        {loading ? (
+          <CircularProgress size={30} />
+        ) : (
+          <>
+            {!error ? (
+              <img
+                src={previewUrl}
+                alt="Category thumbnail"
+                className="max-w-full max-h-full object-contain"
+                onError={handleImageError}
+              />
+            ) : (
+              <ImageIcon className="text-gray-300" style={{ fontSize: 40 }} />
+            )}
+          </>
+        )}
+      </Box>
+      
+      <label htmlFor={`file-upload-${id}`} className="cursor-pointer">
+        <input
+          id={`file-upload-${id}`}
+          type="file"
+          accept="image/*"
+          onChange={handleUpload}
+          className="hidden"
+        />
+        <Button
+          variant="outlined"
+          component="span"
+          size="small"
+          startIcon={<UploadIcon />}
+          disabled={loading}
+        >
+          העלה תמונה
+        </Button>
+      </label>
+    </Box>
+  );
+};
+
+// ======= Delete Confirmation Dialog =======
+const DeleteConfirmDialog = ({ open, handleClose, handleConfirm, itemName }) => {
+  return (
+    <Dialog open={open} onClose={handleClose} dir="rtl">
+      <DialogTitle>מחיקת קטגוריה</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          האם אתה בטוח שברצונך למחוק את הקטגוריה "{itemName}"? פעולה זו אינה ניתנת לביטול.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} color="primary">
+          ביטול
+        </Button>
+        <Button onClick={handleConfirm} color="error" variant="contained" startIcon={<DeleteIcon />}>
+          מחק
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+// ======= Add Category Dialog =======
+const AddCategoryDialog = ({ open, handleClose, handleAdd, categories }) => {
+  const [name, setName] = useState("");
+  const [father, setFather] = useState("0");
+  const [priority, setPriority] = useState(10);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!name) return;
+    
+    setLoading(true);
+    try {
+      await handleAdd({
+        name,
+        father,
+        priority
+      });
+      
+      // Reset form
+      setName("");
+      setFather("0");
+      setPriority(10);
+      
+      handleClose();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose} dir="rtl" maxWidth="sm" fullWidth>
+      <DialogTitle>הוספת קטגוריה חדשה</DialogTitle>
+      <DialogContent>
+        <Box className="flex flex-col gap-4 mt-2">
+          <TextField
+            label="שם הקטגוריה"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            fullWidth
+            required
+            autoFocus
+          />
+          
+          <TextField
+            select
+            label="קטגוריית אב"
+            value={father}
+            onChange={(e) => setFather(e.target.value)}
+            fullWidth
+            SelectProps={{
+              native: true,
+            }}
+          >
+            <option value="0">קטגוריה ראשית</option>
+            {categories
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+          </TextField>
+          
+          <TextField
+            label="קדימות"
+            type="number"
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+            fullWidth
+            InputProps={{ inputProps: { min: 0 } }}
+          />
+        </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>
+          ביטול
+        </Button>
+        <Button 
+          onClick={handleSubmit} 
+          color="primary" 
+          variant="contained" 
+          disabled={!name || loading}
+          startIcon={loading ? <CircularProgress size={20} /> : <AddIcon />}
+        >
+          הוסף
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+// ======= Main Component =======
+const CatalogCategoriesEditor = () => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editing, setEditing] = useState(null);
-  const [newErpCust, setNewErpCust] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [notification, setNotification] = useState({ open: false, message: '', type: 'success' });
+  const [expandedCategories, setExpandedCategories] = useState({});
 
+  // Function to build tree from flat list
   function buildTree(items, fatherId, level = 0) {
     return items
-        .filter(item => item.father === fatherId)
-        .sort((a, b) => (b.priority || 0) - (a.priority || 0)) // Sort children by priority (DESC)
-        .map(item => ({
-            ...item,
-            level: level, // Add level property to indicate depth in hierarchy
-            children: buildTree(items, item.id, level + 1)
-        }));
-}
+      .filter(item => item.father === fatherId || (item.father === null && fatherId === "0"))
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0))
+      .map(item => ({
+        ...item,
+        level: level,
+        children: buildTree(items, item.id, level + 1)
+      }));
+  }
 
-// Helper function to flatten the tree into a sorted list
-function flattenTree(tree) {
+  // Function to flatten tree into sorted list
+  function flattenTree(tree) {
     let result = [];
     for (const node of tree) {
-        result.push({
-            id: node.id,
-            name: node.name,
-            query: node.query,
-            priority: node.priority,
-            active: node.active,
-            father: node.father,
-            level: node.level // Include level in the output
-        });
-        if (node.children.length > 0) {
-            result = result.concat(flattenTree(node.children));
-        }
+      result.push({
+        id: node.id,
+        name: node.name,
+        query: node.query,
+        priority: node.priority,
+        active: node.active,
+        father: node.father || "0",
+        level: node.level,
+        children: node.children
+      });
+      
+      // Only add children if this category is expanded
+      if (node.children && node.children.length > 0 && expandedCategories[node.id]) {
+        result = result.concat(flattenTree(node.children));
+      }
     }
     return result;
-}
-
-  const fetchUsers = async () => {
+  }
+  
+  // Fetch categories from server
+  const fetchCategories = async () => {
+    setLoading(true);
     try {
       const data = await kdb.run({
         "module": "editCatalogCats",
         "name": "getCats"
       });
-    
-    
-      setUsers(data);
+      
+      // Add any missing properties to ensure consistent data structure
+      const processedData = data.map(cat => ({
+        ...cat,
+        father: cat.father || "0",
+        active: cat.active ?? true,
+        priority: cat.priority || 0,
+        query: cat.query || ""
+      }));
+      
+      setCategories(processedData);
+      setError(null);
     } catch (err) {
-      setError(err);
+      console.error(err);
+      setError(err.message || "שגיאה בטעינת הקטגוריות");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
+  // Initial load
   useEffect(() => {
-    fetchUsers();
+    fetchCategories();
   }, []);
 
-
-  const handleEdit = (email) => {
-    setEditing(email);
-    const user = users.find(user => user.email === email);
-    setNewErpCust(user.erpcust);
-  };
-
-
-  
-
-  
-  const handleAddCat = async () => {
+  // Handle add category
+  const handleAddCategory = async (categoryData) => {
     try {
-
       await kdb.run({
         "module": "editCatalogCats",
-        "name": "addCat"
+        "name": "addCat",
+        "data": categoryData
       });
-
-      fetchUsers();
-      setEditing(null);
+      
+      await fetchCategories();
+      showNotification("הקטגוריה נוספה בהצלחה", "success");
+      return true;
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "שגיאה בהוספת קטגוריה");
+      showNotification("שגיאה בהוספת קטגוריה", "error");
+      throw err;
     }
   };
 
-
-  const handleDelCat = async (id) => {
+  // Handle delete category
+  const handleDeleteCategory = async () => {
+    if (!selectedCategory) return;
+    
     try {
-
       await kdb.run({
         "module": "editCatalogCats",
         "name": "delCat",
-        "data":{id:id}
+        "data": { id: selectedCategory.id }
       });
-
-      fetchUsers();
-      setEditing(null);
+      
+      await fetchCategories();
+      setDeleteDialogOpen(false);
+      showNotification("הקטגוריה נמחקה בהצלחה", "success");
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "שגיאה במחיקת קטגוריה");
+      showNotification("שגיאה במחיקת קטגוריה", "error");
     }
   };
 
+  // Toggle category expansion
+  const toggleCategoryExpand = (categoryId) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }));
+  };
 
+  // Show notification
+  const showNotification = (message, type = 'success') => {
+    setNotification({
+      open: true,
+      message,
+      type
+    });
+  };
 
+  // Close notification
+  const handleCloseNotification = () => {
+    setNotification(prev => ({ ...prev, open: false }));
+  };
+
+  // Build the category tree and flatten it for display
+  const treeData = buildTree(categories, "0");
+  const flattenedData = flattenTree(treeData);
   
-  const handleUpload = async (event,id) => {
+  // Filter categories based on search query
+  const filteredCategories = searchQuery
+    ? categories.filter(cat => 
+        cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        cat.id.includes(searchQuery)
+      )
+    : flattenedData;
     
-    
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        
-        
-        await kdb.run({
-          "module": "editCatalogCats",
-          "name": "upload",
-          "data":{id:id,base64:e.target.result}
-
-        });
-
-        fetchUsers();
-
-      };
-      reader.readAsDataURL(file);
-    } else {
-      console.error('No file selected.');
-    }
-
-    
-    try {
-
-      await kdb.run({
-        "module": "editCatalogCats",
-        "name": "upload"
-      });
-
-     
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-
- 
-  const imageOnError = (event) => {
-    event.currentTarget.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMwAAADACAMAAAB/Pny7AAAAZlBMVEX///+Wlor9/f34+PiSkoapqqyjo5nl5ePu7uyxsKfJycOxsqqJiXzW1tKhoJXo6OSMjX2bm5DQ0MuDg3W/v7nc3Nj5+vS4uLGqqqGgo6fh4tzDxLz09PHZ29LLzcSSkYmcm5Z6e2tEytmBAAAQ0UlEQVR4nN2dCcObKBOAw7GeeOBRbeL7dvv//+Q3A2o0XpCI26+z2zRpFHlgGIbhyO32oVCq/xheTI2vfSMfJ6Si/r/2mW5ShhTsytohy0c0CsSSxYkojk9hJq9/gHyWkf++SrSckg9HKmZr8daupQzE4TONhVlm5LbkoZZp2PQuVoqgMmJ+PV1L3gpGdZSOmr4VDF3PhSWMrYpZFLUxjDLIq7VuCqPvddi5GJeqVrD1jJiWNj2x6bMuCDK/rpOkiB6Vb3WvtqWfZYS+kQQUdpDd7/ev4jt6PJombL1USsJBCCeD8Ly2zIhT74NiSfu6nB9NHLcqy7+4QOETyeH/HF7wG3ijvi+BzOphJ+gHpT9+MFCOe/31hbrRhCHkmUBmehE6c5jdPt8vQmSaem0bN80j+i6S2vezoOvoLSKlRTbW2wu16FwKSYjgKt+il2kuB4H6UK+Q5ziuqkrl+X6HPO+1bBuYLV23qKoIShX+g2yipCgeSNuGUMwVljNkuoaCDix6vWfqpDS8i24qmcVjW55WURVFRQLKAQWNJW3peOzIvWpsPJANm2x6O8CE5k9zJ3tDWxuYdvwERsCddB9wmkpI0uGmugodSuPv5eqcPjvmsn/ne7lwKV62l49Tusp47NYSIcEQuJJGiuSE7O5Lw/kI4/nUmfjeBTAVFxMYd8+5BoaYwNCP+55LYCIifuh3OzCWA9Y1WYOxHdYfPtEAxuqRNjDsHJhnT1QQEeh3WzDsdoZ/4w5mUn5rMNTPnuJn9+lHWxm6Spcw47uElAuY9jkagPHAZ11lGTqHeUoty+wVhpDJMEaSj4Sn2zCnD5BrKfxXmEn+P0TZhzldfCnqHZiP5VKY7O+CyZO/BiaQeXE5jKvIWCBFdC3MpyHLHWFSVFfDOBOAeVwK4zQCm15bM1brJazFG2JNV8D00w1/BcznU/sHMgbOroJxhwIwuXcZzM31eol2eJxjmFbXzPticnM4BM6SMvV1wRnBcDKd8TiEyT6GYQazvPEQOEMYPbFjAoMzITYwVr7ZapZNYJonjGcFY1EzUCM2MOsVaAYjBhirmuFcEkMYagmzLiYwFS8HGGkHY1ozqmvJrGA2l2gYwwgwAIYwXHDpeRLnag+ulD3MCeMZg/52nEM1N82cNEXtg9RJ5Il9HNlqn/+Swdntm5TMCobzyB+rmwW1l++xEE/rzDUwBSk7GxjRZvPKDh57laPU7DKYxA5GVIuoHa03LQEYvN7zuwamHkKaRjAiWotAZr9WaPTKgsthfGMYsTGt74s1BdPrJK6EuRNhDMO9jQlwWixoEATV7FIY3wbmvpVK0L4ompT6z7UwAemfcgzDm+2VCckCBtXsapiO5KYweyvhFlXTB90vh/lWbw5h+N5sNIteYeR/A6NDmscwyy5mIq96Ntx0KQyVpjAi2vPz/HSV5lqYm8x1SPO4Zoq9ZLJlo/kPYEjeqL+PYXZz8wbMOesA5jD8AGb4aAYjzWFOWgcwVX7J430YMzXzPeuaOWu2eYKT9r7gDoz+h3zXANRydvGFajatGo97RzB9vppgJ8k3TLODNuP1zzv2AORep1m90c+w08PoYb+w8Rhmz7hudDNXm+YhPmvgaHrberYcA/wnMENI02AIIIotpfDlxsj5z4UhZKPVdPFGxTiC2VzTXXH+wxRmQ9HYlpJ9DLOhCZt248E5M4UhIlyhYdEmizOYja8iGxgi2oWmBY9tFjcwdPObgovOHIZwWcwqh9XhDstnMBvKtM0CXbcVDOG8jfy+32Z+0exPbDiB2Z7nrbnIbGAQx4urqCiiR9MezdF8AEPX95/uTr/7nFvCjJNmBjM078OsLho42rgIMHdbGHP5tGaW/7Z7D8DUExhmWDOLLXbnwqxr0uEKj0DwrycM+uQ7MBw3OXLcE6h2+OAOSC7ynfmzN2Ho+PKKuO9md0IPIRWMmjbcdDSF8KokY/PNJCy4RyEQ7XnNlPqp3dT5ar0cr+5iExiqpkBXYXjOpzutXgdW3UOu4owwXmkHs2wuJqu7AEYFzpIcNwPhuzUYns49Zrqcyc7CFTv9rBljmLVcD1vJD4dy3ADGe83JCswqzrNmjNRsa+/poNOHCXD+wKsTvmWaOVmZ+1tfY5C8DjhtYVYz3deVyQibYxSQUayZVRiermRjKxjxOhugYRj1pYGa9Yq0YcWMogV9SLPY6DR5arUVjcV8CWNomule0zd7fB8F3PAA+NbockvYrG7s+pmtw0DMQzipXqW5BWPt7AbTdmMLs5Jvq7WQfUhzHSavjNMZpc7fgVGjlLUt9FYHyPQhzXUYuRfF3MpWw61hto+9sQsTtjsw+xNMW5JZ14y57T2QPqS5XjNvVAzYgGfVmMHQ/RMBLCTehuE2By1MpBaWMKcFnZtcxWfXYMTmKoZ9eRo0c5j3nvQq1TbMe1oGPnRjB3Pe4u2IE1SmFRgevnlYxHMtzcWx5lskNmF2Z/73ZOxqroaBUsQKWIHJV1eXmYhvq2ZnSSJU05jsoB3CFNtTGLsCHrU/DGycw7wYQrCjGDh7woSyF2J1BtaYPIwNMm9IQ09lu4N5mbL2c+UYP2G6OulFGzOr6qHIQtmYRG9C1mFOMMhLmJrtHG5gx7KxLHwDxibpdXmB6UrSPtjesRMWBbi1xH1LzT7GeV0ZEQo0AXswhgljFG1jub5TAzCFCaIq2q0Z03R31ii4Nc3TAlRop8Bs1uFV/UwvycFpSp+J3ZaTjyURso2dSbu7vuN08dPlwYVnisvDk1Zo1tfynSTDLPVZ4+M/QuyCLSc90tkTr64Xo6mQt5N2vcF58URnm5D1EcZu0t55orukL2RxeC6E40N/F4874cTkzbSvbi50b5XN54k7S3rjee5M8tX9izultjjcnjIYoXycCbcnj5hnY2vt9mHWWNChBB3rr1d3/Cii2XCAJvPPuNAMj0WenifbLWRyfecncEPi//gE5gAnG6JKKS6HqYbIMm0J9yYxc5yiSCdhJz/sD6STsun9xyCWC9HjI4rXe8NJ3OGx77wNs682fXybDxvEvvXVWQnvH8/LOjGb3Wgna5n4uMdj6Sjn/S3N8yw+GArER9pi+WMVg/ST9hxrRu0SFZoGI8XTycwMYeJuIONDvvq/2W1t16mGgfTSnKRSjsu5+NHUwrswIaaPR5pLouOpegMqwvANGKZyzXMZP+IhBstwWJzrw+l1hvGd0Ivy9CHquWwejcyNaN4TBSN0IbBIHfLRsgMYVZm81fnJPP1JJaDOy1abNcJOHZ59wwbToA7zfmimVaHf4+IE5kfv8xf4oLzbh6lVyT+/i1VhP4f3arvm5Nh0PwcNJs/21qjrd/dIvYqhxikYznqDrHaNqfNOd2DwmmnJUm+smiUMFFEIJoy3EyvtjfV/sgQtqkDQm7wOV73k/i5MgHaJTycHcEcTT8deaAoDyXZq19a0IjAtkr45V3oAkxI+NEetdPs1841Kks4SUf3HmN0njBoUqZ1okr1eTyIHMCFY5eEg3VuiSn1sM7E/SjHCNHhJM0tEWcSRfFIzWN3VXAlR0ES8JHESDBSb0OXWJe3MmhHpDZKmZIDBa/J58y3yaeZGGD10UY1yvvwmUSV1vgsIMBK6ejwdvorV3iTxRQeYyeJlMsBQBTOfT9PVuIRRNMo8zOHxiIq3p7H3YFqePjONLPr4glcYPsCotWT5vPXeVeYWMFrN0Hb9msMEzmBmW0QFr/QzXtTMU+Z0s2Y2YJSJ9Ja9SpY7glGNdzgnWlbDThJtzdjoy/ti2mZe1Oabr6qZlpDMXdZbDx+f39HoTvOuLBaMa8YHbJvmZmmK4i1rhoLWjMx/RyVyZs2wZ1kW0jZMpHqV2cV81m+8wCTq+pnp+vfcfgaHPir90Td7kSkMzqrdywEmW3gAd8z9ugdww0MtXhuNGhulby0w2ILRIzkTGLzaH2GUeZq6AD/ki2/2olet8pInla99uf4fPu9t6CcwSm94M+bi0Gvms+tpNdXKE6In9jBPNRvGM3HA1G4T1frzSeYjLuctXhnMvL9er0Pj7Qjx+c+aPWFaozYzrZlbpzwFzpuiKBp1ehZPJyPHBQxTiwI5iSO4Xne/E5/587oZYTqzmqFTmOF8CfzxA/1mNlmp2kw8TSzQ8Y/J9ee1/qlQNYJZwrxGZ9ADyauhELP4ue+Hc9nMImrJ0rMMGsmf15PG1URtAo9ZWVLetYJPt/1S0I+JNWVJ1apoC5dtlcwVBby3/HVemdbD9WRx/YnC6qhYcyyC4nuWoa4oZj+GRbM6KaAR1Nkia9nLrfr6oIYm9l0ky+uvkT8g6nye/D0w10/Wu5Q/YW7jJKGT1/8nqRsvHFyre+O1+jdwwfoWKk5WNdBdsxD3C0ax6uk7eR9ubKtJH+Pj5940+rHXjv0PfOH1nUukw4FdbBXSNJVA/SBgrtYCBy2ON/MSXWDo89VvbECH8xs+/QaPpZY6QhCpXy4KUpHjxUNnzyp1swq8s3+F+plBjeaVeGGO9/pSqLFQ/Tt0UOvAIr86H14DPG5FFkEArmCIzq7EsxkDcF1K9Ag8hCHqp2qiPFY/juIlLGhI2TvAdQldJY1zDqYDkouCrOEl7iTycv4IgorjeaJBqouoLh2EmvBkEyxsSniE8SzVyUckD26+kBJ8gER6PUyGMMqlRBgalXparOlDGbQo0f3pPICpS6kS+sZTE+p+53TBIXWAUQNbJzAsFg+lCl9eTR9lf0wmzx83P29DGFBW/CFHGJKmOWgOwnRtf5Agi8bf4oJq7W5ZgEMcPVZTB843uT6iJ4hFgTDhr9YRDLSS0eMKGtQAtMj4gxS+CB+ioLGoJzBt4ZW1ggk4DoVpFwwTu5BZLvI2QqdH9u4eFhUkpsnYA5oQNLRAApQTmGwKg0WnOssQnu+XcUKa2kv9KUwAoxWmYSRYwKxp23bwU7so9LjgD3obYjW0UTAYiIFx2QPMB8DQWpDAfwPmcF4fakY7sV0SsAZVDj9B00cYP/QaWQUzGNaK6BthsJHROm5b/rufeAtwOj0kUHVpH0VTNaN+qgMGeF1TPrBm2C0UYS3egDk62Q0ep0cpD1CxCI8uwimVHDIKMGCBUp5MYeDFlzyEvHYhGCeGE39S/zAzi9SceOdBe2uEDmD4nsBWRyiuufC9EtsMwASEtPuB8/XjMw6PqSuIsmA+RoPukuDeH9aghQMYBgZIZC8wmDmAoUkpE0w5kL9VQlDw2KswT3xjZByUDfedgfELBMfy6qpf0tcwYDYP5s9XvzuGYXHuVcXDEzGDJgqjxiJqOLYdvwy7WkJuXmGYx9Ead3GZVlFRtePvPXD5qBMoCKjdSpAqimLOUYcfgjfwAfQSKsVDGAoWbl/NVncFHx8gGFSihGbbQBZAVWQpRElwO5P/u2VBCKXN0AMIlAdA1HlgWV5ik4bOtQQHgA+DYFYQnC1X43sWEUwoVXUHX6hUow7rsdTVWcabOdohPHR+WZYURdap0mA4HrwHeAdLfBw0Qu7rGpfO1PBtrQeb96jTN9Y40hyj+TT7guGo7nVUQnXQu6v6A1LQWrt1WeFswXa/r5gO7yff3KYKTF/+XmjD9PPsO/p6q0t/3OjckP8LuXyhsTMZFpi6W8V8obj94bHLF8o7HO5fvurfZeldbVdcPu/ynTIut5Zc32ZcJv1XGHx6c7f/5nJxuqHgYqF/MIj1wtxrN8lYFZzlefd2ztEZ0DZp2MHYeXp/0VSDofxzpvz85+fPn6emaCX/A1CLCdYROVAWAAAAAElFTkSuQmCC";
-    
-  };
-
-  
-
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        mt: 8,
-        p: 3,
-        borderRadius: 2,
-        boxShadow: 3,
-        bgcolor: 'background.paper',
-      }}
-    >
-      <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-        ניהול קטגוריות
-      </Typography>
+    <Box dir="rtl" className="p-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <Box className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <Typography variant="h4" component="h1" className="font-bold">
+          ניהול קטגוריות קטלוג
+        </Typography>
+        
+        <Box className="flex gap-2 w-full md:w-auto">
+          <TextField
+            placeholder="חיפוש לפי שם או מזהה"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            variant="outlined"
+            size="small"
+            className="flex-grow"
+            InputProps={{
+              startAdornment: <SearchIcon className="ml-2 text-gray-400" />,
+            }}
+          />
+          
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setAddDialogOpen(true)}
+            startIcon={<AddIcon />}
+          >
+            הוסף קטגוריה
+          </Button>
+        </Box>
+      </Box>
+      
+      {/* Error message */}
       {error && (
-        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+        <Alert severity="error" className="mb-4" onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
-    <Button onClick={()=>{handleAddCat()}} variant="contained" color="primary">
-      + הוסף קטגוריה
-    </Button>
-
-
-
-
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-             <TableCell>רמה</TableCell>
-              <TableCell>מספר</TableCell>
-              <TableCell>שם </TableCell>
-              <TableCell>אב</TableCell>
-              <TableCell>קדימות</TableCell>
-              <TableCell>פעיל?</TableCell>
-              <TableCell>שאילתא</TableCell>
-              <TableCell></TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {flattenTree(buildTree(users, 0)).map((user) => (
-
-              <TableRow key={user.id}>
-                <TableCell>{">".repeat(user.level)}</TableCell>
-
-                <TableCell>{user.id}</TableCell>
-                <TableCell>
-                  
-                  <KdbInput 
-                  refresh={fetchUsers}
-                   initialValue={user.name} 
-                    idValue={user.id}  
-                    editField="name" />
-
-                </TableCell>
-                <TableCell>
-            
-            <KdbInput 
-              refresh={fetchUsers}
-              initialValue={user.father} 
-                idValue={user.id}  
-                editField="father" />
-
-
-            </TableCell>
-            <TableCell>
-
-                <KdbInput 
-                  refresh={fetchUsers}
-                  initialValue={user.priority} 
-                   idValue={user.id}  
-                   editField="priority" />
-
-
-                </TableCell>
-
-                <TableCell>
-   
-   <KdbInput 
-     refresh={fetchUsers}
-     initialValue={user.active} 
-      idValue={user.id}  
-      editField="active" />
-
-
-   </TableCell>
-
-
-                  <TableCell>
-
-                <KdbInput 
-                refresh={fetchUsers}
-
-                initialValue={user.query} 
-                idValue={user.id}  
-                editField="query" />
-
-
-                </TableCell>
-
-
-
-   
-
-
-                <TableCell>
-                <img
-                
-                        src={`${supabaseUrl}/storage/v1/object/public/cats/${user.id}.jpg?cacheBuster=${Math.random()}`}
-                        style={{ width: '100px', height: 'auto' }}
-                        onError={imageOnError}
-                      />
-
-
-                </TableCell>
-                <TableCell>
-
-                <input type="file" accept="image/*" onChange={(event) => handleUpload(event, user.id)} />
-
-
-                </TableCell>
-
-                <TableCell>
-
-                <Button onClick={()=>{handleDelCat(user.id)}} variant="contained" color="primary">
-                X
-                </Button>
-
-
-
-                </TableCell>
-
-
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      
+      {/* Main content */}
+      <Paper elevation={2} className="overflow-hidden">
+        {loading && categories.length === 0 ? (
+          <Box className="p-8 flex justify-center">
+            <CircularProgress />
+          </Box>
+        ) : (
+          <TableContainer>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell width="40%">שם הקטגוריה</TableCell>
+                  <TableCell>מזהה</TableCell>
+                  <TableCell>קטגוריית אב</TableCell>
+                  <TableCell>קדימות</TableCell>
+                  <TableCell>סטטוס</TableCell>
+                  <TableCell>שאילתא</TableCell>
+                  <TableCell>תמונה</TableCell>
+                  <TableCell align="center">פעולות</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredCategories.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center" className="py-8">
+                      {searchQuery ? (
+                        <Typography>לא נמצאו קטגוריות התואמות את החיפוש "{searchQuery}"</Typography>
+                      ) : (
+                        <Typography>לא נמצאו קטגוריות. לחץ על "הוסף קטגוריה" כדי להתחיל.</Typography>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredCategories.map((category) => (
+                    <TableRow 
+                      key={category.id}
+                      hover
+                      className={category.level > 0 ? "bg-gray-50" : ""}
+                    >
+                      <TableCell className="flex items-center">
+                        {/* Indent and expand controls for hierarchical display */}
+                        <Box className="flex items-center">
+                          <span className="w-6" style={{ marginLeft: `${category.level * 20}px` }}></span>
+                          
+                          {category.children && category.children.length > 0 && (
+                            <IconButton 
+                              size="small" 
+                              onClick={() => toggleCategoryExpand(category.id)}
+                              className="mr-1"
+                            >
+                              {expandedCategories[category.id] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            </IconButton>
+                          )}
+                          
+                          <EditableField 
+                            initialValue={category.name || ""} 
+                            idValue={category.id} 
+                            editField="name"
+                            refresh={fetchCategories}
+                          />
+                        </Box>
+                      </TableCell>
+                      
+                      <TableCell>{category.id}</TableCell>
+                      
+                      <TableCell>
+                        <EditableField 
+                          initialValue={category.father} 
+                          idValue={category.id}
+                          editField="father"
+                          refresh={fetchCategories}
+                          type="select"
+                          options={[
+                            { value: "0", label: "קטגוריה ראשית" },
+                            ...categories
+                              .filter(cat => cat.id !== category.id)
+                              .map(cat => ({ 
+                                value: cat.id, 
+                                label: cat.name 
+                              }))
+                          ]}
+                        />
+                      </TableCell>
+                      
+                      <TableCell>
+                        <EditableField 
+                          initialValue={category.priority} 
+                          idValue={category.id}
+                          editField="priority"
+                          refresh={fetchCategories}
+                          type="number"
+                        />
+                      </TableCell>
+                      
+                      <TableCell>
+                        <EditableField 
+                          initialValue={category.active} 
+                          idValue={category.id}
+                          editField="active"
+                          refresh={fetchCategories}
+                          type="boolean"
+                        />
+                      </TableCell>
+                      
+                      <TableCell>
+                        <EditableField 
+                          initialValue={category.query || ""} 
+                          idValue={category.id}
+                          editField="query"
+                          refresh={fetchCategories}
+                          type="textarea"
+                        />
+                      </TableCell>
+                      
+                      <TableCell>
+                        <ImageUploader 
+                          id={category.id} 
+                          refresh={fetchCategories} 
+                        />
+                      </TableCell>
+                      
+                      <TableCell align="center">
+                        <Tooltip title="מחק קטגוריה">
+                          <IconButton 
+                            color="error"
+                            onClick={() => {
+                              setSelectedCategory(category);
+                              setDeleteDialogOpen(true);
+                            }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Paper>
+      
+      {/* Dialogs */}
+      <DeleteConfirmDialog 
+        open={deleteDialogOpen}
+        handleClose={() => setDeleteDialogOpen(false)}
+        handleConfirm={handleDeleteCategory}
+        itemName={selectedCategory?.name || ""}
+      />
+      
+      <AddCategoryDialog 
+        open={addDialogOpen}
+        handleClose={() => setAddDialogOpen(false)}
+        handleAdd={handleAddCategory}
+        categories={categories}
+      />
+      
+      {/* Notification */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={5000}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <Alert 
+          onClose={handleCloseNotification} 
+          severity={notification.type} 
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
 
-export default Users;
+export default CatalogCategoriesEditor;
