@@ -111,7 +111,7 @@ const menuItems = [
     label: 'כרטסת', 
     icon: <AccountBalanceWalletRoundedIcon fontSize="large" />,
     route: '/rep/accIndex', 
-    permission: 'b2bCatalog', 
+    permission: 'repAccIndex', 
     bgColor: 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)',
     iconBg: '#e6f7ef'
   },

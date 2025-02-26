@@ -1,240 +1,791 @@
-import React, { useContext, useEffect, useState} from 'react';
-import { Box,Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Button ,ButtonGroup} from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { 
+  Box,
+  Container, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper, 
+  Typography, 
+  Button, 
+  ButtonGroup,
+  Card,
+  CardContent,
+  Grid,
+  Chip,
+  Divider,
+  IconButton,
+  Tooltip,
+  CircularProgress,
+  Alert,
+  useTheme,
+  useMediaQuery
+} from '@mui/material';
+import { 
+  ArrowUpward as ArrowUpwardIcon,
+  ArrowDownward as ArrowDownwardIcon,
+  FilterList as FilterListIcon,
+  Print as PrintIcon,
+  GetApp as GetAppIcon,
+  BarChart as BarChartIcon,
+  Refresh as RefreshIcon,
+  AttachMoney as AttachMoneyIcon,
+  Description as DescriptionIcon,
+  DateRange as DateRangeIcon
+} from '@mui/icons-material';
 import kdb from '../../../kadabrix/kadabrix';
 
-
-function Page({ data }) {
-
-  const [invoices, setInvoices] = useState([]);
-
+function CustomerIndexScreen() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  
+  const [transactions, setTransactions] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [years, setYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [summary, setSummary] = useState({
+    openingBalance: 0,
+    closingBalance: 0,
+    totalCredit: 0,
+    totalDebit: 0,
+    documentTypeCounts: {}
+  });
+
+  // Fetch transactions data
   useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        
-
-        let fetchedInvoices = await kdb.run({
-            "module": "accIndex",
-            "name": "getIndex"
-          });
-
-          
-        function updateBalance(list){
-          let sum = 0;
-          let id = 0;
-           list.forEach(function(item) {
-             sum += item.price;
-             id++;
-             item.id = id;
-             item.balance =  sum;
-             item.C=(item.price>0)  ? item.price : 0  ;
-             item.D=(item.price<0)  ? item.price : 0  ;
-           });
-           return list;
-         }
-         
-         updateBalance(fetchedInvoices);
-
-
-        setInvoices(fetchedInvoices);
-        
-      } catch (error) {
-        console.error("Error fetching invoices:", error);
-      }
-    };
-
-    fetchInvoices();
+    fetchTransactions();
   }, []);
 
-  
+  const fetchTransactions = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const fetchedTransactions = await kdb.run({
+        "module": "accIndex",
+        "name": "getIndex"
+      });
 
+      const processedTransactions = processTransactionData(fetchedTransactions);
+      setTransactions(processedTransactions);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      setError("שגיאה בטעינת הנתונים. אנא נסה שוב מאוחר יותר.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  useEffect(() => {
-    const uniqueYears = new Set();
-    invoices.forEach((row) => {
-      const date = new Date(row.valueDate * 1000);
-      uniqueYears.add(date.getFullYear());      
+  // Process transaction data
+  const processTransactionData = (data) => {
+    let sum = 0;
+    let id = 0;
+    
+    return data.map(item => {
+      item.price = Number(item.price);
+      sum += item.price;
+      id++;
+      
+      return {
+        ...item,
+        id: id,
+        balance: Math.round(sum * 100) / 100, // Round to 2 decimal places
+        C: item.price > 0 ? Math.round(item.price * 100) / 100 : 0,
+        D: item.price < 0 ? Math.abs(Math.round(item.price * 100) / 100) : 0
+      };
     });
-    
-    let yearsArray = Array.from(uniqueYears);
+  };
 
-
-    setYears(yearsArray);
-    setSelectedYear(yearsArray[yearsArray.length-1]);
-    
-  }, [invoices]);
-
-  
-
+  // Extract years from transaction data
   useEffect(() => {
+    if (transactions.length > 0) {
+      const uniqueYears = new Set();
+      transactions.forEach((row) => {
+        const date = new Date(row.valueDate * 1000);
+        uniqueYears.add(date.getFullYear());      
+      });
+      
+      const yearsArray = Array.from(uniqueYears).sort((a, b) => b - a); // Sort descending
+      
+      setYears(yearsArray);
+      
+      if (yearsArray.length > 0) {
+        setSelectedYear(yearsArray[0]); // Set to most recent year
+      }
+    }
+  }, [transactions]);
 
-    const filtered = invoices.filter((row) => {
+  // Filter data by selected year and calculate summary
+  useEffect(() => {
+    const filtered = transactions.filter((row) => {
       const date = new Date(row.valueDate * 1000);
       return date.getFullYear() === selectedYear;
     });
+    
     setFilteredData(filtered);
-  }, [invoices,selectedYear]);
+    
+    if (filtered.length > 0) {
+      // Calculate summary data
+      const openingBalance = Math.round((filtered[0].balance - filtered[0].price) * 100) / 100;
+      const closingBalance = filtered[filtered.length - 1].balance;
+      const totalCredit = filtered.reduce((sum, row) => sum + row.C, 0);
+      const totalDebit = filtered.reduce((sum, row) => sum + row.D, 0);
+      
+      // Count document types
+      const documentTypeCounts = {};
+      filtered.forEach(row => {
+        const type = row.docType || 'אחר';
+        documentTypeCounts[type] = (documentTypeCounts[type] || 0) + 1;
+      });
+      
+      setSummary({
+        openingBalance,
+        closingBalance,
+        totalCredit,
+        totalDebit,
+        documentTypeCounts
+      });
+    } else {
+      setSummary({
+        openingBalance: 0,
+        closingBalance: 0,
+        totalCredit: 0,
+        totalDebit: 0,
+        documentTypeCounts: {}
+      });
+    }
+  }, [transactions, selectedYear]);
 
+  // Format unix timestamp to DD/MM/YYYY
+  const formatDate = (unixTimestamp) => {
+    const date = new Date(unixTimestamp * 1000);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
-const getDate = (unixTIme) =>  {
+  // Format currency with thousands separator
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('he-IL', { 
+      style: 'currency', 
+      currency: 'ILS',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
+  };
 
-  
-  const date = new Date(unixTIme * 1000); // Convert Unix timestamp to milliseconds
-  // Get the various components of the date
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1; // Month is 0-indexed, so we add 1
-  const day = date.getDate();
-  return `${day}/${month}/${year}`
+  // Handle print function
+  const handlePrint = () => {
+    window.print();
+  };
 
-}
-const screenHeight=window.innerHeight
-const totalD = filteredData.reduce((sum, row) => sum + row.D, 0);
-const totalC = filteredData.reduce((sum, row) => sum + row.C, 0);
+  // Handle export function - export to CSV
+  const handleExport = () => {
+    if (filteredData.length === 0) return;
+    
+    const headers = ['תאריך', 'מספר תנועה', 'סוג מסמך', 'שם מסמך', 'זכות', 'חובה', 'יתרה'];
+    
+    const csvContent = [
+      headers.join(','),
+      ...filteredData.map(row => [
+        formatDate(row.valueDate),
+        row.transId,
+        row.docType || '',
+        row.docName,
+        row.C,
+        row.D,
+        row.balance
+      ].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `כרטסת-לקוח-${selectedYear}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Get color based on balance value
+  const getBalanceColor = (balance) => {
+    if (balance > 0) return 'success.main';
+    if (balance < 0) return 'error.main';
+    return 'text.primary';
+  };
+
+  // Get document type chip color
+  const getDocTypeColor = (docType) => {
+    const types = {
+      'חשבונית מס': 'primary',
+      'קבלה': 'success',
+      'זיכוי': 'warning',
+      'חיוב': 'error'
+    };
+    
+    return types[docType] || 'default';
+  };
+
+  // Calculate screen height for table container
+  const screenHeight = window.innerHeight * 0.6; // 60% of screen height
 
   return (
-    <div>
+    <Box sx={{ 
+      p: { xs: 1, sm: 2, md: 3 }, 
+      direction: 'rtl',
+      backgroundColor: '#f8f9fa',
+      minHeight: '100vh'
+    }}>
+      {/* Header */}
+      <Card sx={{ 
+        mb: 3, 
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        background: 'linear-gradient(to right, #3f51b5, #2196f3)'
+      }}>
+        <CardContent>
+          <Grid container alignItems="center" justifyContent="space-between">
+            <Grid item>
+              <Typography variant="h4" sx={{ color: 'white', fontWeight: 'bold' }}>
+                כרטסת לקוח
+              </Typography>
+              <Typography variant="subtitle1" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                ניהול ומעקב תנועות פיננסיות
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Tooltip title="רענן נתונים">
+                  <IconButton 
+                    color="inherit" 
+                    onClick={fetchTransactions}
+                    disabled={loading}
+                    sx={{ color: 'white' }}
+                  >
+                    {loading ? <CircularProgress size={24} color="inherit" /> : <RefreshIcon />}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="הדפסה">
+                  <IconButton 
+                    color="inherit" 
+                    onClick={handlePrint}
+                    sx={{ color: 'white' }}
+                  >
+                    <PrintIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="ייצוא לקובץ CSV">
+                  <IconButton 
+                    color="inherit" 
+                    onClick={handleExport}
+                    sx={{ color: 'white' }}
+                    disabled={filteredData.length === 0}
+                  >
+                    <GetAppIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
 
-        
-<Container style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Typography variant="h5" color="primary" gutterBottom style={{ fontWeight: 'bold', textAlign: 'center' }}>
-        כרטסת לקוח
-      </Typography>
-      <Typography variant="body1" style={{ textAlign: 'center' }}>
-        {/* Add any subtext or description here */}
-      </Typography>
-    </Container>
+      {/* Error Alert */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+        </Alert>
+      )}
 
-      <ButtonGroup variant="contained" aria-label="outlined primary button group">
-        {years.map((year) => (
-          <Button 
-          sx={{
-            backgroundColor: year === selectedYear ? 'green' : 'primary.main',
-            '&:hover': {
-              backgroundColor: year === selectedYear ? 'darkgreen' : 'primary.dark',
-            },
-            color: 'white',
-          }}
-
-          key={year} onClick={() => setSelectedYear(year)}>
-            {year} 
-          </Button>
-        ))}
-      </ButtonGroup>
-
-
-<Typography variant="body2">
- 
-
-
- <Typography variant="body2">
-  {filteredData.length>0 ? (
-    <span>
-    
-    
-
-    <Container>
-<Box
-        sx={{
-          direction:'ltr',
-          marginTop: '20px',
-          padding: '16px',
-          borderRadius: '8px',
-          backgroundColor: '#f0f0f0',
-          display: 'flex',
-          justifyContent: 'center',
-          fontSize: '1.2rem', // Larger font size
-          fontWeight: 'bold', // Bold text
-        }}
-      >
-
-
-
-
-<Typography variant="body1" component="span" sx={{ margin: '10px' }}>
-שנה: {selectedYear}
-</Typography>
-   
-        <Typography variant="body1" component="span" style={{ margin: '10px' }}>
-          יתרת פתיחה: {'\u200E'}{filteredData[0].balance - filteredData[0].price}
-        </Typography>
-        
-        <Typography variant="body1" component="span" style={{ margin: '10px'  }}>
-          יתרת סגירה: {'\u200E'}{filteredData[filteredData.length - 1].balance}
-        </Typography>
-
+      {/* Year Selection */}
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+        {loading ? (
+          <CircularProgress size={30} />
+        ) : (
+          <Paper 
+            elevation={2} 
+            sx={{ 
+              p: 1, 
+              borderRadius: 2,
+              display: 'inline-block',
+              background: 'white'
+            }}
+          >
+            <ButtonGroup 
+              variant="contained" 
+              size={isMobile ? "small" : "medium"}
+              aria-label="שנים"
+            >
+              {years.map((year) => (
+                <Button 
+                  key={year} 
+                  onClick={() => setSelectedYear(year)}
+                  sx={{
+                    backgroundColor: year === selectedYear ? '#1e88e5' : 'white',
+                    color: year === selectedYear ? 'white' : '#1e88e5',
+                    fontWeight: 'bold',
+                    '&:hover': {
+                      backgroundColor: year === selectedYear ? '#1565c0' : '#e3f2fd',
+                    },
+                    borderColor: '#1e88e5'
+                  }}
+                >
+                  {year} 
+                </Button>
+              ))}
+            </ButtonGroup>
+          </Paper>
+        )}
       </Box>
-      
 
-</Container> 
-
-
-   
-    </span>
-  ) : (
-    <span> ==  </span>
-  )}
-</Typography>
-
-
-
-</Typography>
-
-      <TableContainer style={{ maxHeight: screenHeight }} component={Paper}>
-        <Table stickyHeader   
-        aria-label="simple table">
-          <TableHead  sx={{
-              backgroundColor: '#3f51b5',
-              '& .MuiTableCell-root': { backgroundColor: '#3f51b5' ,color: '#ffffff', fontWeight: 'bold' },
-            }}>
-            <TableRow style={{ backgroundColor: '#3f51b5' }}>
-            <TableCell align="right">תאריך </TableCell>
-              <TableCell>מספר תנועה</TableCell>
-              <TableCell align="right">שם מסמך</TableCell>
-              <TableCell align="right">זכות</TableCell>
-              <TableCell align="right">חובה</TableCell>
-              <TableCell align="right">יתרה</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredData.map((row,index) => (
-              <TableRow 
-              style={{
-                backgroundColor: index % 2 === 0 ? '#f0f0f0' : '#e0e0e0', // Alternate row colors
+      {/* Summary Cards */}
+      {!loading && filteredData.length > 0 && (
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          {/* Opening Balance */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Card 
+              sx={{ 
+                height: '100%', 
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', 
+                transition: 'transform 0.2s',
+                '&:hover': { transform: 'translateY(-5px)' },
+                bgcolor: '#f5f5f5'
               }}
-              
-              key={row.id}>
-                <TableCell align="right">{getDate(row.valueDate)}</TableCell>
-                <TableCell component="th" scope="row">
-                  {row.transId}
-                </TableCell>
-                
-                <TableCell align="right">{row.docName}</TableCell>
-                <TableCell style={{ direction: 'ltr' }} align="right">{row.C}</TableCell>
-                <TableCell style={{ direction: 'ltr' }}  align="right">{row.D}</TableCell>
-                <TableCell style={{ direction: 'ltr' }}  align="right">{row.balance}</TableCell>
-              </TableRow>
+            >
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+                    יתרת פתיחה
+                  </Typography>
+                  <DateRangeIcon color="primary" />
+                </Box>
+                <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    fontWeight: 'bold', 
+                    color: getBalanceColor(summary.openingBalance),
+                    direction: 'ltr',
+                    textAlign: 'right'
+                  }}
+                >
+                  {formatCurrency(summary.openingBalance)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {selectedYear} תחילת שנת
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          
+          {/* Total Credit */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Card 
+              sx={{ 
+                height: '100%', 
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', 
+                transition: 'transform 0.2s',
+                '&:hover': { transform: 'translateY(-5px)' },
+                bgcolor: '#e8f5e9'
+              }}
+            >
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'success.dark' }}>
+                    סה"כ זכות
+                  </Typography>
+                  <ArrowUpwardIcon color="success" />
+                </Box>
+                <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    fontWeight: 'bold', 
+                    color: 'success.main',
+                    direction: 'ltr',
+                    textAlign: 'right'
+                  }}
+                >
+                  {formatCurrency(summary.totalCredit)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {selectedYear} סך הזיכויים בשנת
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          
+          {/* Total Debit */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Card 
+              sx={{ 
+                height: '100%', 
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', 
+                transition: 'transform 0.2s',
+                '&:hover': { transform: 'translateY(-5px)' },
+                bgcolor: '#ffebee'
+              }}
+            >
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'error.dark' }}>
+                    סה"כ חובה
+                  </Typography>
+                  <ArrowDownwardIcon color="error" />
+                </Box>
+                <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    fontWeight: 'bold', 
+                    color: 'error.main',
+                    direction: 'ltr',
+                    textAlign: 'right'
+                  }}
+                >
+                  {formatCurrency(summary.totalDebit)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {selectedYear} סך החיובים בשנת
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          
+          {/* Closing Balance */}
+          <Grid item xs={12} sm={6} md={3}>
+            <Card 
+              sx={{ 
+                height: '100%', 
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', 
+                transition: 'transform 0.2s',
+                '&:hover': { transform: 'translateY(-5px)' },
+                bgcolor: '#e3f2fd'
+              }}
+            >
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.dark' }}>
+                    יתרת סגירה
+                  </Typography>
+                  <AttachMoneyIcon color="primary" />
+                </Box>
+                <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    fontWeight: 'bold', 
+                    color: getBalanceColor(summary.closingBalance),
+                    direction: 'ltr',
+                    textAlign: 'right'
+                  }}
+                >
+                  {formatCurrency(summary.closingBalance)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  יתרה נוכחית מעודכנת
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      )}
+
+      {/* Document Types Summary */}
+      {!loading && filteredData.length > 0 && Object.keys(summary.documentTypeCounts).length > 0 && (
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+            <DescriptionIcon sx={{ mr: 1 }} />
+            סוגי מסמכים
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {Object.entries(summary.documentTypeCounts).map(([type, count]) => (
+              <Chip 
+                key={type}
+                label={`${type}: ${count}`}
+                color={getDocTypeColor(type)}
+                variant="outlined"
+                sx={{ fontWeight: 'medium' }}
+              />
             ))}
+          </Box>
+        </Box>
+      )}
 
-
-<TableRow >
-                <TableCell component="th" scope="row">
-                </TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"> סה"כ</TableCell>
-                <TableCell sx={{ direction: 'ltr' }} align="right">{'\u200E'}{totalC}</TableCell>
-                <TableCell sx={{ direction: 'ltr' }} align="right">{'\u200E'}{totalD}</TableCell>
-                <TableCell sx={{ direction: 'ltr' }} align="right"></TableCell>
-              </TableRow>
-
-
-          </TableBody>
-        </Table> 
-      </TableContainer>
-    </div>
+      {/* Transactions Table */}
+      <Card sx={{ boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
+        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#f5f5f5', borderBottom: '1px solid #e0e0e0' }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+            <BarChartIcon sx={{ mr: 1 }} />
+            תנועות כרטסת
+            {filteredData.length > 0 && (
+              <Chip 
+                label={`${filteredData.length} רשומות`}
+                size="small"
+                color="primary"
+                sx={{ ml: 1 }}
+              />
+            )}
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {!isMobile && (
+              <Typography variant="body2" color="text.secondary">
+                שנה: {selectedYear}
+              </Typography>
+            )}
+          </Box>
+        </Box>
+        
+        <TableContainer 
+          sx={{ maxHeight: screenHeight, overflowY: 'auto', bgcolor: 'white' }}
+        >
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+              <CircularProgress />
+            </Box>
+          ) : filteredData.length === 0 ? (
+            <Box sx={{ p: 4, textAlign: 'center' }}>
+              <Typography variant="h6" color="text.secondary">
+                אין נתונים לשנה זו
+              </Typography>
+            </Box>
+          ) : (
+            <Table stickyHeader aria-label="customer index table">
+              <TableHead>
+                <TableRow>
+                  <TableCell 
+                    align="right" 
+                    sx={{ 
+                      bgcolor: '#1976d2', 
+                      color: 'white', 
+                      fontWeight: 'bold',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    תאריך
+                  </TableCell>
+                  {!isMobile && (
+                    <TableCell 
+                      align="right" 
+                      sx={{ 
+                        bgcolor: '#1976d2', 
+                        color: 'white', 
+                        fontWeight: 'bold',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      מספר תנועה
+                    </TableCell>
+                  )}
+                  <TableCell 
+                    align="right" 
+                    sx={{ 
+                      bgcolor: '#1976d2', 
+                      color: 'white', 
+                      fontWeight: 'bold',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    סוג מסמך
+                  </TableCell>
+                  {!isMobile && (
+                    <TableCell 
+                      align="right" 
+                      sx={{ 
+                        bgcolor: '#1976d2', 
+                        color: 'white', 
+                        fontWeight: 'bold',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      שם מסמך
+                    </TableCell>
+                  )}
+                  <TableCell 
+                    align="right" 
+                    sx={{ 
+                      bgcolor: '#1976d2', 
+                      color: 'white', 
+                      fontWeight: 'bold',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    זכות
+                  </TableCell>
+                  <TableCell 
+                    align="right" 
+                    sx={{ 
+                      bgcolor: '#1976d2', 
+                      color: 'white', 
+                      fontWeight: 'bold',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    חובה
+                  </TableCell>
+                  <TableCell 
+                    align="right" 
+                    sx={{ 
+                      bgcolor: '#1976d2', 
+                      color: 'white', 
+                      fontWeight: 'bold',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    יתרה
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredData.map((row, index) => (
+                  <TableRow 
+                    key={row.id}
+                    sx={{
+                      bgcolor: index % 2 === 0 ? 'white' : '#f8f9fa',
+                      '&:hover': {
+                        bgcolor: '#e3f2fd',
+                      }
+                    }}
+                  >
+                    <TableCell 
+                      align="right"
+                      sx={{
+                        borderBottom: '1px solid #e0e0e0',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {formatDate(row.valueDate)}
+                    </TableCell>
+                    {!isMobile && (
+                      <TableCell 
+                        align="right"
+                        sx={{
+                          borderBottom: '1px solid #e0e0e0',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {row.transId}
+                      </TableCell>
+                    )}
+                    <TableCell 
+                      align="right"
+                      sx={{
+                        borderBottom: '1px solid #e0e0e0',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {row.docType ? (
+                        <Chip 
+                          label={row.docType}
+                          size="small"
+                          color={getDocTypeColor(row.docType)}
+                          variant="outlined"
+                        />
+                      ) : '-'}
+                    </TableCell>
+                    {!isMobile && (
+                      <TableCell 
+                        align="right"
+                        sx={{
+                          borderBottom: '1px solid #e0e0e0',
+                          maxWidth: '150px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        <Tooltip title={row.docName}>
+                          <span>{row.docName}</span>
+                        </Tooltip>
+                      </TableCell>
+                    )}
+                    <TableCell 
+                      align="right"
+                      sx={{
+                        borderBottom: '1px solid #e0e0e0',
+                        color: 'success.main',
+                        fontWeight: row.C > 0 ? 'bold' : 'normal',
+                        direction: 'ltr',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {row.C > 0 ? formatCurrency(row.C) : '-'}
+                    </TableCell>
+                    <TableCell 
+                      align="right"
+                      sx={{
+                        borderBottom: '1px solid #e0e0e0',
+                        color: 'error.main',
+                        fontWeight: row.D > 0 ? 'bold' : 'normal',
+                        direction: 'ltr',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {row.D > 0 ? formatCurrency(row.D) : '-'}
+                    </TableCell>
+                    <TableCell 
+                      align="right"
+                      sx={{
+                        borderBottom: '1px solid #e0e0e0',
+                        color: getBalanceColor(row.balance),
+                        fontWeight: 'bold',
+                        direction: 'ltr',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {formatCurrency(row.balance)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </TableContainer>
+        
+        {/* Table Footer with Totals */}
+        {!loading && filteredData.length > 0 && (
+          <Box 
+            sx={{ 
+              p: 2, 
+              borderTop: '2px solid #e0e0e0', 
+              bgcolor: '#f5f5f5', 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              flexWrap: 'wrap'
+            }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+              סה"כ רשומות: {filteredData.length}
+            </Typography>
+            
+            <Box sx={{ display: 'flex', gap: { xs: 2, md: 4 } }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'success.main', direction: 'ltr' }}>
+                סה"כ זכות: {formatCurrency(summary.totalCredit)}
+              </Typography>
+              <Typography variant="body1" sx={{ fontWeight: 'bold', color: 'error.main', direction: 'ltr' }}>
+                סה"כ חובה: {formatCurrency(summary.totalDebit)}
+              </Typography>
+              <Typography variant="body1" sx={{ fontWeight: 'bold', direction: 'ltr' }}>
+                יתרה: {formatCurrency(summary.closingBalance)}
+              </Typography>
+            </Box>
+          </Box>
+        )}
+      </Card>
+      
+      {/* Additional Info Footer */}
+      <Box sx={{ mt: 3, textAlign: 'center' }}>
+        <Typography variant="caption" color="text.secondary">
+          המידע מעודכן לתאריך {new Date().toLocaleDateString('he-IL')}
+        </Typography>
+      </Box>
+    </Box>
   );
 }
 
-export default Page;
+export default CustomerIndexScreen;

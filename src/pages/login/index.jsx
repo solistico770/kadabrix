@@ -3,7 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import kdb from '../../kadabrix/kadabrix';
 
+import {useUserStore} from "../../kadabrix/userState";
+
+
+
 const Login = () => {
+  const userState = useUserStore(state => state.userDetails);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -13,7 +19,7 @@ const Login = () => {
     const checkSession = async () => {
       const { data: { session } } = await kdb.auth.getSession();
       if (session?.user) {
-        navigate('/admin/menu');
+        navigate(userState.config.defaultScreen);
       }
     };
     checkSession();
@@ -29,7 +35,7 @@ const Login = () => {
         console.log('User authenticated:', data.session.user);
         // Send Supabase credentials to Service Worker
         sendCredentialsToServiceWorker(data.session.access_token);
-        navigate('/admin/menu');
+        navigate(userState.config.defaultScreen);
       }
     }
   };
