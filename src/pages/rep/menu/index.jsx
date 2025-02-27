@@ -116,11 +116,11 @@ const menuItems = [
     iconBg: '#e6f7ef'
   },
   { 
-    key: 'giul', 
+    key: 'debtAging', 
     label: 'גיול חובות', 
     icon: <PaidRoundedIcon fontSize="large" />,
-    route: '/rep/giul', 
-    permission: 'userIb2bCatalogndex', 
+    route: '/rep/debtAging', 
+    permission: 'repDebtAging', 
     bgColor: 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',
     iconBg: '#fff0e6'
   },
