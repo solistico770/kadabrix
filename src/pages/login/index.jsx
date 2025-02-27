@@ -1,42 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { 
+  Box, 
+  Typography, 
+  TextField, 
+  Button, 
+  CircularProgress, 
+  Alert, 
+  InputAdornment,
+  IconButton,
+  Paper,
+  Divider
+} from '@mui/material';
+
+// Icons
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import EmailIcon from '@mui/icons-material/Email';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import ShieldIcon from '@mui/icons-material/Shield';
+import LoginIcon from '@mui/icons-material/Login';
+
 import kdb from '../../kadabrix/kadabrix';
-
-import {useUserStore} from "../../kadabrix/userState";
-
-
+import { useUserStore } from "../../kadabrix/userState";
 
 const Login = () => {
   const userState = useUserStore(state => state.userDetails);
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await kdb.auth.getSession();
-      if (session?.user) {
-        navigate(userState.config.defaultScreen);
-      }
-    };
-    checkSession();
-  }, [navigate]);
+
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    const { data, error } = await kdb.auth.signInWithPassword({ email, password });
-    if (error) {
-      setError(error.message);
-    } else {
-      if (data?.session) {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const { data, error } = await kdb.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        setError(error.message);
+      } else if (data?.session) {
         console.log('User authenticated:', data.session.user);
+        
         // Send Supabase credentials to Service Worker
         sendCredentialsToServiceWorker(data.session.access_token);
+        
+        // Navigate to default screen
         navigate(userState.config.defaultScreen);
       }
+    } catch (err) {
+      setError('התרחשה שגיאה בעת ההתחברות. אנא נסה שוב מאוחר יותר.');
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,64 +80,156 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 transition-all duration-300 hover:shadow-2xl" dir="rtl">
-        <div className="flex flex-col items-center mb-8">
-          <div className="mb-4 bg-blue-600 p-3 rounded-full shadow-lg">
-            <LockOutlinedIcon className="text-white text-3xl" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-800">כניסה למערכת</h1>
-        </div>
-
-        {error && (
-          <div className="mb-6 p-3 bg-red-100 text-red-700 rounded-lg text-sm flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">כתובת אימייל</label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              required
-              dir="ltr"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              placeholder="example@mail.com"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">סיסמה</label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              dir="ltr"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
+    <Box className="min-h-screen bg-violet-600 flex items-center justify-center p-4">
+      <Paper 
+        elevation={3} 
+        className="w-full max-w-md bg-white rounded-md overflow-hidden"
+      >
+        <Box className="p-6 flex flex-col items-center" dir="rtl">
+          {/* Logo */}
+          <Typography variant="h5" component="h1" className="font-bold text-blue-600 mb-4">
+            Kadabrix <ShieldIcon className="align-middle ml-1" />
+          </Typography>
+          
+          {/* Lock Icon */}
+          <Box className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mb-4">
+            <LockOutlinedIcon className="text-white" fontSize="large" />
+          </Box>
+          
+          {/* Header */}
+          <Typography variant="h5" component="h2" className="font-bold mb-1">
             כניסה למערכת
-          </button>
-        </form>
-      </div>
-    </div>
+          </Typography>
+          <Typography variant="body2" color="textSecondary" className="mb-6 text-center">
+            ברוכים הבאים! אנא התחברו כדי להמשיך
+          </Typography>
+
+          {/* Error message */}
+          {error && (
+            <Alert severity="error" className="mb-4 w-full">
+              {error}
+            </Alert>
+          )}
+
+          {/* Login form */}
+          <form onSubmit={handleLogin} className="w-full">
+            <Box className="mb-6 relative">
+              <Typography variant="caption" className="mb-1 block text-gray-600">
+                דוא״ל *
+              </Typography>
+              <TextField
+                id="email"
+                type="email"
+                variant="outlined"
+                fullWidth
+                required
+                dir="ltr"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@company.com"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#f0f4f8'
+                  }
+                }}
+              />
+            </Box>
+
+            <Box className="mb-6 relative">
+              <Typography variant="caption" className="mb-1 block text-gray-600">
+                סיסמה *
+              </Typography>
+              <TextField
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                variant="outlined"
+                fullWidth
+                required
+                dir="ltr"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockOutlinedIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        size="small"
+                      >
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#f0f4f8'
+                  }
+                }}
+              />
+            </Box>
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              className="mb-3"
+              sx={{
+                bgcolor: '#1976d2',
+                '&:hover': {
+                  bgcolor: '#1565c0'
+                },
+                py: 1.5
+              }}
+              startIcon={loading ? <CircularProgress size={20} /> : <LoginIcon />}
+            >
+              {loading ? 'מתחבר...' : 'התחבר'}
+            </Button>
+            
+            {/* Forgot password link */}
+            <Box className="text-center mb-4">
+              <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800">
+                שכחת את הסיסמה?
+              </Link>
+            </Box>
+          
+            {/* Divider */}
+            <Divider className="mb-4">
+              <Typography variant="body2" color="textSecondary">
+                או
+              </Typography>
+            </Divider>
+
+            {/* Sign up button */}
+            <Button
+              component={Link}
+              to="/signup"
+              fullWidth
+              variant="outlined"
+              color="primary"
+              startIcon={<PersonAddIcon />}
+            >
+              הרשמה לחשבון חדש
+            </Button>
+          </form>
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 
