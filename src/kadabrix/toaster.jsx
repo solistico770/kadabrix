@@ -5,7 +5,10 @@ import { Toaster, toast } from 'sonner';
 const DialogComponent = () => {
   useEffect(() => {
     // Registering to the "toast" event
-    const unpublish = eventBus.on("toast", ({ type = "success", title, text }) => {
+    const unpublish = eventBus.on("toast", ({ type = "success", title='*', text = '*' }) => {
+      
+      
+
       // Handling the toast type
       switch (type) {
         case "success":

@@ -1,6 +1,29 @@
 import kdb from './kadabrix';
 import eventBus from "./event";
 import { useCartStore } from "./cartState";
+ 
+export const discountSetItem = async (index, discount) => {
+    try {
+        const cartData = useCartStore.getState().cart;
+        const cartItem = cartData.items.find((item) => item.index === index);
+
+        await eventBus.emit("discountSetItem", { index, discount });
+        await kdb.run({
+            module: 'kdb_cart',
+            name: 'discountSetItem',
+            data: {
+                index,
+                discount
+            }
+        });
+        await eventBus.emit("discountPostSetItem", { index, discount });
+        eventBus.emit("toast", { title: "הנחה עודכן", text: `הנחה המוצר ${cartItem.partDes} עודכן ל-${discount}` });
+    } catch (error) {
+        eventBus.emit("toast", { type:'error', title: "שגיאה", text: error });
+    }
+}
+
+
 
 export async function addItem({ part, partName, partDes, quant, price }) {
     try {
