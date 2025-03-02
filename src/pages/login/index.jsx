@@ -53,7 +53,7 @@ const Login = () => {
         sendCredentialsToServiceWorker(data.session.access_token);
         
         // Navigate to default screen
-        navigate(userState.config.defaultScreen);
+        
       }
     } catch (err) {
       setError('התרחשה שגיאה בעת ההתחברות. אנא נסה שוב מאוחר יותר.');
