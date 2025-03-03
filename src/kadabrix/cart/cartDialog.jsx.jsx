@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PiPencilSimple, PiTrash, PiPercent } from 'react-icons/pi';
+import { PiPencilSimple, PiTrash, PiPercent, PiShoppingCart, PiCheckCircle } from 'react-icons/pi';
 import PropTypes from 'prop-types';
 import kdb from '../kadabrix.js';
 import { useCartStore } from '../cartState.jsx';
@@ -46,7 +46,9 @@ function CartDialog(props) {
   const cart = useCartStore((state) => state.cart);
   const [selectedItems, setSelectedItems] = useState([]);
   const [batchDiscountOpen, setBatchDiscountOpen] = useState(false);
-  // Remove snackbar states
+  const [orderConfirmOpen, setOrderConfirmOpen] = useState(false);
+  const [orderNumber, setOrderNumber] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     // Reset selected items when cart changes
@@ -69,17 +71,26 @@ function CartDialog(props) {
 
   const placeOrder = async () => {
     try {
-      await kdb.run({
+      setIsProcessing(true);
+      const result = await kdb.run({
         'module': 'kdb_cart',
         'name': 'placeOrder'
       });
-      eventBus.emit("toast", { type: 'success', title: "הצלחה", text: "ההזמנה נשלחה בהצלחה" });
-      setTimeout(() => {
-        handleClose();
-      }, 1500);
+      
+      // The API returns the order number
+      setOrderNumber(result);
+      setOrderConfirmOpen(true);
+      
     } catch (error) {
-      eventBus.emit("toast", { type: 'error', title: "שגיאה", text: "שגיאה בשליחת ההזמנה" });
+      eventBus.emit("toast", { type: 'error', title: "שגיאה", text: error.message || "שגיאה בשליחת ההזמנה" });
+    } finally {
+      setIsProcessing(false);
     }
+  };
+
+  const handleOrderConfirmClose = () => {
+    setOrderConfirmOpen(false);
+    handleClose(); // Close the cart dialog as well
   };
 
   const toggleItemSelection = (index) => {
@@ -302,16 +313,16 @@ function CartDialog(props) {
             variant="contained" 
             color="primary" 
             onClick={placeOrder}
-            disabled={!cart.items || cart.items.length === 0}
+            disabled={!cart.items || cart.items.length === 0 || isProcessing}
             sx={{ borderRadius: 2 }}
           >
-            שלח הזמנה
+            {isProcessing ? 'מעבד...' : 'שלח הזמנה'}
           </Button>
           <Button 
             variant="outlined" 
             color="error" 
             onClick={clearCart}
-            disabled={!cart.items || cart.items.length === 0}
+            disabled={!cart.items || cart.items.length === 0 || isProcessing}
             sx={{ borderRadius: 2 }}
           >
             נקה סל
@@ -319,9 +330,62 @@ function CartDialog(props) {
           <Button 
             variant="outlined" 
             onClick={handleClose}
+            disabled={isProcessing}
             sx={{ borderRadius: 2 }}
           >
             סגור חלון
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Order Confirmation Dialog */}
+      <Dialog
+        open={orderConfirmOpen}
+        onClose={handleOrderConfirmClose}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Zoom}
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            p: 1
+          }
+        }}
+      >
+        <DialogContent sx={{ textAlign: 'center', direction: 'rtl' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center',
+            p: 3 
+          }}>
+            <PiCheckCircle 
+              size={80} 
+              color={theme.palette.success.main} 
+              style={{ marginBottom: '16px' }}
+            />
+            <Typography variant="h5" gutterBottom color="success.main" fontWeight="bold">
+              ההזמנה התקבלה בהצלחה
+            </Typography>
+            <Typography variant="h4" gutterBottom fontWeight="bold">
+              הזמנה מספר #{orderNumber}
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+              פרטי ההזמנה נשלחו למערכת ויטופלו בהקדם
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', p: 2, pb: 3 }}>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleOrderConfirmClose}
+            sx={{ 
+              borderRadius: 2,
+              minWidth: 120
+            }}
+          >
+            אישור
           </Button>
         </DialogActions>
       </Dialog>
@@ -332,8 +396,6 @@ function CartDialog(props) {
         onClose={() => setBatchDiscountOpen(false)}
         selectedItems={selectedItems}
       />
-
-      {/* No snackbar needed, using eventBus for toasts */}
     </>
   );
 }

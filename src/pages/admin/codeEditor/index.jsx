@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import kdb from '../../../kadabrix/kadabrix';
 import AceEditor from "react-ace";
@@ -8,6 +8,7 @@ import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-searchbox";
 import ace from "ace-builds";
 import JsonImportModal from './JsonImportModal';
+import { debounce } from 'lodash';
 
 // Material UI imports
 import {
@@ -30,17 +31,18 @@ import {
   DialogTitle,
   Alert,
   Snackbar,
-  Divider,
   Tooltip,
   InputAdornment,
-  Stack,
-  Tabs,
-  Tab,
   Grid,
+  FormControlLabel,
+  Switch,
   Select,
   MenuItem,
+  Pagination,
   FormControl,
-  InputLabel
+  InputLabel,
+  Tabs,
+  Tab
 } from '@mui/material';
 
 // Import icons
@@ -53,41 +55,52 @@ import CloseIcon from '@mui/icons-material/Close';
 import CodeIcon from '@mui/icons-material/Code';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const CodeEditor = () => {
   const navigate = useNavigate();
-
+  
+  // State for custom/normal mode
+  const [isCustomMode, setIsCustomMode] = useState(false);
+  
   // Configure Ace editor completions
-  ace.config.loadModule("ace/ext/language_tools", function () {
-    const customCompleter = {
-      getCompletions: function (editor, session, pos, prefix, callback) {
-        const completions = [
-          { caption: "function", value: "function", meta: "keyword" },
-          { caption: "console.log", value: "console.log()", meta: "method" },
-          { caption: "return", value: "return", meta: "keyword" },
-          { caption: "if", value: "if (condition) {\n\t\n}", meta: "keyword" },
-          { caption: "else", value: "else {\n\t\n}", meta: "keyword" },
-          { caption: "for", value: "for (let i = 0; i < array.length; i++) {\n\t\n}", meta: "loop" },
-          { caption: "forEach", value: "forEach((item) => {\n\t\n})", meta: "method" },
-          { caption: "map", value: "map((item) => {\n\t\n})", meta: "method" },
-          { caption: "filter", value: "filter((item) => {\n\t\n})", meta: "method" },
-          { caption: "async", value: "async", meta: "keyword" },
-          { caption: "await", value: "await", meta: "keyword" },
-          { caption: "Promise", value: "Promise", meta: "class" },
-          { caption: "try/catch", value: "try {\n\t\n} catch (error) {\n\t\n}", meta: "error handling" },
-        ];
-        callback(null, completions);
-      },
-    };
-    ace.require("ace/ext/language_tools").addCompleter(customCompleter);
-  });
+  useEffect(() => {
+    ace.config.loadModule("ace/ext/language_tools", function () {
+      const customCompleter = {
+        getCompletions: function (editor, session, pos, prefix, callback) {
+          const completions = [
+            { caption: "function", value: "function", meta: "keyword" },
+            { caption: "console.log", value: "console.log()", meta: "method" },
+            { caption: "return", value: "return", meta: "keyword" },
+            { caption: "if", value: "if (condition) {\n\t\n}", meta: "keyword" },
+            { caption: "else", value: "else {\n\t\n}", meta: "keyword" },
+            { caption: "for", value: "for (let i = 0; i < array.length; i++) {\n\t\n}", meta: "loop" },
+            { caption: "forEach", value: "forEach((item) => {\n\t\n})", meta: "method" },
+            { caption: "map", value: "map((item) => {\n\t\n})", meta: "method" },
+            { caption: "filter", value: "filter((item) => {\n\t\n})", meta: "method" },
+            { caption: "async", value: "async", meta: "keyword" },
+            { caption: "await", value: "await", meta: "keyword" },
+            { caption: "Promise", value: "Promise", meta: "class" },
+            { caption: "try/catch", value: "try {\n\t\n} catch (error) {\n\t\n}", meta: "error handling" },
+          ];
+          callback(null, completions);
+        },
+      };
+      ace.require("ace/ext/language_tools").addCompleter(customCompleter);
+    });
+  }, []);
 
   // State variables
   const [records, setRecords] = useState([]);
   const [filteredRecords, setFilteredRecords] = useState([]);
+  const [displayedRecords, setDisplayedRecords] = useState([]);
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
+  const [loading, setLoading] = useState(false);
+  
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [totalPages, setTotalPages] = useState(1);
   
   const [filters, setFilters] = useState({
     type: '',
@@ -109,49 +122,81 @@ const CodeEditor = () => {
     recordId: null
   });
 
+  // Get the correct module name based on mode
+  const getModuleName = useCallback(() => {
+    return isCustomMode ? "codeEditorCustom" : "codeEditor";
+  }, [isCustomMode]);
+
   // Fetch records from backend
-  const fetchRecords = async () => {
+  const fetchRecords = useCallback(async () => {
+    setLoading(true);
     try {
       const data = await kdb.run({
-        "module": "codeEditor",
+        "module": getModuleName(),
         "name": "getRecords"
       });
       setRecords(data);
+      setPage(1); // Reset to page 1 on new data load
     } catch (err) {
       setError(`Error fetching records: ${err.message}`);
       showNotification(`Failed to load records: ${err.message}`, 'error');
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [getModuleName]);
 
-  // Filter records based on search criteria
+  // Apply filters to records - debounced to improve performance
+  const applyFilters = useCallback(
+    debounce((filters, records) => {
+      const { type, module, name, searchAll } = filters;
+      
+      const lowerCaseSearchAll = searchAll ? searchAll.toLowerCase() : '';
+      
+      const filtered = records.filter(record => {
+        // Check for the "search all" field first
+        if (searchAll && !Object.values(record).some(value => 
+          typeof value === 'string' && value.toLowerCase().includes(lowerCaseSearchAll)
+        )) {
+          return false;
+        }
+        
+        // Check for type, module, and name filters
+        if (type && !record.type?.toLowerCase().includes(type.toLowerCase())) return false;
+        if (module && !record.module?.toLowerCase().includes(module.toLowerCase())) return false;
+        if (name && !record.name?.toLowerCase().includes(name.toLowerCase())) return false;
+        
+        return true;
+      });
+      
+      setFilteredRecords(filtered);
+      setPage(1); // Reset to page 1 when filters change
+    }, 300),
+    []
+  );
+
+  // Handle pagination
   useEffect(() => {
-    const { type, module, name, searchAll } = filters;
-    
-    const lowerCaseSearchAll = searchAll ? searchAll.toLowerCase() : '';
-    
-    const filtered = records.filter(record => {
-      // Check for the "search all" field first
-      if (searchAll && !Object.values(record).some(value => 
-        typeof value === 'string' && value.toLowerCase().includes(lowerCaseSearchAll)
-      )) {
-        return false;
-      }
-      
-      // Check for type, module, and name filters
-      if (type && !record.type?.toLowerCase().includes(type.toLowerCase())) return false;
-      if (module && !record.module?.toLowerCase().includes(module.toLowerCase())) return false;
-      if (name && !record.name?.toLowerCase().includes(name.toLowerCase())) return false;
-      
-      return true;
-    });
-    
-    setFilteredRecords(filtered);
-  }, [records, filters]);
+    if (rowsPerPage === 0) {
+      // "No limit" option
+      setDisplayedRecords(filteredRecords);
+      setTotalPages(1);
+    } else {
+      const start = (page - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+      setDisplayedRecords(filteredRecords.slice(start, end));
+      setTotalPages(Math.ceil(filteredRecords.length / rowsPerPage));
+    }
+  }, [filteredRecords, page, rowsPerPage]);
 
-  // Initial load
+  // Apply filters when filters or records change
+  useEffect(() => {
+    applyFilters(filters, records);
+  }, [filters, records, applyFilters]);
+
+  // Load records on initial load and when mode changes
   useEffect(() => {
     fetchRecords();
-  }, []);
+  }, [fetchRecords, isCustomMode]);
 
   // Open editor dialog with a record
   const openEditor = (record = null) => {
@@ -201,7 +246,7 @@ const CodeEditor = () => {
       if (!editorDialog.currentRecord.id) {
         // Add new record
         await kdb.run({
-          "module": "codeEditor",
+          "module": getModuleName(),
           "name": "addRecord",
           "data": {
             "isDuplicate": false,
@@ -212,7 +257,7 @@ const CodeEditor = () => {
       } else {
         // Update existing record
         await kdb.run({
-          "module": "codeEditor",
+          "module": getModuleName(),
           "name": "saveRecord",
           "data": editorDialog.currentRecord
         });
@@ -231,7 +276,7 @@ const CodeEditor = () => {
   const deleteRecord = async () => {
     try {
       await kdb.run({
-        "module": "codeEditor",
+        "module": getModuleName(),
         "name": "delRecord",
         "data": {
           id: deleteDialog.recordId
@@ -252,7 +297,10 @@ const CodeEditor = () => {
   };
 
   // Open delete confirmation dialog
-  const openDeleteDialog = (recordId) => {
+  const openDeleteDialog = (recordId, event) => {
+    if (event) {
+      event.stopPropagation();
+    }
     setDeleteDialog({
       open: true,
       recordId
@@ -284,34 +332,52 @@ const CodeEditor = () => {
     });
   };
 
-  // Handle filter changes
-  const handleFilterChange = (field, value) => {
-    setFilters({
-      ...filters,
+  // Handle filter changes - using callbacks to avoid recreation
+  const handleFilterChange = useCallback((field, value) => {
+    setFilters(prevFilters => ({
+      ...prevFilters,
       [field]: value
-    });
-  };
+    }));
+  }, []);
 
   // Clear all filters
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setFilters({
       type: '',
       module: '',
       name: '',
       searchAll: ''
     });
-  };
+  }, []);
 
   // Handle successful import
-  const handleImportSuccess = () => {
+  const handleImportSuccess = useCallback(() => {
     fetchRecords();
     showNotification('Records imported successfully', 'success');
+  }, [fetchRecords]);
+
+  // Toggle mode (custom/normal)
+  const toggleMode = useCallback(() => {
+    setIsCustomMode(prev => !prev);
+  }, []);
+
+  // Handle page change
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
   };
 
-  // Get unique values for dropdown filters
-  const getUniqueValues = (field) => {
-    const uniqueValues = [...new Set(records.map(record => record[field]))].filter(Boolean);
-    return uniqueValues.sort();
+  // Handle rows per page change
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(1); // Reset to first page
+  };
+
+  // Handle key down in the editor dialog to prevent ESC closing
+  const handleKeyDown = (event) => {
+    // Prevent ESC key from closing the dialog
+    if (event.key === 'Escape') {
+      event.stopPropagation();
+    }
   };
 
   return (
@@ -349,23 +415,27 @@ const CodeEditor = () => {
         <Box display="flex" alignItems="center">
           <CodeIcon sx={{ fontSize: 32, mr: 2, color: '#5c6bc0' }} />
           <Typography variant="h5" fontWeight="bold" color="primary">
-            Code Editor Manager
+            {isCustomMode ? 'Custom Code Editor Manager' : 'Code Editor Manager'}
           </Typography>
         </Box>
         
         <Box>
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate('/admin/codeEditorCustom')}
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isCustomMode}
+                onChange={toggleMode}
+                color="primary"
+              />
+            }
+            label="Custom Mode"
             sx={{ mr: 2 }}
-          >
-            Custom Editor
-          </Button>
+          />
           
           <JsonImportModal 
             jsonData={filteredRecords} 
-            onImport={handleImportSuccess} 
+            onImport={handleImportSuccess}
+            moduleName={getModuleName()}
           />
           
           <Button
@@ -559,7 +629,15 @@ const CodeEditor = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredRecords.length === 0 ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
+                    <Typography variant="subtitle1" color="text.secondary">
+                      Loading...
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : displayedRecords.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
                     <Typography variant="subtitle1" color="text.secondary">
@@ -568,7 +646,7 @@ const CodeEditor = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredRecords.map((record) => (
+                displayedRecords.map((record) => (
                   <TableRow 
                     key={record.id} 
                     hover
@@ -578,7 +656,7 @@ const CodeEditor = () => {
                         cursor: 'pointer'
                       }
                     }}
-                    onClick={() => openEditor(record)}
+                    
                   >
                     <TableCell>
                       <Chip 
@@ -609,10 +687,7 @@ const CodeEditor = () => {
                           <IconButton 
                             color="error" 
                             size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openDeleteDialog(record.id);
-                            }}
+                            onClick={(e) => openDeleteDialog(record.id, e)}
                           >
                             <DeleteIcon />
                           </IconButton>
@@ -627,9 +702,37 @@ const CodeEditor = () => {
         </TableContainer>
         
         <Box p={2} display="flex" justifyContent="space-between" alignItems="center" bgcolor="#f0f0f0">
-          <Typography variant="body2" color="text.secondary">
-            {filteredRecords.length} of {records.length} records
-          </Typography>
+          <Box display="flex" alignItems="center">
+            <Typography variant="body2" color="text.secondary" sx={{ mr: 2 }}>
+              {filteredRecords.length} records
+            </Typography>
+            
+            <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
+              <InputLabel id="rows-per-page-label">Rows per page</InputLabel>
+              <Select
+                labelId="rows-per-page-label"
+                value={rowsPerPage}
+                onChange={handleRowsPerPageChange}
+                label="Rows per page"
+              >
+                <MenuItem value={10}>10</MenuItem>
+                <MenuItem value={20}>20</MenuItem>
+                <MenuItem value={50}>50</MenuItem>
+                <MenuItem value={100}>100</MenuItem>
+                <MenuItem value={0}>No limit</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          
+          {rowsPerPage > 0 && (
+            <Pagination 
+              count={totalPages} 
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              shape="rounded"
+            />
+          )}
         </Box>
       </Paper>
 
@@ -647,6 +750,8 @@ const CodeEditor = () => {
             m: 1
           }
         }}
+        onKeyDown={handleKeyDown}
+        disableEscapeKeyDown
       >
         <DialogTitle sx={{ px: 3, py: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box display="flex" alignItems="center">
@@ -687,6 +792,10 @@ const CodeEditor = () => {
                 showPrintMargin={true}
                 showGutter={true}
                 highlightActiveLine={true}
+                onLoad={(editor) => {
+                  // Disable Ace Editor's own Escape key binding
+                  editor.commands.bindKey("Escape", null);
+                }}
                 setOptions={{
                   enableBasicAutocompletion: true,
                   enableLiveAutocompletion: true,
