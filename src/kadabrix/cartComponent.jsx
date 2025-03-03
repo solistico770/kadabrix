@@ -1,2 +1,2 @@
-import cartComponent from './cart/CartComponent'
+import cartComponent from './cart/CartComponentNew'
 export default cartComponent;
