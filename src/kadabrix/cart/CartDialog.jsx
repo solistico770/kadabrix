@@ -32,6 +32,8 @@ import {
   Grid
 } from '@mui/material';
 
+
+
 // Import the separated components
 import CartLine from './CartLine.jsx';
 import BatchDiscountDialog from './BatchDiscountDialog.jsx';
