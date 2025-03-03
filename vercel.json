@@ -1,4 +1,9 @@
 {
+  "build": {
+    "env": {
+      "VERCEL_FILESYSTEM_CASE_SENSITIVE": "0"
+    }
+  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ]
