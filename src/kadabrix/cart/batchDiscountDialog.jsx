@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useCartStore } from '../cartState.jsx';
+import { useCartStore } from '../cartState';
 import { discountSetItem } from '../cartCommands';
 import eventBus from '../event';
 import {

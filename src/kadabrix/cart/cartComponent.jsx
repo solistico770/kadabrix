@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PiShoppingCart } from 'react-icons/pi';
 import PropTypes from 'prop-types';
 import eventBus from '../event';
-import { useCartStore } from '../cartState.jsx';
+import { useCartStore } from '../cartState';
 import { 
   Badge, 
   IconButton, 
@@ -11,7 +11,7 @@ import {
   useMediaQuery
 } from '@mui/material';
 
-import CartDialog from './cartDialog.jsx'; // Importing the separated dialog component
+import CartDialog from './cartDialog'; // Importing the separated dialog component
 
 
 // Main Cart Button Component

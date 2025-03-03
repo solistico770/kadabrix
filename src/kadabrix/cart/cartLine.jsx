@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material';
 import { supabaseUrl } from '../kdbConfig';
 import eventBus from '../event';
 import { updatePrice, discountSetItem, removeItem } from '../cartCommands';
-import CartQuantBtn from './cartQuantBtn.jsx';
+import CartQuantBtn from './cartQuantBtn';
 import {
   TableRow,
   TableCell,
@@ -18,8 +18,8 @@ import {
 } from '@mui/material';
 
 // Import the separated dialog components
-import PriceEditDialog from './PriceEditDialog.jsx';
-import DiscountEditDialog from './DiscountEditDialog.jsx';
+import PriceEditDialog from './PriceEditDialog';
+import DiscountEditDialog from './DiscountEditDialog';
 
 // Cart Line Component
 const CartLine = ({ 
