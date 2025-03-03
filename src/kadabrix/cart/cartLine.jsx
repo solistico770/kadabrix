@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material';
 import { supabaseUrl } from '../kdbConfig';
 import eventBus from '../event';
 import { updatePrice, discountSetItem, removeItem } from '../cartCommands';
-import CartQuantBtn from './cartQuantBtn';
+import CartQuantBtn from './CartQuantBtn';
 import {
   TableRow,
   TableCell,

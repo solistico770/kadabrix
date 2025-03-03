@@ -35,8 +35,8 @@ import {
 
 
 // Import the separated components
-import CartLine from './CartLine.jsx';
-import BatchDiscountDialog from './BatchDiscountDialog.jsx';
+import CartLine from './CartLine';
+import BatchDiscountDialog from './BatchDiscountDialog';
 
 // Main Cart Dialog Component
 function CartDialog(props) {
