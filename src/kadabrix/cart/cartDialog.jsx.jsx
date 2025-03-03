@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { PiPencilSimple, PiTrash, PiPercent, PiShoppingCart, PiCheckCircle } from 'react-icons/pi';
 import PropTypes from 'prop-types';
 import kdb from '../kadabrix.js';
-import { useCartStore } from '../cartState';
-import { resetCart } from '../cartCommands';
-import eventBus from '../event';
+import { useCartStore } from '../cartState.jsx';
+import { resetCart } from '../cartCommands.js';
+import eventBus from '../event.js';
 import {
   Dialog,
   DialogTitle,
@@ -33,8 +33,8 @@ import {
 } from '@mui/material';
 
 // Import the separated components
-import CartLine from './CartLine';
-import BatchDiscountDialog from './BatchDiscountDialog';
+import CartLine from './CartLine.jsx';
+import BatchDiscountDialog from './BatchDiscountDialog.jsx';
 
 // Main Cart Dialog Component
 function CartDialog(props) {

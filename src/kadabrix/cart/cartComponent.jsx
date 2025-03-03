@@ -11,7 +11,7 @@ import {
   useMediaQuery
 } from '@mui/material';
 
-import CartDialog from './cartDialog'; // Importing the separated dialog component
+import CartDialog from './CartDialog'; // Importing the separated dialog component
 
 
 // Main Cart Button Component
