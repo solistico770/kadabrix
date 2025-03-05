@@ -101,7 +101,7 @@ const CartLine = ({
       )}
       <TableCell>
         <Avatar
-          src={`${supabaseUrl}/storage/v1/render/image/public/images/${item.part}.jpg?width=200&height=200`}
+          src={`${supabaseUrl}/storage/v1/render/image/public/images/${item.part}.jpg?width=200&height=200&resize=contain`}
           alt={item.partName}
           variant="rounded"
           sx={{ width: 56, height: 56 }}

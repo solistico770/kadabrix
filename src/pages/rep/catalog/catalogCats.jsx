@@ -24,7 +24,7 @@ const Cat = ({ category,setCat,children }) => {
             className="hover:bg-[rgb(208,152,248,0.2)] duration-300 w-full h-[calc(100%/1.7)]  mb-3 group border rounded-2xl border-primary flex flex-col items-center cursor-pointer "
         >
             <img
-                src={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=120&height=120`}
+                src={`${supabaseUrl}/storage/v1/render/image/public/cats/${category.id}.jpg?width=120&height=120&resize=contain`}
                 className="size-20 mix-blend-hue sm:size-10"
                 alt={category.name}
 

@@ -22,7 +22,7 @@ const Product = ({ product }) => {
           {/* Image section - Fixed aspect ratio */}
           <div className="relative pt-[100%] w-full overflow-hidden rounded-t-xl">
             <img
-              src={`${supabaseUrl}/storage/v1/render/image/public/images/${product.part}.jpg?width=200&height=200`}
+              src={`${supabaseUrl}/storage/v1/render/image/public/images/${product.part}.jpg?width=200&height=200&resize=contain`}
               alt={product.partName}
               onError={imageOnError}
               className="absolute inset-0 w-full h-full object-contain p-4 bg-white transition-all duration-300"

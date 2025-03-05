@@ -228,7 +228,7 @@ const DocumentPopup = ({ docID, onClose }) => {
                         <div className="h-12 w-12 flex-shrink-0 ml-2 relative rounded-md overflow-hidden border border-gray-200">
                           {line.part ? (
                             <img
-                              src={`${supabaseUrl}/storage/v1/render/image/public/images/${line.part}.jpg?width=60&height=60`}
+                              src={`${supabaseUrl}/storage/v1/render/image/public/images/${line.part}.jpg?width=60&height=60&resize=contain`}
                               alt={line.partName}
                               onError={imageOnError}
                               className="w-full h-full object-cover bg-white"
