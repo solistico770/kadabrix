@@ -33,10 +33,10 @@ import {
 } from '@mui/material';
 
 
-
 // Import the separated components
 import CartLine from './CartLine';
 import BatchDiscountDialog from './BatchDiscountDialog';
+
 
 // Main Cart Dialog Component
 function CartDialog(props) {

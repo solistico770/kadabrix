@@ -35,6 +35,7 @@ const ProductList = () => {
   const limit = 100;
 
   const setCat = (cat)=>{
+    setPage(1);
     setCatId(cat  )
 
 
