@@ -34,7 +34,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import InfoIcon from '@mui/icons-material/Info';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
-const JsonImportModal = ({ jsonData, onImport }) => {
+const JsonImportModal = ({ jsonData, onImport  ,moduleName }) => {
   // State variables
   const [isOpen, setIsOpen] = useState(false);
   const [editorValue, setEditorValue] = useState('');
@@ -164,7 +164,7 @@ const JsonImportModal = ({ jsonData, onImport }) => {
         try {
           // Make sure we're explicitly passing the isDuplicate flag
           const result = await kdb.run({
-            "module": "codeEditor",
+            "module": moduleName,
             "name": "addRecord",
             "data": {
               "isDuplicate": isDuplicate,
