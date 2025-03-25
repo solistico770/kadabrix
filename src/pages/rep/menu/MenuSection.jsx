@@ -148,7 +148,19 @@ const MenuSection = ({ userDetails, navigate }) => {
       permission: 'b2bManager',
       bgColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       iconBg: '#eeeeff',
+    },
+    {
+      key: 'docs',
+      label: 'ניהול הזמנות',
+      icon: <QueryStatsRoundedIcon fontSize="large" />,
+      route: '/rep/docs',
+      permission: 'kdb_docs',
+      bgColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      iconBg: '#eeeeff',
     }
+    
+
+
     
   ];
 
