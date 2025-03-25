@@ -265,7 +265,7 @@ const CodeEditor = () => {
       }
       
       fetchRecords();
-      closeEditor();
+      //closeEditor();
     } catch (err) {
       setError(`Error saving record: ${err.message}`);
       showNotification(`Failed to save record: ${err.message}`, 'error');
