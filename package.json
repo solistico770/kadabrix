@@ -23,6 +23,7 @@
     "@supabase/supabase-js": "^2.44.2",
     "@supercharge/promise-pool": "^3.2.0",
     "@tinymce/tinymce-react": "^5.1.1",
+    "ace-builds": "^1.39.1",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

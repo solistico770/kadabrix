@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
+import AceEditor from 'react-ace';
 import { useNavigate, useLocation } from 'react-router-dom';
-
 import kdb from '../../../kadabrix/kadabrix';
 import {
   Select,
@@ -22,7 +21,11 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, Save as SaveIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
-const editHtmlTemplates = () => {
+// Import Ace editor modes and theme
+import 'ace-builds/src-noconflict/mode-html';
+import 'ace-builds/src-noconflict/theme-monokai';
+
+const EditHtmlTemplates = () => {
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [templateName, setTemplateName] = useState('');
@@ -30,10 +33,9 @@ const editHtmlTemplates = () => {
   const [loading, setLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  const [isSourceView, setIsSourceView] = useState(false); // New state for toggling source view
+  const [isSourceView, setIsSourceView] = useState(true); // Default to source view with Ace
   const navigate = useNavigate();
   const location = useLocation();
-
 
   const showNotification = (message, severity = 'success') => {
     setSnackbar({ open: true, message, severity });
@@ -56,16 +58,7 @@ const editHtmlTemplates = () => {
   };
 
   const handleSelectTemplate = async (id) => {
-    if (!id) {
-      navigate('/editHtmlTemplates'); // Clear the query parameter
-      setSelectedTemplate(null);
-      setTemplateName('');
-      setEmailHtml('');
-      return;
-    } else {
-      navigate(`/editHtmlTemplates?id=${id}`);
-    }
-
+  
     try {
       setLoading(true);
       const data = await kdb.run({
@@ -116,10 +109,7 @@ const editHtmlTemplates = () => {
     if (id) {
       handleSelectTemplate(id);
     }
-
   }, []);
-
-
 
   return (
     <Box sx={{ p: 3, maxWidth: '1200px', margin: '0 auto' }}>
@@ -164,46 +154,35 @@ const editHtmlTemplates = () => {
             disabled={loading}
           />
         }
-        label="Edit Source Code"
+        label={isSourceView ? "Edit Source Code" : "Preview"}
       />
 
       {isSourceView ? (
-        <TextField
-          fullWidth
-          multiline
-          rows={20}
-          value={emailHtml}
-          onChange={(e) => setEmailHtml(e.target.value)}
-          variant="outlined"
-          sx={{ mb: 3 }}
-          disabled={loading}
-          InputProps={{
-            inputProps: { dir: 'ltr' },
-          }}
-
-        />
-      ) : (
         <Box sx={{ mb: 3, minHeight: '400px' }}>
-          <Editor
-            apiKey="mk27ffhenqpul8cfabujsq0s1jxxohiz8n7fmafwp1iuyd30"
+          <AceEditor
+            mode="html"
+            theme="monokai"
             value={emailHtml}
-            disabled={loading}
-            init={{
-              height: 500,
-              menubar: true,
-              plugins: [
-                'preview', 'importcss', 'searchreplace', 'autolink', 'autosave', 'save', 'directionality', 'code',
-                'visualblocks', 'visualchars', 'fullscreen', 'image', 'link', 'media', 'template', 'codesample',
-                'table', 'charmap', 'pagebreak', 'nonbreaking', 'anchor', 'insertdatetime', 'advlist', 'lists',
-                'wordcount', 'help', 'charmap', 'quickbars', 'emoticons',
-              ],
-              toolbar:
-                'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | code | help | preview',
-              content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+            onChange={setEmailHtml}
+            name="ace-editor"
+            editorProps={{ $blockScrolling: true }}
+            setOptions={{
+              enableBasicAutocompletion: true,
+              enableLiveAutocompletion: true,
+              enableSnippets: true,
+              showLineNumbers: true,
+              tabSize: 2,
             }}
-            onEditorChange={setEmailHtml}
+            width="100%"
+            height="500px"
+            readOnly={loading}
           />
         </Box>
+      ) : (
+        <Box
+          sx={{ mb: 3, minHeight: '400px', border: '1px solid #ccc', p: 2, overflow: 'auto' }}
+          dangerouslySetInnerHTML={{ __html: emailHtml }}
+        />
       )}
 
       <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
@@ -228,8 +207,40 @@ const editHtmlTemplates = () => {
           </Button>
         )}
       </Box>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this template?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => {/* Add delete logic here */}} color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
 
-export default editHtmlTemplates;
+export default EditHtmlTemplates;
