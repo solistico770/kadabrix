@@ -47,38 +47,55 @@ const Index = () => {
 
 
   
-const fetchInitialData = async () => {
-  const requestId = {};
-  currentRequestRef.current = requestId;
+  const refresh = async () => {
 
+    const requestId = {};
+    currentRequestRef.current = requestId;
+  
+    setLoading(true);
+    try {
+      const ordersData = await kdb.run({ 
+        module: "OrderRouting", 
+        name: "getAllOrders", 
+        data: { filter, limit: rowsPerPage, offset: page * rowsPerPage } 
+      });
+  
+      // Only update state if this is the latest request
+      if (currentRequestRef.current === requestId) {
+        setOrders(ordersData.orders);
+        setTotalRows(ordersData.total);
+      }
+    } catch (error) {
+      console.error("שגיאה בטעינת נתונים ראשוניים:", error);
+    } finally {
+      if (currentRequestRef.current === requestId) {
+        setLoading(false);
+      }
+    }
+
+
+  }
+
+  const fetchInitialData = async () => {
   setLoading(true);
   try {
-    const ordersData = await kdb.run({ 
-      module: "OrderRouting", 
-      name: "getAllOrders", 
-      data: { filter, limit: rowsPerPage, offset: page * rowsPerPage } 
-    });
 
-    // Only update state if this is the latest request
-    if (currentRequestRef.current === requestId) {
-      setOrders(ordersData.orders);
-      setTotalRows(ordersData.total);
+    const odsStatusesData = await kdb.run({ module: "OrderRouting", name: "manageOdsStatusesGet", data: {} });
+    setOdsStatuses(odsStatusesData.items);
 
-      const odsStatusesData = await kdb.run({ module: "OrderRouting", name: "manageOdsStatusesGet", data: {} });
-      setOdsStatuses(odsStatusesData.items);
+    const pickStatusesData = await kdb.run({ module: "OrderRouting", name: "managePickStatusesGet", data: {} });
+    setPickStatuses(pickStatusesData.items);
 
-      const pickStatusesData = await kdb.run({ module: "OrderRouting", name: "managePickStatusesGet", data: {} });
-      setPickStatuses(pickStatusesData.items);
+    const pickersData = await kdb.run({ module: "OrderRouting", name: "managePickersGet", data: {} });
+    setPickers(pickersData.items);
 
-      const pickersData = await kdb.run({ module: "OrderRouting", name: "managePickersGet", data: {} });
-      setPickers(pickersData.items);
+    const linesData = await kdb.run({ module: "OrderRouting", name: "manageLinesGet", data: {} });
+    setLines(linesData.items);
 
-      const linesData = await kdb.run({ module: "OrderRouting", name: "manageLinesGet", data: {} });
-      setLines(linesData.items);
+    const linesInstancesData = await kdb.run({ module: "OrderRouting", name: "manageLinesInstancesGet", data: {} });
+    setLinesInstances(linesInstancesData.items);
 
-      const linesInstancesData = await kdb.run({ module: "OrderRouting", name: "manageLinesInstancesGet", data: {} });
-      setLinesInstances(linesInstancesData.items);
-    }
+
   } catch (error) {
     console.error("שגיאה בטעינת נתונים ראשוניים:", error);
   } finally {
@@ -89,8 +106,14 @@ const fetchInitialData = async () => {
 };
 
 
+useEffect(() => {
+  refresh();
+}, [filter,page, rowsPerPage]);
+
+
+
   useEffect(() => {
-    fetchInitialData();
+    refresh();
   }, [filter,page, rowsPerPage]);
 
   
@@ -113,8 +136,10 @@ const fetchInitialData = async () => {
           pickStatuses={pickStatuses}
           pickers={pickers}
           lines={lines}
+          lineInstances={linesInstances}
         />
         <OrdersTable 
+          refresh={refresh}
           orders={orders} 
           loading={loading} 
           page={page} 

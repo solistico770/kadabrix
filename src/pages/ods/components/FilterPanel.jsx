@@ -1,5 +1,5 @@
 // File: src/components/FilterPanel.jsx
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField, Checkbox, ListItemText, OutlinedInput } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -8,16 +8,26 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import TodayIcon from '@mui/icons-material/Today';
 import dayjs from 'dayjs';
 
-const FilterPanel = ({ filter, setFilter, handleFilter, odsStatuses, pickStatuses, pickers, lines, lineInstances }) => {
+const FilterPanel = ({ filter, setFilter,  odsStatuses, pickStatuses, pickers, lines, lineInstances }) => {
   const [openFilter, setOpenFilter] = useState(null);
   const [tempFilter, setTempFilter] = useState(filter);
+
+  
+  useEffect(()=>{
+
+    clearFilters();
+
+
+  },[])
+
+
 
   const filtersConfig = [
     { key: 'odsStatus', label: 'סטטוס ODS', items: odsStatuses, multiple: true },
     { key: 'pickStatus', label: 'סטטוס ליקוט', items: pickStatuses, multiple: true },
     { key: 'pickers', label: 'מלקטים', items: pickers, multiple: true },
     { key: 'lines', label: 'קווים', items: lines, multiple: true },
-    { key: 'lineInstance', label: 'מופע קו', items: lineInstances, multiple: false }, // בחירה בודדת
+    { key: 'lineInstance', label: 'מופע קו', items: lineInstances || [], multiple: true }, // בחירה מרובה, ודא שיש ברירת מחדל
     { key: 'lineInstanceDate', label: 'תאריך מופע קו', type: 'date' },
     { key: 'city', label: 'עיר' },
     { key: 'customerName', label: 'שם לקוח' },
@@ -38,20 +48,15 @@ const FilterPanel = ({ filter, setFilter, handleFilter, odsStatuses, pickStatuse
       orderDateFrom: dayjs().subtract(30, 'day'),
       orderDateTo: dayjs(),
     });
-    handleFilter(); // רענון הטבלה לאחר ניקוי
   };
 
   const applyFilters = () => {
     setFilter(tempFilter);
-    handleFilter(); // רענון הטבלה לאחר אישור
   };
 
   const isFilterActive = (key, value) => {
     if (Array.isArray(value)) {
-      return value.length > 0; // מערכים (כמו odsStatus) נחשבים פעילים אם יש לפחות ערך אחד
-    }
-    if (key === 'lineInstance') {
-      return value !== '' && value !== null && value !== undefined; // עבור lineInstance (בחירה בודדת)
+      return value.length > 0; // מערכים (כמו odsStatus, lineInstance) נחשבים פעילים אם יש לפחות ערך אחד
     }
     if (key === 'orderDateFrom' || key === 'orderDateTo') {
       return value !== null && value !== undefined; // תאריכים תמיד פעילים כי יש להם ברירת מחדל
@@ -102,7 +107,7 @@ const FilterPanel = ({ filter, setFilter, handleFilter, odsStatuses, pickStatuse
       );
     } else if (config.items) {
       if (config.multiple) {
-        // בחירה מרובה (למשל odsStatus, pickers)
+        // בחירה מרובה (למשל odsStatus, pickers, lineInstance)
         return (
           <FormControl fullWidth>
             <InputLabel>{config.label}</InputLabel>
@@ -116,17 +121,21 @@ const FilterPanel = ({ filter, setFilter, handleFilter, odsStatuses, pickStatuse
                 return item ? (item.desc || item.statusDesc || item.id) : id;
               }).join(', ')}
             >
-              {config.items.map(item => (
-                <MenuItem key={item.id} value={item.id}>
-                  <Checkbox checked={(tempFilter[config.key] || []).includes(item.id)} />
-                  <ListItemText primary={item.statusDesc || item.desc || item.id} />
-                </MenuItem>
-              ))}
+              {config.items.length > 0 ? (
+                config.items.map(item => (
+                  <MenuItem key={item.id} value={item.id}>
+                    <Checkbox checked={(tempFilter[config.key] || []).includes(item.id)} />
+                    <ListItemText primary={item.statusDesc || item.desc || item.id} />
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>אין פריטים זמינים</MenuItem>
+              )}
             </Select>
           </FormControl>
         );
       } else {
-        // בחירה בודדת (למשל lineInstance)
+        // בחירה בודדת (אין כרגע שימוש, אבל נשאיר למקרה עתידי)
         return (
           <FormControl fullWidth>
             <InputLabel>{config.label}</InputLabel>
@@ -136,11 +145,15 @@ const FilterPanel = ({ filter, setFilter, handleFilter, odsStatuses, pickStatuse
               input={<OutlinedInput label={config.label} />}
             >
               <MenuItem value="">ללא בחירה</MenuItem>
-              {config.items.map(item => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.desc || `${item.line} - ${item.van} - ${item.driver} (${item.date})`}
-                </MenuItem>
-              ))}
+              {config.items.length > 0 ? (
+                config.items.map(item => (
+                  <MenuItem key={item.id} value={item.id}>
+                    {item.desc || item.id}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>אין פריטים זמינים</MenuItem>
+              )}
             </Select>
           </FormControl>
         );
@@ -180,13 +193,7 @@ const FilterPanel = ({ filter, setFilter, handleFilter, odsStatuses, pickStatuse
         >
           נקה פילטרים
         </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={applyFilters}
-        >
-          אישור
-        </Button>
+   
       </div>
 
       {openFilter && (

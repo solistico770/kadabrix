@@ -9,7 +9,7 @@ import BatchUpdateDialog from './BatchUpdateDialog';
 import Pagination from '@mui/material/Pagination';
 
 const OrdersTable = ({ 
-  orders, loading, page, setPage, rowsPerPage, setRowsPerPage, totalRows, handleFilter, 
+  orders, loading, page, setPage, rowsPerPage, setRowsPerPage, totalRows, refresh, 
   odsStatuses, pickStatuses, pickers, linesInstances 
 }) => {
   const [selectedOrders, setSelectedOrders] = useState([]);
@@ -45,7 +45,6 @@ const OrdersTable = ({
 
   const handleDialogClose = (success) => {
     setDialogOpen(false);
-    if (success) handleFilter();
   };
 
   return (
@@ -94,7 +93,7 @@ const OrdersTable = ({
               <Button
                 variant="outlined"
                 startIcon={<RefreshIcon />}
-                onClick={handleFilter}
+                onClick={refresh}
                 color="primary"
               >
                 רענן
