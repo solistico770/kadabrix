@@ -1,5 +1,5 @@
-// File: src/components/FilterPanel.jsx
-import React, { useState , useEffect} from 'react';
+// File: src/pages/ods/components/FilterPanel.jsx
+import React, { useState, useEffect } from 'react';
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField, Checkbox, ListItemText, OutlinedInput } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -8,26 +8,43 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import TodayIcon from '@mui/icons-material/Today';
 import dayjs from 'dayjs';
 
-const FilterPanel = ({ filter, setFilter,  odsStatuses, pickStatuses, pickers, lines, lineInstances }) => {
+const FilterPanel = ({ filter, setFilter, odsStatuses, pickStatuses, pickers, lines, lineInstances }) => {
   const [openFilter, setOpenFilter] = useState(null);
   const [tempFilter, setTempFilter] = useState(filter);
 
-  
-  useEffect(()=>{
+  useEffect(() => {
+    setDefaultFilters();
+  }, []);
 
-    clearFilters();
+  useEffect(() => {
+    setTempFilter(filter);
+  }, [filter]);
 
-
-  },[])
-
-
+  const setDefaultFilters = () => {
+    setFilter({
+      orderDateFrom: dayjs().subtract(30, 'day'), // ברירת מחדל: לפני 30 יום
+      orderDateTo: dayjs(), // ברירת מחדל: היום
+      odsStatus: [],
+      pickStatus: [],
+      pickDateFrom: null,
+      pickDateTo: null,
+      pickers: [],
+      lines: [],
+      lineInstance: [],
+      odsInstance: null,
+      city: '',
+      customerName: '',
+      totalFrom: '',
+      totalTo: '',
+    });
+  };
 
   const filtersConfig = [
     { key: 'odsStatus', label: 'סטטוס ODS', items: odsStatuses, multiple: true },
     { key: 'pickStatus', label: 'סטטוס ליקוט', items: pickStatuses, multiple: true },
     { key: 'pickers', label: 'מלקטים', items: pickers, multiple: true },
     { key: 'lines', label: 'קווים', items: lines, multiple: true },
-    { key: 'lineInstance', label: 'מופע קו', items: lineInstances || [], multiple: true }, // בחירה מרובה, ודא שיש ברירת מחדל
+    { key: 'lineInstance', label: 'מופע קו', items: lineInstances || [], multiple: true },
     { key: 'lineInstanceDate', label: 'תאריך מופע קו', type: 'date' },
     { key: 'city', label: 'עיר' },
     { key: 'customerName', label: 'שם לקוח' },
@@ -40,13 +57,11 @@ const FilterPanel = ({ filter, setFilter,  odsStatuses, pickStatuses, pickers, l
   ];
 
   const clearFilters = () => {
-    setFilter({
-      orderDateFrom: dayjs().subtract(30, 'day'), // ברירת מחדל: לפני 30 יום
-      orderDateTo: dayjs(), // ברירת מחדל: היום
-    });
+    setDefaultFilters();
     setTempFilter({
       orderDateFrom: dayjs().subtract(30, 'day'),
       orderDateTo: dayjs(),
+      odsInstance: null,
     });
   };
 
@@ -55,13 +70,17 @@ const FilterPanel = ({ filter, setFilter,  odsStatuses, pickStatuses, pickers, l
   };
 
   const isFilterActive = (key, value) => {
+    if (key === 'odsInstance') {
+      return value !== null && value !== undefined;
+    }
+    
     if (Array.isArray(value)) {
-      return value.length > 0; // מערכים (כמו odsStatus, lineInstance) נחשבים פעילים אם יש לפחות ערך אחד
+      return value.length > 0;
     }
     if (key === 'orderDateFrom' || key === 'orderDateTo') {
-      return value !== null && value !== undefined; // תאריכים תמיד פעילים כי יש להם ברירת מחדל
+      return value !== null && value !== undefined;
     }
-    return value !== '' && value !== null && value !== undefined; // שדות טקסט/מספר
+    return value !== '' && value !== null && value !== undefined;
   };
 
   const renderPopupContent = (config) => {
@@ -72,7 +91,6 @@ const FilterPanel = ({ filter, setFilter,  odsStatuses, pickStatuses, pickers, l
             label={config.label}
             value={tempFilter[config.key] || null}
             onChange={(date) => setTempFilter({ ...tempFilter, [config.key]: date })}
-            renderInput={(params) => <TextField {...params} fullWidth />}
           />
           <div className="flex gap-2">
             <Button
@@ -107,7 +125,6 @@ const FilterPanel = ({ filter, setFilter,  odsStatuses, pickStatuses, pickers, l
       );
     } else if (config.items) {
       if (config.multiple) {
-        // בחירה מרובה (למשל odsStatus, pickers, lineInstance)
         return (
           <FormControl fullWidth>
             <InputLabel>{config.label}</InputLabel>
@@ -135,7 +152,6 @@ const FilterPanel = ({ filter, setFilter,  odsStatuses, pickStatuses, pickers, l
           </FormControl>
         );
       } else {
-        // בחירה בודדת (אין כרגע שימוש, אבל נשאיר למקרה עתידי)
         return (
           <FormControl fullWidth>
             <InputLabel>{config.label}</InputLabel>
@@ -193,7 +209,6 @@ const FilterPanel = ({ filter, setFilter,  odsStatuses, pickStatuses, pickers, l
         >
           נקה פילטרים
         </Button>
-   
       </div>
 
       {openFilter && (

@@ -1,4 +1,4 @@
-// File: src/components/PickStatusManager.jsx
+// File: src/pages/ods/components/PickStatusManager.jsx
 import React, { useState, useEffect } from 'react';
 import kdb from '../../../kadabrix/kadabrix';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
@@ -14,7 +14,6 @@ const PickStatusManager = ({ open, onClose }) => {
       const fetchItems = async () => {
         setLoading(true);
         try {
-            debugger;
           const data = await kdb.run({ module: "OrderRouting", name: "managePickStatusesGet", data: {} });
           setItems(data.items);
         } catch (error) {
@@ -102,10 +101,13 @@ const PickStatusManager = ({ open, onClose }) => {
               fullWidth
               className="mb-2"
             />
-            <Checkbox
-              checked={formData.allowPick}
-              onChange={(e) => setFormData({ ...formData, allowPick: e.target.checked })}
-            /> מאפשר ליקוט
+            <div className="flex items-center mb-2">
+              <Checkbox
+                checked={formData.allowPick}
+                onChange={(e) => setFormData({ ...formData, allowPick: e.target.checked })}
+              /> 
+              <span>מאפשר ליקוט</span>
+            </div>
             <Button onClick={handleSave} color="primary" className="mt-2">שמור</Button>
           </div>
         ) : null}
