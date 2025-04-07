@@ -33,8 +33,8 @@ const config =
 {
   "screenName": "capi",
   "apiName": {
-    "module": "test",
-    "name": "capi"
+    "module": "repSelectCust",
+    "name": "searchCustomers"
   },
   "fields": [
 
