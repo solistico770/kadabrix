@@ -137,7 +137,7 @@ const CartLine = ({
             )}
            
           </Box>
-        </TableCell>
+        </TableCell> 
       )}
       {!isMobile && !isTablet && (
         <TableCell>
