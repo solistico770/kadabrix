@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { PiPencilSimple, PiTrash } from 'react-icons/pi';
+import { PiPencilSimple, PiTrash, PiNotePencil, PiCheckCircle } from 'react-icons/pi';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material';
 import { supabaseUrl } from '../kdbConfig';
 import eventBus from '../event';
-import { updatePrice, discountSetItem, removeItem } from '../cartCommands';
+import { updatePrice, discountSetItem, removeItem, updateLineRemarks } from '../cartCommands';
 import CartQuantBtn from './CartQuantBtn';
 import {
   TableRow,
@@ -14,12 +14,15 @@ import {
   Stack,
   Tooltip,
   IconButton,
-  Avatar
+  Avatar,
+  Box,
+  Chip
 } from '@mui/material';
 
 // Import the separated dialog components
 import PriceEditDialog from './PriceEditDialog';
 import DiscountEditDialog from './DiscountEditDialog';
+import LineRemarksDialog from './LineRemarksDialog';
 
 // Cart Line Component
 const CartLine = ({ 
@@ -33,6 +36,7 @@ const CartLine = ({
 }) => {  
   const [priceEditOpen, setPriceEditOpen] = useState(false);
   const [discountEditOpen, setDiscountEditOpen] = useState(false);
+  const [lineRemarksOpen, setLineRemarksOpen] = useState(false);
   const theme = useTheme();
   
   const currencyFormat = (num) => {
@@ -43,27 +47,36 @@ const CartLine = ({
   const handlePriceUpdate = async (newPrice) => {
     try {
       await updatePrice(item.index, newPrice);
-      eventBus.emit("toast", { type: 'success', title: "הצלחה", text: "המחיר עודכן בהצלחה" });
+      showSnackbar('success', "המחיר עודכן בהצלחה");
     } catch (error) {
-      eventBus.emit("toast", { type: 'error', title: "שגיאה", text: "שגיאה בעדכון המחיר" });
+      showSnackbar('error', "שגיאה בעדכון המחיר");
     }
   };
 
   const handleDiscountUpdate = async (newDiscount) => {
     try {
       await discountSetItem(item.index, newDiscount);
-      eventBus.emit("toast", { type: 'success', title: "הצלחה", text: "ההנחה עודכנה בהצלחה" });
+      showSnackbar('success', "ההנחה עודכנה בהצלחה");
     } catch (error) {
-      eventBus.emit("toast", { type: 'error', title: "שגיאה", text: "שגיאה בעדכון ההנחה" });
+      showSnackbar('error', "שגיאה בעדכון ההנחה");
+    }
+  };
+
+  const handleLineRemarksUpdate = async (remarks) => {
+    try {
+      await updateLineRemarks(item.index, remarks);
+      showSnackbar('success', "ההערות עודכנו בהצלחה");
+    } catch (error) {
+      showSnackbar('error', "שגיאה בעדכון ההערות");
     }
   };
 
   const handleRemoveItem = async () => {
     try {
       await removeItem(item.index);
-      eventBus.emit("toast", { type: 'success', title: "הצלחה", text: "הפריט הוסר בהצלחה" });
+      showSnackbar('success', "הפריט הוסר בהצלחה");
     } catch (error) {
-      eventBus.emit("toast", { type: 'error', title: "שגיאה", text: "שגיאה בהסרת הפריט" });
+      showSnackbar('error', "שגיאה בהסרת הפריט");
     }
   };
 
@@ -77,6 +90,9 @@ const CartLine = ({
     e.target.onerror = null;
     e.target.src = '/path/to/fallback-image.png'; // Set a fallback image
   };
+
+  // Check if item has remarks
+  const hasRemarks = item.remarks && item.remarks.trim().length > 0;
 
   return (
     <TableRow 
@@ -110,14 +126,17 @@ const CartLine = ({
       </TableCell>
       {!isMobile && (
         <TableCell>
-          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            {item.partName}
-          </Typography>
-          {isMobile && (
-            <Typography variant="caption" color="text.secondary">
-              {item.partDes}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+            <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+              {item.partName}
             </Typography>
-          )}
+            {isMobile && (
+              <Typography variant="caption" color="text.secondary">
+                {item.partDes}
+              </Typography>
+            )}
+           
+          </Box>
         </TableCell>
       )}
       {!isMobile && !isTablet && (
@@ -191,14 +210,26 @@ const CartLine = ({
         </Typography>
       </TableCell>
       <TableCell>
-        <IconButton
-          onClick={handleRemoveItem}
-          size="small"
-          color="error"
-          sx={{ p: 0.5 }}
-        >
-          <PiTrash />
-        </IconButton>
+        <Stack direction="row" spacing={0.5}>
+          <Tooltip title={hasRemarks ? "ערוך הערות פריט" : "הוסף הערות לפריט"}>
+            <IconButton
+              onClick={() => setLineRemarksOpen(true)}
+              size="small"
+              color="info"
+              sx={{ p: 0.5 }}
+            >
+              {hasRemarks ? <PiCheckCircle /> : <PiNotePencil />}
+            </IconButton>
+          </Tooltip>
+          <IconButton
+            onClick={handleRemoveItem}
+            size="small"
+            color="error"
+            sx={{ p: 0.5 }}
+          >
+            <PiTrash />
+          </IconButton>
+        </Stack>
       </TableCell>
 
       {/* Price Edit Dialog */}
@@ -216,6 +247,15 @@ const CartLine = ({
         originalDiscount={item.discount || 0}
         itemName={item.partName}
         onSave={handleDiscountUpdate}
+      />
+
+      {/* Line Remarks Dialog */}
+      <LineRemarksDialog
+        open={lineRemarksOpen}
+        onClose={() => setLineRemarksOpen(false)}
+        itemName={item.partName}
+        currentRemarks={item.remarks || ''}
+        onSave={handleLineRemarksUpdate}
       />
     </TableRow>
   );

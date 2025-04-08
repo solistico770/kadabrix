@@ -121,3 +121,31 @@ export async function resetCart() {
         eventBus.emit("toast", { type:'error', title: "שגיאה", text: error });
     }
 }
+
+
+
+// New commands for remarks
+export async function updateCartRemarks(remarks) {
+    return await kdb.run({
+      'module': 'kdb_cart',
+      'name': 'updateCartRemarks',
+      "data":{
+        
+        'remarks': remarks
+
+      }
+    });
+  }
+  
+  export async function updateLineRemarks(index, remarks) {
+    return await kdb.run({
+      'module': 'kdb_cart',
+      'name': 'updateLineRemarks',
+        data:{
+            'index': index,
+            'remarks': remarks
+            
+        }
+    });
+  }
+

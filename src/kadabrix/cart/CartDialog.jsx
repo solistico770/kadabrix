@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { PiPencilSimple, PiTrash, PiPercent, PiShoppingCart, PiCheckCircle } from 'react-icons/pi';
+import { 
+  PiPencilSimple, 
+  PiTrash, 
+  PiPercent, 
+  PiShoppingCart, 
+  PiCheckCircle, 
+  PiNotePencil 
+} from 'react-icons/pi';
 import PropTypes from 'prop-types';
 import kdb from '../kadabrix.js';
 import { useCartStore } from '../cartState.jsx';
-import { resetCart } from '../cartCommands.js';
+import { resetCart, updateCartRemarks } from '../cartCommands.js';
 import eventBus from '../event.js';
 import {
   Dialog,
@@ -29,13 +36,16 @@ import {
   useMediaQuery,
   Card,
   CardContent,
-  Grid
+  Grid,
+  Tooltip,
+  Chip
 } from '@mui/material';
 
 
 // Import the separated components
 import CartLine from './CartLine';
 import BatchDiscountDialog from './BatchDiscountDialog';
+import OrderRemarksDialog from './OrderRemarksDialog';
 
 
 // Main Cart Dialog Component
@@ -51,6 +61,7 @@ function CartDialog(props) {
   const [orderConfirmOpen, setOrderConfirmOpen] = useState(false);
   const [orderNumber, setOrderNumber] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [remarksDialogOpen, setRemarksDialogOpen] = useState(false);
 
   useEffect(() => {
     // Reset selected items when cart changes
@@ -68,6 +79,15 @@ function CartDialog(props) {
       eventBus.emit("toast", { type: 'success', title: "הצלחה", text: "הסל נוקה בהצלחה" });
     } catch (error) {
       eventBus.emit("toast", { type: 'error', title: "שגיאה", text: "שגיאה בניקוי הסל" });
+    }
+  };
+
+  const handleSaveRemarks = async (remarks) => {
+    try {
+      await updateCartRemarks(remarks);
+      eventBus.emit("toast", { type: 'success', title: "הצלחה", text: "ההערות נשמרו בהצלחה" });
+    } catch (error) {
+      eventBus.emit("toast", { type: 'error', title: "שגיאה", text: "שגיאה בשמירת ההערות" });
     }
   };
 
@@ -118,6 +138,9 @@ function CartDialog(props) {
 
   // Determine if the dialog should be fullscreen based on screen size
   const fullScreen = isMobile;
+  
+  // Check if order has remarks
+  const hasRemarks = cart?.orderRemarks && cart.orderRemarks.trim().length > 0;
 
   return (
     <>
@@ -149,22 +172,39 @@ function CartDialog(props) {
           alignItems: 'center',
           direction: 'rtl' // RTL support
         }}>
-          <Typography variant="h6" component="div">
-            סל הקניות
-          </Typography>
-          {selectedItems.length > 0 && (
-            <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography variant="h6" component="div">
+              סל הקניות
+            </Typography>
+                          {hasRemarks && (
+              <Tooltip title="יש הערות להזמנה">
+                <Chip 
+                  icon={<PiCheckCircle />} 
+                  label="הערות" 
+                  size="small" 
+                  color="warning"
+                  variant="filled" 
+                  clickable
+                  onClick={() => setRemarksDialogOpen(true)}
+                  sx={{ mr: 1, ml: 2 }}
+                />
+              </Tooltip>
+            )}
+          </Box>
+          
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {selectedItems.length > 0 && (
               <Button 
                 variant="contained" 
                 color="secondary"
                 startIcon={<PiPercent />}
                 onClick={handleBatchDiscount}
-                sx={{ ml: 2 }}
+                size="small"
               >
                 הנחה מרוכזת ({selectedItems.length})
               </Button>
-            </Box>
-          )}
+            )}
+          </Box>
         </DialogTitle>
 
         <DialogContent 
@@ -219,7 +259,7 @@ function CartDialog(props) {
                         <TableCell>כמות</TableCell>
                         {!isMobile && <TableCell>הנחה</TableCell>}
                         <TableCell>סה"כ</TableCell>
-                        <TableCell></TableCell>
+                        <TableCell>פעולות</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -232,7 +272,7 @@ function CartDialog(props) {
                           isTablet={isTablet}
                           isSelected={selectedItems.includes(item.index)}
                           onToggleSelect={() => toggleItemSelection(item.index)}
-                          
+                          showSnackbar={(type, message) => eventBus.emit("toast", { type, title: type === 'success' ? "הצלחה" : "שגיאה", text: message })}
                         />
                       ))}
                       <TableRow sx={{ backgroundColor: theme.palette.grey[50] }}>
@@ -309,34 +349,50 @@ function CartDialog(props) {
         <DialogActions sx={{ 
           backgroundColor: theme.palette.grey[100],
           p: 2,
-          direction: 'rtl' // RTL support
+          direction: 'rtl', // RTL support
+          display: 'flex',
+          justifyContent: 'space-between'
         }}>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            onClick={placeOrder}
-            disabled={!cart.items || cart.items.length === 0 || isProcessing}
-            sx={{ borderRadius: 2 }}
-          >
-            {isProcessing ? 'מעבד...' : 'שלח הזמנה'}
-          </Button>
-          <Button 
-            variant="outlined" 
-            color="error" 
-            onClick={clearCart}
-            disabled={!cart.items || cart.items.length === 0 || isProcessing}
-            sx={{ borderRadius: 2 }}
-          >
-            נקה סל
-          </Button>
-          <Button 
-            variant="outlined" 
-            onClick={handleClose}
-            disabled={isProcessing}
-            sx={{ borderRadius: 2 }}
-          >
-            סגור חלון
-          </Button>
+          <Box>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={placeOrder}
+              disabled={!cart.items || cart.items.length === 0 || isProcessing}
+              sx={{ borderRadius: 2, mr: 1 }}
+            >
+              {isProcessing ? 'מעבד...' : 'שלח הזמנה'}
+            </Button>
+            <Button 
+              variant="outlined" 
+              color="info" 
+              onClick={() => setRemarksDialogOpen(true)}
+              disabled={!cart.items || cart.items.length === 0 || isProcessing}
+              startIcon={hasRemarks ? <PiCheckCircle /> : <PiNotePencil />}
+              sx={{ borderRadius: 2, mr: 1 }}
+            >
+              {hasRemarks ? 'ערוך הערות' : 'הוסף הערות'}
+            </Button>
+          </Box>
+          <Box>
+            <Button 
+              variant="outlined" 
+              color="error" 
+              onClick={clearCart}
+              disabled={!cart.items || cart.items.length === 0 || isProcessing}
+              sx={{ borderRadius: 2, ml: 1 }}
+            >
+              נקה סל
+            </Button>
+            <Button 
+              variant="outlined" 
+              onClick={handleClose}
+              disabled={isProcessing}
+              sx={{ borderRadius: 2 }}
+            >
+              סגור חלון
+            </Button>
+          </Box>
         </DialogActions>
       </Dialog>
 
@@ -397,6 +453,15 @@ function CartDialog(props) {
         open={batchDiscountOpen} 
         onClose={() => setBatchDiscountOpen(false)}
         selectedItems={selectedItems}
+        showSnackbar={(type, message) => eventBus.emit("toast", { type, title: type === 'success' ? "הצלחה" : "שגיאה", text: message })}
+      />
+
+      {/* Order Remarks Dialog */}
+      <OrderRemarksDialog
+        open={remarksDialogOpen}
+        onClose={() => setRemarksDialogOpen(false)}
+        currentRemarks={cart?.orderRemarks || ''}
+        onSave={handleSaveRemarks}
       />
     </>
   );
