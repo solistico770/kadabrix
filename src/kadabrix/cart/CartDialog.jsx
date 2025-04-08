@@ -501,7 +501,7 @@ const EmptyCart = () => {
         ניתן להוסיף מוצרים מהקטלוג
       </Typography>
     </Box>
-  );
+  ); 
 };
 
 CartDialog.propTypes = {
