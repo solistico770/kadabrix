@@ -508,5 +508,5 @@ CartDialog.propTypes = {
   onClose: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
 };
-
+ 
 export default CartDialog;
